@@ -7,11 +7,11 @@
 
 ## General Questions
 
-### What is Reconcilify?
+### What is Settler?
 
-Reconcilify is a Reconciliation-as-a-Service (RaaS) platform that automates financial and event data reconciliation across fragmented SaaS and e-commerce ecosystems. Think "Stripe for reconciliation"—dead-simple onboarding, pure API, usage-based pricing, and composable adapters for every platform.
+Settler is a Reconciliation-as-a-Service (RaaS) platform that automates financial and event data reconciliation across fragmented SaaS and e-commerce ecosystems. Think "Stripe for reconciliation"—dead-simple onboarding, pure API, usage-based pricing, and composable adapters for every platform.
 
-### How is Reconcilify different from legacy reconciliation solutions?
+### How is Settler different from legacy reconciliation solutions?
 
 **Key Differentiators:**
 - ⚡ **Fast:** 5-minute integration vs. 3-6 month implementations
@@ -21,9 +21,9 @@ Reconcilify is a Reconciliation-as-a-Service (RaaS) platform that automates fina
 
 **Comparison:**
 - **BlackLine:** $100K+/year, 3-6 month setup, UI-heavy
-- **Reconcilify:** $1K-$10K+/month, 5-minute setup, API-first
+- **Settler:** $1K-$10K+/month, 5-minute setup, API-first
 
-### What platforms does Reconcilify support?
+### What platforms does Settler support?
 
 **Built-in Adapters:**
 - Stripe (payments)
@@ -56,7 +56,7 @@ Reconcilify is a Reconciliation-as-a-Service (RaaS) platform that automates fina
 
 ## Security & Compliance
 
-### Is Reconcilify SOC 2 Type II certified?
+### Is Settler SOC 2 Type II certified?
 
 **Status:** In Progress (Target: Q2 2026)
 
@@ -77,7 +77,7 @@ Reconcilify is a Reconciliation-as-a-Service (RaaS) platform that automates fina
 - We can schedule security review calls
 - We can provide audit reports (once certified)
 
-### Is Reconcilify GDPR compliant?
+### Is Settler GDPR compliant?
 
 **Yes, GDPR compliant by design:**
 
@@ -97,7 +97,7 @@ Reconcilify is a Reconciliation-as-a-Service (RaaS) platform that automates fina
 - Delete all data via API (`DELETE /api/v1/users/{id}/data`)
 - Request data processing information
 
-### Is Reconcilify PCI-DSS compliant?
+### Is Settler PCI-DSS compliant?
 
 **Status:** Not applicable (we don't store card data)
 
@@ -111,7 +111,7 @@ Reconcilify is a Reconciliation-as-a-Service (RaaS) platform that automates fina
 - Timeline: 6-12 months
 - Cost: Included in Enterprise plan
 
-### Is Reconcilify HIPAA compliant?
+### Is Settler HIPAA compliant?
 
 **Status:** HIPAA-ready (on-demand)
 
@@ -240,7 +240,7 @@ Reconcilify is a Reconciliation-as-a-Service (RaaS) platform that automates fina
 - Standard: 99.9% uptime
 - Enterprise: 99.99% uptime (custom SLA available)
 
-### Can we self-host Reconcilify?
+### Can we self-host Settler?
 
 **Yes, self-hosted option available:**
 
@@ -263,15 +263,15 @@ Reconcilify is a Reconciliation-as-a-Service (RaaS) platform that automates fina
 - Kubernetes (production)
 - Deployment guides available
 
-**Contact:** enterprise@reconcilify.io for deployment guides
+**Contact:** enterprise@settler.io for deployment guides
 
 ### How do webhooks work?
 
 **Webhook Flow:**
 1. Reconciliation event occurs (matched, mismatch, error)
-2. Reconcilify sends HTTP POST to your webhook URL
+2. Settler sends HTTP POST to your webhook URL
 3. Your server processes the webhook
-4. Your server returns 200 OK (or Reconcilify retries)
+4. Your server returns 200 OK (or Settler retries)
 
 **Webhook Security:**
 - Webhook secrets to verify signatures
@@ -354,7 +354,7 @@ DELETE /api/v1/users/{id}/data
 - Custom contracts available
 - Annual billing discounts (10-15%)
 
-**Contact:** sales@reconcilify.io for custom pricing
+**Contact:** sales@settler.io for custom pricing
 
 ### Are there setup fees?
 
@@ -399,7 +399,7 @@ DELETE /api/v1/users/{id}/data
 - Equivalent to 1-2 months free
 - Custom contracts available
 
-**Contact:** sales@reconcilify.io for annual pricing
+**Contact:** sales@settler.io for annual pricing
 
 ---
 
@@ -412,7 +412,7 @@ DELETE /api/v1/users/{id}/data
 - 1-hour SLA (critical issues)
 - 4-hour SLA (high priority)
 - 24/7 support available
-- Slack channel (#reconcilify-enterprise)
+- Slack channel (#settler-enterprise)
 - Phone support (Enterprise)
 
 **Standard Support:**
@@ -479,16 +479,16 @@ DELETE /api/v1/users/{id}/data
 
 ## Integration Questions
 
-### How do we integrate Reconcilify?
+### How do we integrate Settler?
 
 **Integration Options:**
 
 **1. REST API:**
 ```typescript
-import Reconcilify from '@reconcilify/sdk';
+import Settler from '@settler/sdk';
 
-const client = new Reconcilify({
-  apiKey: process.env.RECONCILIFY_API_KEY,
+const client = new Settler({
+  apiKey: process.env.SETTLER_API_KEY,
 });
 
 const job = await client.jobs.create({ /* config */ });
@@ -520,7 +520,7 @@ app.post('/webhooks/reconcile', async (req, res) => {
 - OpenAPI/Swagger documentation
 - Code examples available
 
-### Can we use Reconcilify with our existing systems?
+### Can we use Settler with our existing systems?
 
 **Yes, API-first design:**
 
@@ -546,16 +546,16 @@ app.post('/webhooks/reconcile', async (req, res) => {
 - Custom email templates
 - Custom webhook endpoints
 
-**Contact:** enterprise@reconcilify.io for white-label options
+**Contact:** enterprise@settler.io for white-label options
 
 ---
 
 ## Contact
 
-**Sales:** sales@reconcilify.io  
-**Enterprise:** enterprise@reconcilify.io  
-**Security:** security@reconcilify.io  
-**Support:** support@reconcilify.io
+**Sales:** sales@settler.io  
+**Enterprise:** enterprise@settler.io  
+**Security:** security@settler.io  
+**Support:** support@settler.io
 
 **Phone:** (Coming soon for Enterprise)
 

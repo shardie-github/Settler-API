@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-[Brand] is a fast-growing e-commerce platform processing thousands of orders daily across multiple payment providers. Before Reconcilify, their finance team spent 40+ hours per week manually reconciling transactions between Shopify, Stripe, PayPal, and QuickBooks. After implementing Reconcilify, they automated 100% of reconciliation, reduced errors by 95%, and saved $X per month in operational costs.
+[Brand] is a fast-growing e-commerce platform processing thousands of orders daily across multiple payment providers. Before Settler, their finance team spent 40+ hours per week manually reconciling transactions between Shopify, Stripe, PayPal, and QuickBooks. After implementing Settler, they automated 100% of reconciliation, reduced errors by 95%, and saved $X per month in operational costs.
 
 **Key Results:**
 - ⏱️ **Time Saved:** 40 hours/week (2,080 hours/year)
@@ -61,7 +61,7 @@
 
 ### The Cost
 
-**Annual Costs (Before Reconcilify):**
+**Annual Costs (Before Settler):**
 - Finance team time: 2,080 hours/year × $50/hour = **$104,000/year**
 - Error investigation: 200 hours/year × $50/hour = **$10,000/year**
 - Revenue leakage (unmatched transactions): **$X,XXX/year**
@@ -72,7 +72,7 @@
 
 ## The Solution
 
-### Why Reconcilify?
+### Why Settler?
 
 [Brand] evaluated several options:
 
@@ -88,7 +88,7 @@
 - **Risk:** Medium (complex setup, vendor lock-in)
 - **Verdict:** Too expensive, too complex
 
-**Option 3: Reconcilify**
+**Option 3: Settler**
 - **Timeline:** 3 days
 - **Cost:** $99/month (Growth plan)
 - **Risk:** Low (managed service, API-first)
@@ -104,7 +104,7 @@
 ### Implementation
 
 **Day 1: Setup (2 hours)**
-- Created Reconcilify account
+- Created Settler account
 - Configured Stripe adapter (15 minutes)
 - Configured Shopify adapter (15 minutes)
 - Configured PayPal adapter (15 minutes)
@@ -113,7 +113,7 @@
 - Tested with sample data (30 minutes)
 
 **Day 2: Integration (4 hours)**
-- Integrated Reconcilify API into existing systems
+- Integrated Settler API into existing systems
 - Set up webhooks for real-time reconciliation
 - Configured matching rules (order ID, amount, date)
 - Tested end-to-end reconciliation flow
@@ -174,13 +174,13 @@
 
 ### Time Savings
 
-**Before Reconcilify:**
+**Before Settler:**
 - Daily reconciliation: 8 hours/day × 5 days = **40 hours/week**
 - Weekly QuickBooks reconciliation: 4 hours/week
 - Monthly reporting: 8 hours/month
 - **Total: 2,080 hours/year**
 
-**After Reconcilify:**
+**After Settler:**
 - Daily reconciliation: **0 hours** (automated)
 - Weekly QuickBooks reconciliation: **0 hours** (automated)
 - Monthly reporting: **1 hour/month** (review automated reports)
@@ -202,7 +202,7 @@
 - Reduced audit costs: **$X,XXX/year** (cleaner books)
 - **Total Indirect Savings: $XX,XXX/year**
 
-**Reconcilify Cost:**
+**Settler Cost:**
 - Growth plan: $99/month = **$1,188/year**
 
 **Net Savings:** **$XXX,XXX/year**
@@ -211,14 +211,14 @@
 
 ### Accuracy Improvements
 
-**Before Reconcilify:**
+**Before Settler:**
 - Manual matching accuracy: **92%**
 - Error rate: **8%**
 - Unmatched transactions: **5%**
 - Duplicate charges missed: **1%**
 - Refund mismatches: **2%**
 
-**After Reconcilify:**
+**After Settler:**
 - Automated matching accuracy: **99.8%**
 - Error rate: **0.2%**
 - Unmatched transactions: **0.1%** (flagged for review)
@@ -229,12 +229,12 @@
 
 ### Scalability
 
-**Before Reconcilify:**
+**Before Settler:**
 - Process broke down during peak seasons
 - Required hiring additional finance staff
 - Manual process didn't scale with growth
 
-**After Reconcilify:**
+**After Settler:**
 - Handles 10x transaction volume without additional resources
 - No additional staff needed
 - Process scales automatically with business growth
@@ -269,7 +269,7 @@
 
 ## Customer Testimonial
 
-> "Reconcilify transformed our finance operations. What used to take 40 hours per week now happens automatically. Our finance team can finally focus on what matters—analyzing our business and driving growth—instead of manually matching transactions in Excel."
+> "Settler transformed our finance operations. What used to take 40 hours per week now happens automatically. Our finance team can finally focus on what matters—analyzing our business and driving growth—instead of manually matching transactions in Excel."
 >
 > **— [Name], CFO, [Brand]**
 
@@ -292,11 +292,11 @@
 - **Stripe:** REST API + Webhooks
 - **PayPal:** REST API + Webhooks
 - **QuickBooks:** REST API + OAuth 2.0
-- **Reconcilify:** REST API + Webhooks
+- **Settler:** REST API + Webhooks
 
 **Data Flow:**
 ```
-Shopify Orders → Reconcilify → Stripe Payments
+Shopify Orders → Settler → Stripe Payments
                     ↓
               QuickBooks Books
 ```
@@ -304,7 +304,7 @@ Shopify Orders → Reconcilify → Stripe Payments
 **Reconciliation Process:**
 1. Orders flow from Shopify via webhooks
 2. Payments flow from Stripe/PayPal via webhooks
-3. Reconcilify matches transactions in real-time
+3. Settler matches transactions in real-time
 4. Matched transactions automatically posted to QuickBooks
 5. Unmatched transactions flagged for review
 6. Daily reports generated automatically
@@ -384,7 +384,7 @@ Shopify Orders → Reconcilify → Stripe Payments
 
 ## Conclusion
 
-Reconcilify enabled [Brand] to automate 100% of their reconciliation process, saving 40 hours per week and $XXX,XXX per year. The 3-day implementation, 99.8% accuracy, and real-time visibility transformed their finance operations, allowing the team to focus on strategic work instead of manual data matching.
+Settler enabled [Brand] to automate 100% of their reconciliation process, saving 40 hours per week and $XXX,XXX per year. The 3-day implementation, 99.8% accuracy, and real-time visibility transformed their finance operations, allowing the team to focus on strategic work instead of manual data matching.
 
 **Key Takeaways:**
 - ⚡ **Fast Implementation:** 3 days vs. 6 months
@@ -395,7 +395,7 @@ Reconcilify enabled [Brand] to automate 100% of their reconciliation process, sa
 
 **Ready to transform your reconciliation process?**
 
-[Get Started →](https://reconcilify.io/signup) | [Schedule Demo →](https://reconcilify.io/demo) | [Contact Sales →](mailto:sales@reconcilify.io)
+[Get Started →](https://settler.io/signup) | [Schedule Demo →](https://settler.io/demo) | [Contact Sales →](mailto:sales@settler.io)
 
 ---
 
@@ -409,7 +409,7 @@ Reconcilify enabled [Brand] to automate 100% of their reconciliation process, sa
 
 ## Appendix: Before & After Comparison
 
-### Before Reconcilify
+### Before Settler
 
 | Metric | Value |
 |--------|-------|
@@ -422,7 +422,7 @@ Reconcilify enabled [Brand] to automate 100% of their reconciliation process, sa
 | **Scalability** | Limited (hiring required) |
 | **Cost** | $XXX,XXX/year |
 
-### After Reconcilify
+### After Settler
 
 | Metric | Value |
 |--------|-------|

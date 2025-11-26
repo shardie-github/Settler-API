@@ -7,7 +7,7 @@
 
 ## Overview
 
-This guide walks enterprise customers through the onboarding process for Reconcilify, from initial setup to production deployment. Typical onboarding takes **1-2 weeks** depending on complexity.
+This guide walks enterprise customers through the onboarding process for Settler, from initial setup to production deployment. Typical onboarding takes **1-2 weeks** depending on complexity.
 
 ### Onboarding Timeline
 
@@ -70,10 +70,10 @@ This guide walks enterprise customers through the onboarding process for Reconci
 4. Access granted to dashboard and API
 
 **Initial Access:**
-- **Dashboard:** `https://app.reconcilify.io`
-- **API:** `https://api.reconcilify.io`
-- **Documentation:** `https://docs.reconcilify.io`
-- **Support Portal:** `https://support.reconcilify.io`
+- **Dashboard:** `https://app.settler.io`
+- **API:** `https://api.settler.io`
+- **Documentation:** `https://docs.settler.io`
+- **Support Portal:** `https://support.settler.io`
 
 **API Keys Provided:**
 - **Production:** `sk_live_...` (for production use)
@@ -108,7 +108,7 @@ const stripeConfig = {
 
 **API Test:**
 ```bash
-curl -X POST https://api.reconcilify.io/api/v1/adapters/stripe/test \
+curl -X POST https://api.settler.io/api/v1/adapters/stripe/test \
   -H "X-API-Key: sk_test_..." \
   -H "Content-Type: application/json" \
   -d '{"apiKey": "sk_test_..."}'
@@ -159,10 +159,10 @@ const quickbooksConfig = {
 **Create your first reconciliation job:**
 
 ```typescript
-import Reconcilify from '@reconcilify/sdk';
+import Settler from '@settler/sdk';
 
-const client = new Reconcilify({
-  apiKey: process.env.RECONCILIFY_API_KEY,
+const client = new Settler({
+  apiKey: process.env.SETTLER_API_KEY,
 });
 
 // Create reconciliation job
@@ -244,16 +244,16 @@ console.log(report.summary);
 
 ### Step 1: API Integration
 
-**Integrate Reconcilify into your application:**
+**Integrate Settler into your application:**
 
 ```typescript
 // Example: Express.js webhook handler
 import express from 'express';
-import Reconcilify from '@reconcilify/sdk';
+import Settler from '@settler/sdk';
 
 const app = express();
-const reconcilify = new Reconcilify({
-  apiKey: process.env.RECONCILIFY_API_KEY,
+const settler = new Settler({
+  apiKey: process.env.SETTLER_API_KEY,
 });
 
 // Webhook endpoint for reconciliation events
@@ -287,7 +287,7 @@ app.post('/webhooks/reconcile', async (req, res) => {
 
 ```typescript
 // Create webhook endpoint
-const webhook = await reconcilify.webhooks.create({
+const webhook = await settler.webhooks.create({
   url: 'https://your-app.com/webhooks/reconcile',
   events: [
     'reconciliation.matched',
@@ -321,7 +321,7 @@ function verifyWebhookSignature(payload, signature, secret) {
 ```typescript
 // Monitor job execution
 async function monitorJob(jobId: string) {
-  const job = await reconcilify.jobs.get(jobId);
+  const job = await settler.jobs.get(jobId);
   
   if (job.status === 'failed') {
     // Alert team
@@ -333,7 +333,7 @@ async function monitorJob(jobId: string) {
   }
   
   // Check for unmatched transactions
-  const report = await reconcilify.reports.get(jobId);
+  const report = await settler.reports.get(jobId);
   if (report.summary.unmatched > 0) {
     // Alert finance team
     await sendAlert({
@@ -378,19 +378,19 @@ setInterval(() => monitorJob(jobId), 60 * 60 * 1000);
 
 1. **Switch to Production API Keys:**
    ```bash
-   export RECONCILIFY_API_KEY="sk_live_..."
+   export SETTLER_API_KEY="sk_live_..."
    ```
 
 2. **Update Webhook URLs:**
    ```typescript
-   await reconcilify.webhooks.update(webhookId, {
+   await settler.webhooks.update(webhookId, {
      url: 'https://your-production-app.com/webhooks/reconcile',
    });
    ```
 
 3. **Enable Scheduled Jobs:**
    ```typescript
-   await reconcilify.jobs.update(jobId, {
+   await settler.jobs.update(jobId, {
      status: 'active',
    });
    ```
@@ -438,8 +438,8 @@ setInterval(() => monitorJob(jobId), 60 * 60 * 1000);
 ### Support Transition
 
 **Support Channels:**
-- **Email:** support@reconcilify.io
-- **Slack:** #reconcilify-support (Enterprise)
+- **Email:** support@settler.io
+- **Slack:** #settler-support (Enterprise)
 - **Phone:** (Enterprise only)
 - **Dashboard:** In-app support chat
 
@@ -462,14 +462,14 @@ A: Typical onboarding takes 1-2 weeks, depending on complexity. Simple use cases
 A: Yes, we recommend having a developer or DevOps engineer available for integration work (approximately 20-40 hours total).
 
 **Q: Can we use our existing infrastructure?**  
-A: Yes! Reconcilify is API-first and integrates with your existing systems. No infrastructure changes required on your end.
+A: Yes! Settler is API-first and integrates with your existing systems. No infrastructure changes required on your end.
 
 **Q: What if we need custom adapters?**  
 A: We can develop custom adapters for your platforms. Typical timeline: 2-4 weeks. Cost: $500 one-time + $50/month maintenance.
 
 ### Security & Compliance
 
-**Q: Is Reconcilify SOC 2 Type II certified?**  
+**Q: Is Settler SOC 2 Type II certified?**  
 A: We're actively pursuing SOC 2 Type II certification (target: Q2 2026). All SOC 2 controls are implemented from day one.
 
 **Q: Can we use our own encryption keys?**  
@@ -486,11 +486,11 @@ A: We have a 24-hour breach notification SLA. Affected customers are notified vi
 **Q: What's the API rate limit?**  
 A: Enterprise customers have custom rate limits (typically 10,000+ requests/15 min). Contact your account manager for specifics.
 
-**Q: Can we self-host Reconcilify?**  
-A: Yes, the self-hosted core is available under AGPL v3 license. Contact enterprise@reconcilify.io for deployment guides.
+**Q: Can we self-host Settler?**  
+A: Yes, the self-hosted core is available under AGPL v3 license. Contact enterprise@settler.io for deployment guides.
 
 **Q: How do we handle webhook failures?**  
-A: Reconcilify automatically retries failed webhook deliveries (exponential backoff, up to 3 retries). You can also implement idempotency on your end.
+A: Settler automatically retries failed webhook deliveries (exponential backoff, up to 3 retries). You can also implement idempotency on your end.
 
 **Q: Can we export all our data?**  
 A: Yes, you can export all data via our data export API (GDPR compliant). Data is available in JSON or CSV format.
@@ -517,14 +517,14 @@ A: Enterprise customers have custom limits. Overage charges are discussed and ap
 
 **During Onboarding:**
 - **Account Manager:** Your dedicated point of contact
-- **Technical Support:** support@reconcilify.io
-- **Slack Channel:** #reconcilify-enterprise (invite-only)
+- **Technical Support:** support@settler.io
+- **Slack Channel:** #settler-enterprise (invite-only)
 
 **After Onboarding:**
-- **Support Portal:** https://support.reconcilify.io
-- **Documentation:** https://docs.reconcilify.io
-- **API Reference:** https://docs.reconcilify.io/api
-- **Status Page:** https://status.reconcilify.io
+- **Support Portal:** https://support.settler.io
+- **Documentation:** https://docs.settler.io
+- **API Reference:** https://docs.settler.io/api
+- **Status Page:** https://status.settler.io
 
 ### Additional Resources
 
@@ -536,6 +536,6 @@ A: Enterprise customers have custom limits. Overage charges are discussed and ap
 
 ---
 
-**Questions? Contact your account manager or support@reconcilify.io**
+**Questions? Contact your account manager or support@settler.io**
 
 **This guide is updated quarterly. Last update: January 2026.**

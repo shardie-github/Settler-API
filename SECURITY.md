@@ -9,7 +9,7 @@ We take security seriously. If you discover a security vulnerability, please rep
 
 ### How to Report
 
-**Email:** security@reconcilify.io  
+**Email:** security@settler.io  
 **Subject:** `[SECURITY] Brief description of the issue`
 
 **Please include:**
@@ -72,7 +72,7 @@ Rewards are determined by impact, exploitability, and report quality.
 **Best Practices for Users:**
 ```bash
 # ✅ DO: Use environment variables
-export RECONCILIFY_API_KEY="sk_live_..."
+export SETTLER_API_KEY="sk_live_..."
 
 # ✅ DO: Use secret management tools
 # AWS Secrets Manager, HashiCorp Vault, etc.
@@ -81,7 +81,7 @@ export RECONCILIFY_API_KEY="sk_live_..."
 const apiKey = "sk_live_abc123"; // NEVER DO THIS
 
 # ❌ DON'T: Commit to git
-echo "RECONCILIFY_API_KEY=sk_live_..." >> .env
+echo "SETTLER_API_KEY=sk_live_..." >> .env
 git add .env  # NEVER DO THIS
 ```
 
@@ -181,9 +181,9 @@ What You Should Do:
 
 We take this incident seriously and apologize for any inconvenience.
 
-Questions? Contact security@reconcilify.io
+Questions? Contact security@settler.io
 
-- The Reconcilify Security Team
+- The Settler Security Team
 ```
 
 #### Regulatory Compliance
@@ -500,9 +500,9 @@ const rateLimiter = rateLimit({
 - [Compliance Documentation](./docs/compliance.md)
 
 **Support:**
-- **Security Issues:** security@reconcilify.io
-- **General Support:** support@reconcilify.io
-- **Status Page:** status.reconcilify.io
+- **Security Issues:** security@settler.io
+- **General Support:** support@settler.io
+- **Status Page:** status.settler.io
 
 **External Resources:**
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)

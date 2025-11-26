@@ -1,4 +1,4 @@
-# Enterprise Battlecard: Reconcilify vs. Legacy Solutions
+# Enterprise Battlecard: Settler vs. Legacy Solutions
 
 **Last Updated:** January 2026  
 **Audience:** Enterprise Sales, Security Teams, Technical Evaluators
@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-Reconcilify is a modern, API-first reconciliation platform built for the cloud-native era. Unlike legacy solutions that require months of implementation and expensive infrastructure, Reconcilify delivers enterprise-grade reconciliation in minutes with a developer-friendly API.
+Settler is a modern, API-first reconciliation platform built for the cloud-native era. Unlike legacy solutions that require months of implementation and expensive infrastructure, Settler delivers enterprise-grade reconciliation in minutes with a developer-friendly API.
 
 **Key Differentiators:**
 - ⚡ **Fast:** 5-minute integration vs. 3-6 month implementations
@@ -17,11 +17,11 @@ Reconcilify is a modern, API-first reconciliation platform built for the cloud-n
 
 ---
 
-## Why Reconcilify is Safe
+## Why Settler is Safe
 
 ### Security & Compliance
 
-| Feature | Reconcilify | Legacy Solutions |
+| Feature | Settler | Legacy Solutions |
 |---------|-------------|------------------|
 | **SOC 2 Type II** | ✅ In Progress (Q2 2026) | ✅ Available (but expensive) |
 | **GDPR Compliance** | ✅ Built-in (data export/deletion APIs) | ⚠️ Requires custom work |
@@ -76,11 +76,11 @@ Reconcilify is a modern, API-first reconciliation platform built for the cloud-n
 
 ---
 
-## Why Reconcilify is Fast
+## Why Settler is Fast
 
 ### Implementation Speed
 
-| Metric | Reconcilify | Legacy Solutions |
+| Metric | Settler | Legacy Solutions |
 |--------|-------------|------------------|
 | **Time to First Reconciliation** | 5 minutes | 3-6 months |
 | **API Integration** | REST API, TypeScript SDK | Custom integrations, consultants |
@@ -93,10 +93,10 @@ Reconcilify is a modern, API-first reconciliation platform built for the cloud-n
 
 **API-First Design:**
 ```typescript
-// Reconcilify: 5 lines of code
-import Reconcilify from '@reconcilify/sdk';
+// Settler: 5 lines of code
+import Settler from '@settler/sdk';
 
-const client = new Reconcilify({ apiKey: process.env.API_KEY });
+const client = new Settler({ apiKey: process.env.API_KEY });
 const job = await client.jobs.create({ /* config */ });
 const report = await client.reports.get(job.id);
 ```
@@ -134,7 +134,7 @@ const report = await client.reports.get(job.id);
 
 ---
 
-## Why Reconcilify is API-First
+## Why Settler is API-First
 
 ### API Coverage
 
@@ -181,7 +181,7 @@ const report = await client.reports.get(job.id);
 
 ---
 
-## Why Reconcilify is Future-Proof
+## Why Settler is Future-Proof
 
 ### Cloud-Native Architecture
 
@@ -245,7 +245,7 @@ const report = await client.reports.get(job.id);
 
 ### vs. BlackLine (Enterprise Reconciliation)
 
-| Feature | Reconcilify | BlackLine |
+| Feature | Settler | BlackLine |
 |---------|-------------|-----------|
 | **Setup Time** | 5 minutes | 3-6 months |
 | **Pricing** | $29-$299/month | $100K+/year |
@@ -255,11 +255,11 @@ const report = await client.reports.get(job.id);
 | **Customization** | ✅ Adapter SDK | ⚠️ Requires consultants |
 | **Best For** | Modern SaaS, e-commerce | Large enterprises, finance teams |
 
-**Reconcilify Wins:** Speed, cost, developer experience, API-first design
+**Settler Wins:** Speed, cost, developer experience, API-first design
 
 ### vs. QuickBooks (Accounting Software)
 
-| Feature | Reconcilify | QuickBooks |
+| Feature | Settler | QuickBooks |
 |---------|-------------|------------|
 | **Reconciliation** | ✅ Automated, real-time | ⚠️ Manual, batch |
 | **Multi-Platform** | ✅ Any platform (adapters) | ⚠️ Limited integrations |
@@ -268,11 +268,11 @@ const report = await client.reports.get(job.id);
 | **Real-Time** | ✅ Webhook-based | ❌ Daily sync |
 | **Best For** | Developers, automation | Small businesses, accountants |
 
-**Reconcilify Wins:** Automation, multi-platform support, real-time processing
+**Settler Wins:** Automation, multi-platform support, real-time processing
 
 ### vs. Fivetran (ETL/Data Pipeline)
 
-| Feature | Reconcilify | Fivetran |
+| Feature | Settler | Fivetran |
 |---------|-------------|----------|
 | **Purpose** | ✅ Reconciliation-focused | ⚠️ General ETL |
 | **Matching Engine** | ✅ Built-in matching rules | ❌ Requires custom logic |
@@ -281,11 +281,11 @@ const report = await client.reports.get(job.id);
 - **Pricing** | ✅ Usage-based ($29-$299/month) | ⚠️ Volume-based ($500+/month) |
 | **Best For** | Financial reconciliation | Data warehousing, analytics |
 
-**Reconcilify Wins:** Purpose-built for reconciliation, built-in matching, cost-effective
+**Settler Wins:** Purpose-built for reconciliation, built-in matching, cost-effective
 
 ### vs. Custom Scripts (DIY)
 
-| Feature | Reconcilify | Custom Scripts |
+| Feature | Settler | Custom Scripts |
 |---------|-------------|----------------|
 | **Development Time** | ✅ 5 minutes | ❌ Weeks/months |
 | **Maintenance** | ✅ Managed service | ❌ Ongoing maintenance |
@@ -295,17 +295,17 @@ const report = await client.reports.get(job.id);
 | **Audit Logging** | ✅ Immutable logs | ❌ Custom logging |
 | **Best For** | Production use | Learning, prototyping |
 
-**Reconcilify Wins:** Time to market, compliance, scalability, reliability
+**Settler Wins:** Time to market, compliance, scalability, reliability
 
 ---
 
-## Use Cases Where Reconcilify Excels
+## Use Cases Where Settler Excels
 
 ### 1. E-commerce Order Reconciliation
 
 **Challenge:** Shopify orders vs. Stripe payments reconciliation
 
-**Reconcilify Solution:**
+**Settler Solution:**
 - 5-minute setup with Shopify + Stripe adapters
 - Real-time webhook reconciliation
 - Automated daily reports
@@ -321,7 +321,7 @@ const report = await client.reports.get(job.id);
 
 **Challenge:** Stripe + PayPal + Square payments vs. QuickBooks
 
-**Reconcilify Solution:**
+**Settler Solution:**
 - Single reconciliation job for all platforms
 - Unified reports across platforms
 - Multi-currency support
@@ -337,7 +337,7 @@ const report = await client.reports.get(job.id);
 
 **Challenge:** Stripe subscriptions vs. internal database vs. accounting system
 
-**Reconcilify Solution:**
+**Settler Solution:**
 - Custom adapters for internal systems
 - Real-time webhook reconciliation
 - Automated revenue recognition reports
@@ -355,7 +355,7 @@ const report = await client.reports.get(job.id);
 
 ### Cost Comparison (Annual)
 
-**Reconcilify (Growth Plan):**
+**Settler (Growth Plan):**
 - Subscription: $99/month × 12 = $1,188/year
 - Setup time: 5 minutes (developer time: $0)
 - Maintenance: Managed (included)
@@ -377,7 +377,7 @@ const report = await client.reports.get(job.id);
 
 ### Time Savings
 
-**Reconcilify:**
+**Settler:**
 - Setup: 5 minutes
 - Daily reconciliation: Automated (0 hours)
 - Exception handling: Automated alerts (15 min/day)
@@ -395,7 +395,7 @@ const report = await client.reports.get(job.id);
 - Exception handling: Manual review (1 hour/day)
 - **Total: 2 hours/day = 730 hours/year**
 
-**Time Saved with Reconcilify: 1,004 hours/year = $100,400/year (at $100/hour)**
+**Time Saved with Settler: 1,004 hours/year = $100,400/year (at $100/hour)**
 
 ---
 
@@ -438,7 +438,7 @@ const report = await client.reports.get(job.id);
 
 ### "We already have a reconciliation solution"
 
-**Response:** "That's great! Many of our customers use Reconcilify alongside existing solutions for specific use cases (like real-time webhook reconciliation or multi-platform reconciliation). Reconcilify complements legacy solutions by providing API-first automation for modern platforms. Would you like to see a side-by-side comparison?"
+**Response:** "That's great! Many of our customers use Settler alongside existing solutions for specific use cases (like real-time webhook reconciliation or multi-platform reconciliation). Settler complements legacy solutions by providing API-first automation for modern platforms. Would you like to see a side-by-side comparison?"
 
 ### "We need on-premise deployment"
 
@@ -446,7 +446,7 @@ const report = await client.reports.get(job.id);
 
 ### "We're concerned about vendor lock-in"
 
-**Response:** "Reconcilify is API-first and open-source friendly. You can export all your data anytime via our data export API. Our self-hosted core is AGPL v3 licensed, so you always have the option to self-host. We use standard REST APIs and open data formats (JSON, CSV), so there's no proprietary lock-in."
+**Response:** "Settler is API-first and open-source friendly. You can export all your data anytime via our data export API. Our self-hosted core is AGPL v3 licensed, so you always have the option to self-host. We use standard REST APIs and open data formats (JSON, CSV), so there's no proprietary lock-in."
 
 ### "We need SOC 2 Type II certification now"
 
@@ -460,15 +460,15 @@ const report = await client.reports.get(job.id);
 
 ## Next Steps
 
-1. **Schedule a Demo:** See Reconcilify in action (15 minutes)
+1. **Schedule a Demo:** See Settler in action (15 minutes)
 2. **Security Review:** Schedule a call with our security team
 3. **Pilot Program:** Start with a small use case (free for 30 days)
 4. **Custom Proposal:** Get a tailored proposal for your requirements
 
 **Contact:**
-- **Sales:** sales@reconcilify.io
-- **Security:** security@reconcilify.io
-- **Enterprise:** enterprise@reconcilify.io
+- **Sales:** sales@settler.io
+- **Security:** security@settler.io
+- **Enterprise:** enterprise@settler.io
 
 ---
 

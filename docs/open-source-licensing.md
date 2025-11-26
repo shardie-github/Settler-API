@@ -4,15 +4,15 @@
 
 ## License Recommendations
 
-Reconcilify uses a **dual-licensing model** to balance open source community growth with sustainable business operations.
+Settler uses a **dual-licensing model** to balance open source community growth with sustainable business operations.
 
 ### Core Components (MIT License)
 
 **What's MIT Licensed:**
-- **SDK (`@reconcilify/sdk`)**: MIT License
-- **Adapter SDK (`@reconcilify/adapter-sdk`)**: MIT License
+- **SDK (`@settler/sdk`)**: MIT License
+- **Adapter SDK (`@settler/adapter-sdk`)**: MIT License
 - **Community Adapters**: MIT License (individual packages)
-- **CLI Tool (`@reconcilify/cli`)**: MIT License
+- **CLI Tool (`@settler/cli`)**: MIT License
 - **Documentation**: CC BY 4.0
 
 **Why MIT:**
@@ -25,7 +25,7 @@ Reconcilify uses a **dual-licensing model** to balance open source community gro
 ```
 MIT License
 
-Copyright (c) 2026 Reconcilify
+Copyright (c) 2026 Settler
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -104,21 +104,21 @@ of this license document, but changing it is not allowed.
 **Version:** 1.0  
 **Effective Date:** January 2026
 
-By contributing to Reconcilify, you agree to the following terms:
+By contributing to Settler, you agree to the following terms:
 
 #### 1. Definitions
 
 - **"You"** (or **"Your"**) means the individual or entity making a Contribution.
-- **"Contribution"** means any original work of authorship, including any modifications or additions to an existing work, that is intentionally submitted by You to Reconcilify for inclusion in the project.
-- **"Project"** means the Reconcilify open source project and its associated repositories.
+- **"Contribution"** means any original work of authorship, including any modifications or additions to an existing work, that is intentionally submitted by You to Settler for inclusion in the project.
+- **"Project"** means the Settler open source project and its associated repositories.
 
 #### 2. Grant of Copyright License
 
-Subject to the terms and conditions of this Agreement, You hereby grant to Reconcilify and to recipients of software distributed by Reconcilify a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute Your Contributions and such derivative works.
+Subject to the terms and conditions of this Agreement, You hereby grant to Settler and to recipients of software distributed by Settler a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute Your Contributions and such derivative works.
 
 #### 3. Grant of Patent License
 
-Subject to the terms and conditions of this Agreement, You hereby grant to Reconcilify and to recipients of software distributed by Reconcilify a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except as stated in this section) patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer the Work, where such license applies only to those patent claims licensable by You that are necessarily infringed by Your Contribution(s) alone or by combination of Your Contribution(s) with the Work to which such Contribution(s) was submitted.
+Subject to the terms and conditions of this Agreement, You hereby grant to Settler and to recipients of software distributed by Settler a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except as stated in this section) patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer the Work, where such license applies only to those patent claims licensable by You that are necessarily infringed by Your Contribution(s) alone or by combination of Your Contribution(s) with the Work to which such Contribution(s) was submitted.
 
 If You institute patent litigation against any entity (including a cross-claim or counterclaim in a lawsuit) alleging that the Work or a Contribution incorporated within the Work constitutes direct or contributory patent infringement, then any patent licenses granted to You under this Agreement for that Work shall terminate as of the date such litigation is filed.
 
@@ -133,7 +133,7 @@ You represent that:
 
 #### 5. Disclaimer
 
-**YOUR CONTRIBUTIONS ARE PROVIDED "AS IS".** THE CONTRIBUTOR(S) AND/OR RECONCILIFY DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+**YOUR CONTRIBUTIONS ARE PROVIDED "AS IS".** THE CONTRIBUTOR(S) AND/OR SETTLER DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
 
 #### 6. No Obligation
 
@@ -145,7 +145,7 @@ This Agreement shall be governed by and construed in accordance with the laws of
 
 #### 8. Entire Agreement
 
-This Agreement constitutes the entire agreement between You and Reconcilify regarding Your Contributions and supersedes all prior agreements and understandings.
+This Agreement constitutes the entire agreement between You and Settler regarding Your Contributions and supersedes all prior agreements and understandings.
 
 ---
 
@@ -154,21 +154,21 @@ This Agreement constitutes the entire agreement between You and Reconcilify rega
 **Version:** 1.0  
 **Effective Date:** January 2026
 
-This Corporate Contributor License Agreement ("Agreement") is entered into between Reconcilify ("Reconcilify") and the entity identified below ("Corporation").
+This Corporate Contributor License Agreement ("Agreement") is entered into between Settler ("Settler") and the entity identified below ("Corporation").
 
 #### 1. Definitions
 
 - **"Corporation"** means the entity making a Contribution.
-- **"Contribution"** means any original work of authorship, including any modifications or additions to an existing work, that is intentionally submitted by Corporation to Reconcilify for inclusion in the project.
+- **"Contribution"** means any original work of authorship, including any modifications or additions to an existing work, that is intentionally submitted by Corporation to Settler for inclusion in the project.
 - **"Authorized Representative"** means an individual authorized to bind Corporation to this Agreement.
 
 #### 2. Grant of Copyright License
 
-Subject to the terms and conditions of this Agreement, Corporation hereby grants to Reconcilify and to recipients of software distributed by Reconcilify a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute Corporation's Contributions and such derivative works.
+Subject to the terms and conditions of this Agreement, Corporation hereby grants to Settler and to recipients of software distributed by Settler a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute Corporation's Contributions and such derivative works.
 
 #### 3. Grant of Patent License
 
-Subject to the terms and conditions of this Agreement, Corporation hereby grants to Reconcilify and to recipients of software distributed by Reconcilify a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except as stated in this section) patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer the Work, where such license applies only to those patent claims licensable by Corporation that are necessarily infringed by Corporation's Contribution(s) alone or by combination of Corporation's Contribution(s) with the Work to which such Contribution(s) was submitted.
+Subject to the terms and conditions of this Agreement, Corporation hereby grants to Settler and to recipients of software distributed by Settler a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except as stated in this section) patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer the Work, where such license applies only to those patent claims licensable by Corporation that are necessarily infringed by Corporation's Contribution(s) alone or by combination of Corporation's Contribution(s) with the Work to which such Contribution(s) was submitted.
 
 #### 4. Representations
 
@@ -207,7 +207,7 @@ Corporation represents that:
 - Download the Corporate CLA template
 - Fill out the corporate information
 - Have an authorized representative sign
-- Email the signed CLA to legal@reconcilify.io
+- Email the signed CLA to legal@settler.io
 - Include your GitHub username(s) in the email
 
 ### 2. Make Your Contribution
@@ -244,7 +244,7 @@ All contributors must follow our [Code of Conduct](./CODE_OF_CONDUCT.md). We are
 
 ## License FAQ
 
-### Q: Can I use Reconcilify SDK in my proprietary project?
+### Q: Can I use Settler SDK in my proprietary project?
 
 **A:** Yes! The SDK is MIT licensed, so you can use it in any project (open source or proprietary) without restrictions.
 
@@ -258,23 +258,23 @@ All contributors must follow our [Code of Conduct](./CODE_OF_CONDUCT.md). We are
 
 ### Q: Can I contribute adapters without signing a CLA?
 
-**A:** No. All contributions to Reconcilify repositories require CLA acceptance.
+**A:** No. All contributions to Settler repositories require CLA acceptance.
 
 ### Q: What if I want to contribute but my employer owns the copyright?
 
 **A:** You'll need to use the Corporate CLA and have an authorized representative sign it.
 
-### Q: Can I use Reconcilify trademarks in my project?
+### Q: Can I use Settler trademarks in my project?
 
-**A:** You can use Reconcilify trademarks to refer to the project, but not to imply endorsement or affiliation without permission. See our [Trademark Policy](./trademark-policy.md).
+**A:** You can use Settler trademarks to refer to the project, but not to imply endorsement or affiliation without permission. See our [Trademark Policy](./trademark-policy.md).
 
 ---
 
 ## Contact
 
-**Legal Questions:** legal@reconcilify.io  
-**Contributor Support:** contributors@reconcilify.io  
-**General Inquiries:** hello@reconcilify.io
+**Legal Questions:** legal@settler.io  
+**Contributor Support:** contributors@settler.io  
+**General Inquiries:** hello@settler.io
 
 ---
 
