@@ -21,6 +21,11 @@ import { logInfo } from "./utils/logger";
 import { v4 as uuidv4 } from "uuid";
 import { startDataRetentionJob } from "./jobs/data-retention";
 import { processPendingWebhooks } from "./utils/webhook-queue";
+import { versionMiddleware } from "./middleware/versioning";
+import { v1Router } from "./routes/v1";
+import { v2Router } from "./routes/v2";
+import { SecretsManager, REQUIRED_SECRETS } from "./infrastructure/security/SecretsManager";
+import { initializeTracing } from "./infrastructure/observability/tracing";
 
 const app: Express = express();
 const PORT = config.port;
@@ -90,27 +95,43 @@ app.use(express.json({
 
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
+// Initialize tracing
+initializeTracing();
+
+// Validate secrets at startup
+if (config.nodeEnv === 'production') {
+  try {
+    SecretsManager.validateSecrets(REQUIRED_SECRETS);
+  } catch (error: any) {
+    console.error('Secret validation failed:', error.message);
+    process.exit(1);
+  }
+}
+
 // Health check (no auth required)
 app.use("/health", healthRouter);
 
 // Metrics endpoint (no auth required, but should be protected in production)
 app.use("/metrics", metricsRouter);
 
+// API versioning middleware
+app.use("/api", versionMiddleware);
+
 // Idempotency middleware for state-changing operations
 app.use("/api/v1", idempotencyMiddleware());
+app.use("/api/v2", idempotencyMiddleware());
 
 // Rate limiting per API key
 app.use("/api/v1", authMiddleware, rateLimitMiddleware());
+app.use("/api/v2", authMiddleware, rateLimitMiddleware());
 
 // Auth routes (no auth required for login/refresh)
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v2/auth", authRouter);
 
-// API routes (auth required)
-app.use("/api/v1/jobs", authMiddleware, jobsRouter);
-app.use("/api/v1/reports", authMiddleware, reportsRouter);
-app.use("/api/v1/webhooks", authMiddleware, webhooksRouter);
-app.use("/api/v1/adapters", authMiddleware, adaptersRouter);
-app.use("/api/v1/users", authMiddleware, usersRouter);
+// Versioned API routes
+app.use("/api/v1", authMiddleware, v1Router);
+app.use("/api/v2", authMiddleware, v2Router);
 
 // Error handling
 app.use(errorHandler);

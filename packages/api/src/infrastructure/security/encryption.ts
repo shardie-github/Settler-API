@@ -1,59 +1,65 @@
 /**
- * Encryption Service
- * Handles encryption/decryption of sensitive data at rest using AES-256-GCM
+ * Encryption Utilities
+ * AES-256-GCM authenticated encryption
  */
 
 import crypto from 'crypto';
-import { config } from '../../config';
+import { SecretsManager } from './SecretsManager';
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
-const SALT_LENGTH = 64;
-const TAG_LENGTH = 16;
-const KEY_LENGTH = 32;
+const AUTH_TAG_LENGTH = 16;
 
-function getEncryptionKey(): Buffer {
-  if (!config.encryption.key) {
-    throw new Error('ENCRYPTION_KEY not configured');
+/**
+ * Encrypt sensitive data
+ */
+export function encrypt(data: string, keyName: string = 'ENCRYPTION_KEY'): string {
+  const key = SecretsManager.getSecret(keyName);
+  if (!key) {
+    throw new Error(`Encryption key ${keyName} not found`);
   }
 
-  // Derive a 32-byte key from the encryption key
-  return crypto
-    .createHash('sha256')
-    .update(config.encryption.key)
-    .digest();
-}
+  const keyBuffer = Buffer.from(key, 'hex');
+  if (keyBuffer.length !== 32 && keyBuffer.length !== 64) {
+    throw new Error('Encryption key must be 32 or 64 bytes (hex encoded)');
+  }
 
-export async function encrypt(plaintext: string): Promise<string> {
-  const key = getEncryptionKey();
   const iv = crypto.randomBytes(IV_LENGTH);
-  const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
+  const cipher = crypto.createCipheriv(ALGORITHM, keyBuffer.slice(0, 32), iv);
 
-  let encrypted = cipher.update(plaintext, 'utf8', 'hex');
+  let encrypted = cipher.update(data, 'utf8', 'hex');
   encrypted += cipher.final('hex');
 
-  const tag = cipher.getAuthTag();
+  const authTag = cipher.getAuthTag();
 
-  // Combine IV + tag + encrypted data
-  return `${iv.toString('hex')}:${tag.toString('hex')}:${encrypted}`;
+  return JSON.stringify({
+    iv: iv.toString('hex'),
+    encrypted,
+    authTag: authTag.toString('hex'),
+  });
 }
 
-export async function decrypt(ciphertext: string): Promise<string> {
-  const key = getEncryptionKey();
-  const parts = ciphertext.split(':');
-
-  if (parts.length !== 3) {
-    throw new Error('Invalid ciphertext format');
+/**
+ * Decrypt sensitive data
+ */
+export function decrypt(encryptedData: string, keyName: string = 'ENCRYPTION_KEY'): string {
+  const key = SecretsManager.getSecret(keyName);
+  if (!key) {
+    throw new Error(`Encryption key ${keyName} not found`);
   }
 
-  const iv = Buffer.from(parts[0], 'hex');
-  const tag = Buffer.from(parts[1], 'hex');
-  const encrypted = parts[2];
+  const keyBuffer = Buffer.from(key, 'hex');
+  const parsed = JSON.parse(encryptedData);
 
-  const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
-  decipher.setAuthTag(tag);
+  const decipher = crypto.createDecipheriv(
+    ALGORITHM,
+    keyBuffer.slice(0, 32),
+    Buffer.from(parsed.iv, 'hex')
+  );
 
-  let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+  decipher.setAuthTag(Buffer.from(parsed.authTag, 'hex'));
+
+  let decrypted = decipher.update(parsed.encrypted, 'hex', 'utf8');
   decrypted += decipher.final('utf8');
 
   return decrypted;
