@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "composite": true,
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@reconcilify/sdk": ["./packages/sdk/src"],
+      "@reconcilify/api": ["./packages/api/src"],
+      "@reconcilify/adapters": ["./packages/adapters/src"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "build", ".next"]
+}

@@ -1,0 +1,40 @@
+{
+  "name": "@reconcilify/api",
+  "version": "1.0.0",
+  "description": "Reconcilify API Server - Serverless reconciliation service",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@reconcilify/adapters": "workspace:*",
+    "@reconcilify/sdk": "workspace:*",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.22.4",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/node": "^20.10.0",
+    "@types/jest": "^29.5.11",
+    "ts-jest": "^29.1.1",
+    "jest": "^29.7.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}

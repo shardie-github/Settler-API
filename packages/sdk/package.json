@@ -1,0 +1,43 @@
+{
+  "name": "@reconcilify/sdk",
+  "version": "1.0.0",
+  "description": "Reconcilify SDK - TypeScript SDK for reconciliation API",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3"
+  },
+  "keywords": [
+    "reconciliation",
+    "api",
+    "sdk",
+    "typescript",
+    "payments",
+    "ecommerce"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reconcilify/reconcilify.git",
+    "directory": "packages/sdk"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,38 @@
+{
+  "name": "@reconcilify/cli",
+  "version": "1.0.0",
+  "description": "Reconcilify CLI - Command-line tool for reconciliation operations",
+  "bin": {
+    "reconcilify": "./dist/index.js"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "test": "jest",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@reconcilify/sdk": "workspace:*",
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "inquirer": "^8.2.6",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^8.2.10",
+    "@types/node": "^20.10.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "keywords": [
+    "reconciliation",
+    "cli",
+    "command-line",
+    "payments",
+    "ecommerce"
+  ],
+  "license": "MIT"
+}
