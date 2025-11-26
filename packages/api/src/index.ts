@@ -11,6 +11,7 @@ import { reportsRouter } from "./routes/reports";
 import { webhooksRouter } from "./routes/webhooks";
 import { adaptersRouter } from "./routes/adapters";
 import { healthRouter } from "./routes/health";
+import { metricsRouter } from "./routes/metrics";
 import { usersRouter } from "./routes/users";
 import { authRouter } from "./routes/auth";
 import { rateLimitMiddleware } from "./utils/rate-limiter";
@@ -91,6 +92,9 @@ app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 // Health check (no auth required)
 app.use("/health", healthRouter);
+
+// Metrics endpoint (no auth required, but should be protected in production)
+app.use("/metrics", metricsRouter);
 
 // Idempotency middleware for state-changing operations
 app.use("/api/v1", idempotencyMiddleware());

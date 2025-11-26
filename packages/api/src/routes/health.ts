@@ -2,8 +2,10 @@ import { Router, Request, Response } from "express";
 import { query } from "../db";
 import { pool } from "../db";
 import { logError } from "../utils/logger";
+import { HealthCheckService } from "../infrastructure/observability/health";
 
 const router = Router();
+const healthCheckService = new HealthCheckService();
 
 interface HealthCheck {
   status: 'healthy' | 'unhealthy' | 'degraded';
@@ -50,10 +52,11 @@ async function checkConnectionPool(): Promise<HealthCheck> {
   }
 }
 
-// Basic health check
+// Basic health check (liveness probe)
 router.get("/", async (req: Request, res: Response) => {
+  const health = await healthCheckService.checkLive();
   res.json({
-    status: "ok",
+    status: health.status,
     timestamp: new Date().toISOString(),
     service: "settler-api",
     version: "1.0.0",
@@ -62,23 +65,26 @@ router.get("/", async (req: Request, res: Response) => {
 
 // Detailed health check with dependency checks
 router.get("/detailed", async (req: Request, res: Response) => {
-  const checks = {
-    database: await checkDatabase(),
-    connectionPool: await checkConnectionPool(),
-  };
-
-  const allHealthy = Object.values(checks).every(c => c.status === 'healthy');
-  const anyUnhealthy = Object.values(checks).some(c => c.status === 'unhealthy');
-  
-  const overallStatus = anyUnhealthy ? 'unhealthy' : (allHealthy ? 'healthy' : 'degraded');
-
-  res.status(overallStatus === 'healthy' ? 200 : 503).json({
-    status: overallStatus,
-    checks,
-    timestamp: new Date().toISOString(),
+  const health = await healthCheckService.checkAll();
+  res.status(health.status === 'healthy' ? 200 : 503).json({
+    status: health.status,
+    checks: health.checks,
+    timestamp: health.timestamp,
     service: "settler-api",
     version: "1.0.0",
   });
+});
+
+// Liveness probe (always returns OK if process is alive)
+router.get("/live", async (req: Request, res: Response) => {
+  const health = await healthCheckService.checkLive();
+  res.status(200).json(health);
+});
+
+// Readiness probe (returns ready only if dependencies are healthy)
+router.get("/ready", async (req: Request, res: Response) => {
+  const health = await healthCheckService.checkReady();
+  res.status(health.status === 'ready' ? 200 : 503).json(health);
 });
 
 export { router as healthRouter };
