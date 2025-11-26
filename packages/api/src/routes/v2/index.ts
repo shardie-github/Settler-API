@@ -1,22 +1,44 @@
 /**
  * API v2 Routes
- * Version 2 of the Settler API (future version)
+ * Version 2 of the Settler API - Strategic Initiatives
  */
 
 import { Router } from 'express';
+import reconciliationGraphRouter from './reconciliation-graph';
+import aiAgentsRouter from './ai-agents';
+import networkEffectsRouter from './network-effects';
+import knowledgeRouter from './knowledge';
+import complianceRouter from './compliance';
 
 export const v2Router = Router();
 
-// v2 routes will be implemented here
-// For now, return deprecation notice
-v2Router.use('*', (req, res) => {
-  res.status(501).json({
-    error: 'NotImplemented',
-    message: 'API v2 is not yet available',
+// Continuous Reconciliation Graph
+v2Router.use('/reconciliation-graph', reconciliationGraphRouter);
+
+// AI Agents
+v2Router.use('/ai-agents', aiAgentsRouter);
+
+// Network Effects
+v2Router.use('/network-effects', networkEffectsRouter);
+
+// Knowledge Management
+v2Router.use('/knowledge', knowledgeRouter);
+
+// Compliance
+v2Router.use('/compliance', complianceRouter);
+
+// Health check for v2
+v2Router.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
     version: '2.0.0',
-    deprecation: {
-      current: 'v1',
-      sunset: null, // TBD
-    },
+    features: [
+      'continuous-reconciliation-graph',
+      'ai-agents',
+      'network-effects',
+      'knowledge-management',
+      'compliance-exports',
+      'privacy-preserving-reconciliation',
+    ],
   });
 });
