@@ -1,7 +1,7 @@
 {
   "name": "@settler/sdk",
   "version": "1.0.0",
-  "description": "Settler SDK - TypeScript SDK for reconciliation API",
+  "description": "Production-grade TypeScript SDK for the Settler Reconciliation API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -11,20 +11,33 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "MIGRATION.md"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
-  "dependencies": {
-    "zod": "^3.22.4"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.11",
     "@types/node": "^20.10.0",
+    "jest": "^29.7.0",
+    "msw": "^2.0.0",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.0.0"
   },
   "keywords": [
     "reconciliation",
@@ -32,12 +45,18 @@
     "sdk",
     "typescript",
     "payments",
-    "ecommerce"
+    "ecommerce",
+    "settler",
+    "webhook",
+    "reconciliation-as-a-service"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/settler/settler.git",
     "directory": "packages/sdk"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
