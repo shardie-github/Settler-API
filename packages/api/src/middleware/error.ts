@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { logError } from "../utils/logger";
 import { AuthRequest } from "./auth";
+import { config } from "../config";
 
 export const errorHandler = (
   err: Error,
@@ -28,7 +29,7 @@ export const errorHandler = (
   };
 
   // Only include stack in development
-  if (process.env.NODE_ENV === "development") {
+  if (config.nodeEnv === "development") {
     response.stack = err.stack;
   }
 

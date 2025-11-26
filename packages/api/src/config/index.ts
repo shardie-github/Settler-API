@@ -36,6 +36,18 @@ export const config = {
     defaultDays: parseInt(process.env.DATA_RETENTION_DAYS || '365', 10),
   },
   allowedOrigins: process.env.ALLOWED_ORIGINS?.split(',') || ['*'],
+  logging: {
+    level: process.env.LOG_LEVEL || 'info',
+    samplingRate: parseFloat(process.env.LOG_SAMPLING_RATE || '1.0'),
+  },
+  observability: {
+    serviceName: process.env.SERVICE_NAME || 'settler-api',
+    otlpEndpoint: process.env.OTLP_ENDPOINT,
+    jaegerEndpoint: process.env.JAEGER_ENDPOINT,
+  },
+  features: {
+    enableSchemaPerTenant: process.env.ENABLE_SCHEMA_PER_TENANT === 'true',
+  },
 };
 
 // Validate critical configuration

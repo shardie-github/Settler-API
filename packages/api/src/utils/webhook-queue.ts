@@ -1,6 +1,5 @@
 import { query } from "../db";
 import { generateWebhookSignature } from "./webhook-signature";
-import { retry, isRetryableError } from "./retry";
 import { logInfo, logError, logWarn } from "./logger";
 import { config } from "../config";
 

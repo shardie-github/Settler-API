@@ -3,6 +3,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { AuthRequest } from '../middleware/auth';
+import { config } from '../config';
 
 export interface TraceContext {
   traceId: string;
@@ -99,7 +100,7 @@ import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
 const sdk = new NodeSDK({
   traceExporter: new JaegerExporter({
-    endpoint: process.env.JAEGER_ENDPOINT,
+    endpoint: config.observability.jaegerEndpoint,
   }),
   instrumentations: [getNodeAutoInstrumentations()],
 });

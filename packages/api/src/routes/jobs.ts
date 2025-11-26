@@ -4,11 +4,13 @@ import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission, requireResourceOwnership } from "../middleware/authorization";
 import { query, transaction } from "../db";
-import { encrypt, decrypt } from "../infrastructure/security/encryption";
 import { logInfo, logError } from "../utils/logger";
 import { Mutex } from "async-mutex";
+import { JobRouteService } from "../application/services/JobRouteService";
+import { sendSuccess, sendError, sendPaginated, sendCreated, sendNoContent } from "../utils/api-response";
 
 const router = Router();
+const jobService = new JobRouteService();
 
 // Per-job mutex to prevent concurrent execution
 const jobMutexes = new Map<string, Mutex>();
@@ -81,64 +83,17 @@ router.post(
   validateRequest(createJobSchema),
   async (req: AuthRequest, res: Response) => {
     try {
-      const { name, source, target, rules, schedule } = req.body;
       const userId = req.userId!;
-
-      // Encrypt API keys in configs
-      const encryptedSourceConfig = encrypt(JSON.stringify(source.config));
-      const encryptedTargetConfig = encrypt(JSON.stringify(target.config));
-
-      const result = await query<{ id: string }>(
-        `INSERT INTO jobs (user_id, name, source_adapter, source_config_encrypted, target_adapter, target_config_encrypted, rules, schedule)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-         RETURNING id`,
-        [
-          userId,
-          name,
-          source.adapter,
-          encryptedSourceConfig,
-          target.adapter,
-          encryptedTargetConfig,
-          JSON.stringify(rules),
-          schedule,
-        ]
-      );
-
-      const jobId = result[0].id;
-
-      // Log audit event
-      await query(
-        `INSERT INTO audit_logs (event, user_id, metadata)
-         VALUES ($1, $2, $3)`,
-        [
-          'job_created',
-          userId,
-          JSON.stringify({ jobId, name }),
-        ]
-      );
-
-      logInfo('Job created', { jobId, userId, name });
-
-      res.status(201).json({
-        data: {
-          id: jobId,
-          userId,
-          name,
-          source: { adapter: source.adapter },
-          target: { adapter: target.adapter },
-          rules,
-          schedule,
-          status: "active",
-          createdAt: new Date().toISOString(),
-        },
-        message: "Reconciliation job created successfully",
-      });
+      const job = await jobService.createJob(userId, req.body);
+      sendCreated(res, job, "Reconciliation job created successfully");
     } catch (error: any) {
       logError('Failed to create job', error, { userId: req.userId });
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to create reconciliation job",
-      });
+      sendError(
+        res,
+        "Internal Server Error",
+        error.message || "Failed to create reconciliation job",
+        500
+      );
     }
   }
 );
@@ -220,80 +175,15 @@ router.get(
         }, 'job', id);
       });
 
-      const jobs = await query<{
-        id: string;
-        user_id: string;
-        name: string;
-        source_adapter: string;
-        source_config_encrypted: string;
-        target_adapter: string;
-        target_config_encrypted: string;
-        rules: any;
-        schedule: string;
-        status: string;
-        created_at: Date;
-        updated_at: Date;
-      }>(
-        `SELECT id, user_id, name, source_adapter, source_config_encrypted, target_adapter, target_config_encrypted, rules, schedule, status, created_at, updated_at
-         FROM jobs
-         WHERE id = $1 AND user_id = $2`,
-        [id, userId]
-      );
-
-      if (jobs.length === 0) {
-        return res.status(404).json({ error: "Job not found" });
+      const job = await jobService.getJob(id, userId);
+      if (!job) {
+        return sendError(res, "Not Found", "Job not found", 404);
       }
 
-      const job = jobs[0];
-
-      // Decrypt configs (but don't expose full API keys in response)
-      const sourceConfig = JSON.parse(decrypt(job.source_config_encrypted));
-      const targetConfig = JSON.parse(decrypt(job.target_config_encrypted));
-
-      // Redact sensitive fields
-      const redactedSourceConfig = Object.fromEntries(
-        Object.entries(sourceConfig).map(([k, v]) => [
-          k,
-          k.toLowerCase().includes('key') || k.toLowerCase().includes('secret')
-            ? '[REDACTED]'
-            : v,
-        ])
-      );
-      const redactedTargetConfig = Object.fromEntries(
-        Object.entries(targetConfig).map(([k, v]) => [
-          k,
-          k.toLowerCase().includes('key') || k.toLowerCase().includes('secret')
-            ? '[REDACTED]'
-            : v,
-        ])
-      );
-
-      res.json({
-        data: {
-          id: job.id,
-          userId: job.user_id,
-          name: job.name,
-          source: {
-            adapter: job.source_adapter,
-            config: redactedSourceConfig,
-          },
-          target: {
-            adapter: job.target_adapter,
-            config: redactedTargetConfig,
-          },
-          rules: job.rules,
-          schedule: job.schedule,
-          status: job.status,
-          createdAt: job.created_at.toISOString(),
-          updatedAt: job.updated_at.toISOString(),
-        },
-      });
+      sendSuccess(res, job);
     } catch (error: any) {
       logError('Failed to fetch job', error, { userId: req.userId, jobId: req.params.id });
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to fetch job",
-      });
+      sendError(res, "Internal Server Error", "Failed to fetch job", 500);
     }
   }
 );
@@ -436,31 +326,15 @@ router.delete(
         }, 'job', id);
       });
 
-      await query(
-        `DELETE FROM jobs WHERE id = $1 AND user_id = $2`,
-        [id, userId]
-      );
+      const deleted = await jobService.deleteJob(id, userId);
+      if (!deleted) {
+        return sendError(res, "Not Found", "Job not found", 404);
+      }
 
-      // Log audit event
-      await query(
-        `INSERT INTO audit_logs (event, user_id, metadata)
-         VALUES ($1, $2, $3)`,
-        [
-          'job_deleted',
-          userId,
-          JSON.stringify({ jobId: id }),
-        ]
-      );
-
-      logInfo('Job deleted', { jobId: id, userId });
-
-      res.status(204).send();
+      sendNoContent(res);
     } catch (error: any) {
       logError('Failed to delete job', error, { userId: req.userId, jobId: req.params.id });
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to delete job",
-      });
+      sendError(res, "Internal Server Error", "Failed to delete job", 500);
     }
   }
 );
