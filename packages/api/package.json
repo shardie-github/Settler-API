@@ -47,7 +47,9 @@
     "isomorphic-dompurify": "^2.9.0",
     "dns": "^0.2.2",
     "@sentry/node": "^7.91.0",
-    "@sentry/profiling-node": "^7.91.0"
+    "@sentry/profiling-node": "^7.91.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "@upstash/redis": "^1.25.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
