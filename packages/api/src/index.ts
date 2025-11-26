@@ -26,6 +26,9 @@ import { v1Router } from "./routes/v1";
 import { v2Router } from "./routes/v2";
 import { SecretsManager, REQUIRED_SECRETS } from "./infrastructure/security/SecretsManager";
 import { initializeTracing } from "./infrastructure/observability/tracing";
+import { compressionMiddleware, brotliCompressionMiddleware } from "./middleware/compression";
+import { etagMiddleware } from "./middleware/etag";
+import { observabilityMiddleware } from "./middleware/observability";
 
 const app: Express = express();
 const PORT = config.port;
@@ -46,6 +49,13 @@ app.use(cors({
   origin: config.allowedOrigins,
   credentials: true,
 }));
+
+// Compression middleware (Gzip and Brotli)
+app.use(compressionMiddleware);
+app.use(brotliCompressionMiddleware);
+
+// Observability middleware (tracing, metrics, logging)
+app.use(observabilityMiddleware);
 
 // Trace ID middleware
 app.use((req: Request, res: Response, next: NextFunction) => {

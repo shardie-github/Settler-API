@@ -1,47 +1,187 @@
-// Simple in-memory cache (for MVP)
-// In production, use Redis
+/**
+ * Cache Implementation
+ * Supports both in-memory (dev) and Redis (production) caching
+ */
+
+import Redis from 'ioredis';
+import { config } from '../config';
+
 interface CacheEntry<T> {
   value: T;
   expiresAt: number;
 }
 
-const cache = new Map<string, CacheEntry<any>>();
+// In-memory cache fallback
+const memoryCache = new Map<string, CacheEntry<any>>();
 
-export function get<T>(key: string): T | null {
-  const entry = cache.get(key);
+// Redis client (lazy initialization)
+let redisClient: Redis | null = null;
+
+function getRedisClient(): Redis | null {
+  if (redisClient) {
+    return redisClient;
+  }
+
+  try {
+    if (config.redis.url) {
+      redisClient = new Redis(config.redis.url, {
+        maxRetriesPerRequest: 3,
+        enableReadyCheck: true,
+        lazyConnect: true,
+      });
+      return redisClient;
+    } else if (config.redis.host) {
+      redisClient = new Redis({
+        host: config.redis.host,
+        port: config.redis.port,
+        maxRetriesPerRequest: 3,
+        enableReadyCheck: true,
+        lazyConnect: true,
+      });
+      return redisClient;
+    }
+  } catch (error) {
+    console.warn('Redis connection failed, falling back to memory cache:', error);
+  }
+
+  return null;
+}
+
+/**
+ * Get value from cache
+ */
+export async function get<T>(key: string): Promise<T | null> {
+  const redis = getRedisClient();
+
+  if (redis) {
+    try {
+      const value = await redis.get(key);
+      if (value) {
+        return JSON.parse(value) as T;
+      }
+    } catch (error) {
+      console.warn('Redis get failed, falling back to memory cache:', error);
+    }
+  }
+
+  // Fallback to memory cache
+  const entry = memoryCache.get(key);
   if (!entry) {
     return null;
   }
 
   if (entry.expiresAt < Date.now()) {
-    cache.delete(key);
+    memoryCache.delete(key);
     return null;
   }
 
   return entry.value as T;
 }
 
-export function set<T>(key: string, value: T, ttlSeconds: number): void {
-  cache.set(key, {
+/**
+ * Set value in cache
+ */
+export async function set<T>(key: string, value: T, ttlSeconds: number): Promise<void> {
+  const redis = getRedisClient();
+
+  if (redis) {
+    try {
+      await redis.setex(key, ttlSeconds, JSON.stringify(value));
+      return;
+    } catch (error) {
+      console.warn('Redis set failed, falling back to memory cache:', error);
+    }
+  }
+
+  // Fallback to memory cache
+  memoryCache.set(key, {
     value,
     expiresAt: Date.now() + ttlSeconds * 1000,
   });
 
   // Cleanup expired entries periodically
-  if (cache.size > 10000) {
+  if (memoryCache.size > 10000) {
     const now = Date.now();
-    for (const [k, v] of cache.entries()) {
+    for (const [k, v] of memoryCache.entries()) {
       if (v.expiresAt < now) {
-        cache.delete(k);
+        memoryCache.delete(k);
       }
     }
   }
 }
 
-export function del(key: string): void {
-  cache.delete(key);
+/**
+ * Delete value from cache
+ */
+export async function del(key: string): Promise<void> {
+  const redis = getRedisClient();
+
+  if (redis) {
+    try {
+      await redis.del(key);
+    } catch (error) {
+      console.warn('Redis del failed:', error);
+    }
+  }
+
+  memoryCache.delete(key);
 }
 
-export function clear(): void {
-  cache.clear();
+/**
+ * Delete multiple keys matching pattern
+ */
+export async function delPattern(pattern: string): Promise<void> {
+  const redis = getRedisClient();
+
+  if (redis) {
+    try {
+      const keys = await redis.keys(pattern);
+      if (keys.length > 0) {
+        await redis.del(...keys);
+      }
+    } catch (error) {
+      console.warn('Redis delPattern failed:', error);
+    }
+  }
+
+  // Fallback: delete from memory cache
+  for (const key of memoryCache.keys()) {
+    if (key.includes(pattern.replace('*', ''))) {
+      memoryCache.delete(key);
+    }
+  }
+}
+
+/**
+ * Clear all cache
+ */
+export async function clear(): Promise<void> {
+  const redis = getRedisClient();
+
+  if (redis) {
+    try {
+      await redis.flushdb();
+    } catch (error) {
+      console.warn('Redis clear failed:', error);
+    }
+  }
+
+  memoryCache.clear();
+}
+
+/**
+ * Generate cache key with namespace
+ */
+export function cacheKey(namespace: string, ...parts: (string | number)[]): string {
+  return `${namespace}:${parts.join(':')}`;
+}
+
+/**
+ * Close Redis connection
+ */
+export async function close(): Promise<void> {
+  if (redisClient) {
+    await redisClient.quit();
+    redisClient = null;
+  }
 }

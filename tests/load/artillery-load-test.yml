@@ -1,0 +1,106 @@
+# Artillery Load Test Configuration
+# Tests key API paths with realistic scenarios
+
+config:
+  target: 'http://localhost:3000'
+  phases:
+    # Warm-up phase
+    - duration: 30
+      arrivalRate: 5
+      name: "Warm-up"
+    
+    # Normal load
+    - duration: 120
+      arrivalRate: 20
+      name: "Normal load"
+    
+    # Peak load (10x scale)
+    - duration: 300
+      arrivalRate: 100
+      name: "Peak load"
+    
+    # Sustained load
+    - duration: 600
+      arrivalRate: 100
+      name: "Sustained load"
+    
+    # Cool-down
+    - duration: 60
+      arrivalRate: 10
+      name: "Cool-down"
+  
+  defaults:
+    headers:
+      Authorization: 'Bearer {{ $processEnvironment.API_KEY }}'
+      Content-Type: 'application/json'
+  
+  processor: './artillery-processor.js'
+  
+  plugins:
+    expect: {}
+    metrics-by-endpoint:
+      stripQueryString: true
+
+scenarios:
+  # Scenario 1: Create reconciliation jobs
+  - name: "Create Reconciliation Jobs"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/v1/jobs"
+          json:
+            name: "Load Test Job {{ $randomString() }}"
+            source:
+              adapter: "stripe"
+              config:
+                api_key: "sk_test_load_test"
+            target:
+              adapter: "shopify"
+              config:
+                api_key: "test_shopify_key"
+                shop: "test-shop"
+            rules:
+              matching:
+                - field: "amount"
+                  type: "exact"
+          capture:
+            - json: "$.data.id"
+              as: "jobId"
+          expect:
+            - statusCode: 201
+            - contentType: json
+            - hasProperty: data.id
+  
+  # Scenario 2: List jobs with pagination
+  - name: "List Jobs"
+    weight: 40
+    flow:
+      - get:
+          url: "/api/v1/jobs?limit=50&page=1"
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - hasProperty: data
+            - hasProperty: pagination
+      - think: 2
+  
+  # Scenario 3: Get job details
+  - name: "Get Job Details"
+    weight: 20
+    flow:
+      - get:
+          url: "/api/v1/jobs/{{ jobId }}"
+          expect:
+            - statusCode: [200, 404]
+            - contentType: json
+  
+  # Scenario 4: Get reconciliation summary
+  - name: "Get Reconciliation Summary"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/v1/reconciliations/{{ jobId }}/summary"
+          expect:
+            - statusCode: [200, 404]
+            - contentType: json
+            - maxResponseTime: 200

@@ -9,6 +9,8 @@ import { reportsRouter } from './reports';
 import { webhooksRouter } from './webhooks';
 import { usersRouter } from './users';
 import { tenantsRouter } from './tenants';
+import { realtimeRouter } from '../realtime';
+import { reconciliationSummaryRouter } from '../reconciliation-summary';
 
 export const v1Router = Router();
 
@@ -18,6 +20,8 @@ v1Router.use('/reports', reportsRouter);
 v1Router.use('/webhooks', webhooksRouter);
 v1Router.use('/users', usersRouter);
 v1Router.use('/tenants', tenantsRouter);
+v1Router.use('/realtime', realtimeRouter);
+v1Router.use('/reconciliations', reconciliationSummaryRouter);
 
 // Health check
 v1Router.get('/health', (req, res) => {
