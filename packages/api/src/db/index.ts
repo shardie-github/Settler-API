@@ -77,6 +77,42 @@ export async function initDatabase(): Promise<void> {
     }
   }
 
+  // Run event sourcing migration
+  const eventSourcingPath = path.join(__dirname, 'migrations', 'event-sourcing.sql');
+  if (fs.existsSync(eventSourcingPath)) {
+    const migrationSQL = fs.readFileSync(eventSourcingPath, 'utf8');
+    const statements = migrationSQL.split(';').filter((s: string) => s.trim().length > 0);
+    for (const statement of statements) {
+      if (statement.trim()) {
+        try {
+          await query(statement);
+        } catch (error: any) {
+          if (!error.message.includes('already exists') && !error.message.includes('duplicate')) {
+            console.warn('Event sourcing migration warning:', error.message);
+          }
+        }
+      }
+    }
+  }
+
+  // Run CQRS projections migration
+  const cqrsProjectionsPath = path.join(__dirname, 'migrations', 'cqrs-projections.sql');
+  if (fs.existsSync(cqrsProjectionsPath)) {
+    const migrationSQL = fs.readFileSync(cqrsProjectionsPath, 'utf8');
+    const statements = migrationSQL.split(';').filter((s: string) => s.trim().length > 0);
+    for (const statement of statements) {
+      if (statement.trim()) {
+        try {
+          await query(statement);
+        } catch (error: any) {
+          if (!error.message.includes('already exists') && !error.message.includes('duplicate')) {
+            console.warn('CQRS projections migration warning:', error.message);
+          }
+        }
+      }
+    }
+  }
+
   await query(`
     CREATE TABLE IF NOT EXISTS users (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
