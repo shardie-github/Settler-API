@@ -9,6 +9,7 @@ import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-otlp-http';
 import { trace, Span, SpanStatusCode } from '@opentelemetry/api';
+import { config } from '../../config';
 
 let sdk: NodeSDK | null = null;
 
@@ -17,8 +18,7 @@ export function initializeTracing(): void {
     return; // Already initialized
   }
 
-  const serviceName = process.env.SERVICE_NAME || 'settler-api';
-  const otlpEndpoint = process.env.OTLP_ENDPOINT;
+  const otlpEndpoint = config.observability.otlpEndpoint;
 
   if (!otlpEndpoint) {
     console.warn('OTLP_ENDPOINT not set, tracing disabled');
@@ -27,7 +27,7 @@ export function initializeTracing(): void {
 
   sdk = new NodeSDK({
     resource: new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
+      [SemanticResourceAttributes.SERVICE_NAME]: config.observability.serviceName,
       [SemanticResourceAttributes.SERVICE_VERSION]: process.env.npm_package_version || '1.0.0',
     }),
     traceExporter: new OTLPTraceExporter({

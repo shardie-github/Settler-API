@@ -52,7 +52,8 @@ export class TenantService {
     await this.tenantRepo.save(tenant);
 
     // Create tenant schema if using schema-per-tenant
-    if (process.env.ENABLE_SCHEMA_PER_TENANT === 'true') {
+    const { config } = require('../../config');
+    if (config.features.enableSchemaPerTenant) {
       await query(`SELECT create_tenant_schema($1)`, [data.slug]);
     }
 

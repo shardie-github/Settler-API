@@ -17,7 +17,7 @@ import { authRouter } from "./routes/auth";
 import { rateLimitMiddleware } from "./utils/rate-limiter";
 import { initDatabase } from "./db";
 import { config } from "./config";
-import { logInfo } from "./utils/logger";
+import { logInfo, logError } from "./utils/logger";
 import { v4 as uuidv4 } from "uuid";
 import { startDataRetentionJob } from "./jobs/data-retention";
 import { processPendingWebhooks } from "./utils/webhook-queue";

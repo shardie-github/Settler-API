@@ -55,65 +55,32 @@ export async function transaction<T>(
 
 // Initialize database schema
 export async function initDatabase(): Promise<void> {
-  // Run multi-tenancy migration first
   const fs = require('fs');
   const path = require('path');
-  const migrationPath = path.join(__dirname, 'migrations', 'multi-tenancy.sql');
+  
+  // Run consolidated initial schema migration
+  const migrationPath = path.join(__dirname, 'migrations', '001-initial-schema.sql');
   if (fs.existsSync(migrationPath)) {
     const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
     // Split by semicolon and execute each statement
     const statements = migrationSQL.split(';').filter((s: string) => s.trim().length > 0);
     for (const statement of statements) {
-      if (statement.trim()) {
+      if (statement.trim() && !statement.trim().startsWith('--')) {
         try {
           await query(statement);
         } catch (error: any) {
-          // Ignore "already exists" errors
-          if (!error.message.includes('already exists') && !error.message.includes('duplicate')) {
+          // Ignore "already exists" errors (idempotent migration)
+          if (!error.message.includes('already exists') && 
+              !error.message.includes('duplicate') &&
+              !error.message.includes('already enabled')) {
             console.warn('Migration warning:', error.message);
           }
         }
       }
     }
-  }
-
-  // Run event sourcing migration
-  const eventSourcingPath = path.join(__dirname, 'migrations', 'event-sourcing.sql');
-  if (fs.existsSync(eventSourcingPath)) {
-    const migrationSQL = fs.readFileSync(eventSourcingPath, 'utf8');
-    const statements = migrationSQL.split(';').filter((s: string) => s.trim().length > 0);
-    for (const statement of statements) {
-      if (statement.trim()) {
-        try {
-          await query(statement);
-        } catch (error: any) {
-          if (!error.message.includes('already exists') && !error.message.includes('duplicate')) {
-            console.warn('Event sourcing migration warning:', error.message);
-          }
-        }
-      }
-    }
-  }
-
-  // Run CQRS projections migration
-  const cqrsProjectionsPath = path.join(__dirname, 'migrations', 'cqrs-projections.sql');
-  if (fs.existsSync(cqrsProjectionsPath)) {
-    const migrationSQL = fs.readFileSync(cqrsProjectionsPath, 'utf8');
-    const statements = migrationSQL.split(';').filter((s: string) => s.trim().length > 0);
-    for (const statement of statements) {
-      if (statement.trim()) {
-        try {
-          await query(statement);
-        } catch (error: any) {
-          if (!error.message.includes('already exists') && !error.message.includes('duplicate')) {
-            console.warn('CQRS projections migration warning:', error.message);
-          }
-        }
-      }
-    }
-  }
-
-  await query(`
+  } else {
+    // Fallback: create basic tables if migration file doesn't exist
+    await query(`
     CREATE TABLE IF NOT EXISTS users (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,

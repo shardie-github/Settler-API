@@ -6,6 +6,7 @@
 import winston from 'winston';
 import { redact } from './redaction';
 import { trace, context } from '@opentelemetry/api';
+import { config } from '../config';
 
 // Get current trace and span IDs from OpenTelemetry context
 function getTraceContext(): { trace_id?: string; span_id?: string } {
@@ -38,11 +39,11 @@ const logFormat = winston.format.combine(
 );
 
 export const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
+  level: config.logging.level,
   format: logFormat,
   defaultMeta: {
     service: 'settler-api',
-    environment: process.env.NODE_ENV || 'development',
+    environment: config.nodeEnv,
   },
   transports: [
     new winston.transports.Console({
@@ -61,13 +62,11 @@ export const logger = winston.createLogger({
 });
 
 // Log sampling configuration
-const LOG_SAMPLING_RATE = parseFloat(process.env.LOG_SAMPLING_RATE || '1.0');
-
 function shouldLog(): boolean {
-  if (LOG_SAMPLING_RATE >= 1.0) {
+  if (config.logging.samplingRate >= 1.0) {
     return true;
   }
-  return Math.random() < LOG_SAMPLING_RATE;
+  return Math.random() < config.logging.samplingRate;
 }
 
 // Helper to log with automatic redaction and trace context

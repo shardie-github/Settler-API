@@ -6,6 +6,7 @@
 import { query } from '../../db';
 import { logError } from '../../utils/logger';
 import { createClient } from 'redis';
+import { config } from '../../config';
 
 export interface HealthCheck {
   status: 'healthy' | 'unhealthy' | 'degraded';
@@ -29,7 +30,7 @@ export class HealthCheckService {
 
   constructor() {
     // Initialize Redis client if URL is provided
-    const redisUrl = process.env.REDIS_URL;
+    const redisUrl = config.redis.url;
     if (redisUrl) {
       this.redisClient = createClient({ url: redisUrl });
       this.redisClient.on('error', (err) => {

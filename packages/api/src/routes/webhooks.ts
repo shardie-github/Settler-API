@@ -5,7 +5,7 @@ import { AuthRequest } from "../middleware/auth";
 import { requirePermission, requireResourceOwnership } from "../middleware/authorization";
 import { query } from "../db";
 import { verifyWebhookSignature, generateWebhookSignature } from "../utils/webhook-signature";
-import { validateWebhookUrl } from "../utils/ssrf-protection";
+import { validateExternalUrl } from "../infrastructure/security/SSRFProtection";
 import { logInfo, logError, logWarn } from "../utils/logger";
 import rateLimit from "express-rate-limit";
 
@@ -47,12 +47,11 @@ router.post(
       const userId = req.userId!;
 
       // Validate webhook URL (SSRF protection)
-      try {
-        await validateWebhookUrl(url);
-      } catch (error: any) {
+      const isValidUrl = await validateExternalUrl(url);
+      if (!isValidUrl) {
         return res.status(400).json({
           error: "Invalid Webhook URL",
-          message: error.message,
+          message: "URL must be HTTPS and cannot point to internal/private IP addresses",
         });
       }
 
