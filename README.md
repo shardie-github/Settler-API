@@ -1,2 +1,2 @@
 # Settler API
-Resend style payment reconcilation API solution made for developers. DX and API first build philosophy where compostability and simplicity reign supreme
+Resend inspired payment reconcilation API to implement payment settlement and transaction balancing checks with zero lift. DX and API first build philosophy where simplicity reigns supreme. 
