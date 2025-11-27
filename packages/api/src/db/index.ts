@@ -93,8 +93,8 @@ export async function initDatabase(): Promise<void> {
         }
       }
     } else {
-    // Fallback: create basic tables if migration file doesn't exist
-    await query(`
+      // Fallback: create basic tables if migration file doesn't exist
+      await query(`
     CREATE TABLE IF NOT EXISTS users (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
@@ -302,5 +302,7 @@ export async function initDatabase(): Promise<void> {
       created_at TIMESTAMP DEFAULT NOW(),
       updated_at TIMESTAMP DEFAULT NOW()
     );
-  `);
+      `);
+    }
+  }
 }

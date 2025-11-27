@@ -78,7 +78,7 @@ export function sentryTracingHandler() {
  * Sentry error handler middleware
  * Must be added before error handler
  */
-export function sentryErrorHandler() {
+export function sentryErrorHandler(): (err: Error, req: Request, res: Response, next: NextFunction) => void {
   if (!sentryInitialized) {
     return (err: Error, req: Request, res: Response, next: NextFunction) => next(err);
   }
@@ -92,7 +92,7 @@ export function sentryErrorHandler() {
       }
       return true;
     },
-  });
+  }) as (err: Error, req: Request, res: Response, next: NextFunction) => void;
 }
 
 /**
