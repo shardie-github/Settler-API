@@ -26,7 +26,11 @@ export function parseOrThrow<T extends z.ZodType>(
 ): z.infer<T> {
   const result = schema.safeParse(data);
   if (!result.success) {
-    throw new z.ZodError(result.error.errors);
+    const error = new z.ZodError(result.error.errors);
+    if (errorMessage) {
+      error.message = errorMessage;
+    }
+    throw error;
   }
   return result.data;
 }

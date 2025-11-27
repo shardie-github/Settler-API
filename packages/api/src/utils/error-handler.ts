@@ -61,7 +61,7 @@ export function handleRouteError(
 ): void {
   const apiError = toApiError(error);
   const message = apiError.message || defaultMessage;
-  const statusCode = apiError.statusCode;
+  const statusCode = apiError.statusCode ?? _defaultStatusCode;
   const errorCode = apiError.errorCode;
   const details = apiError.details;
 

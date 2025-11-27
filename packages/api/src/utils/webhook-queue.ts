@@ -148,6 +148,9 @@ export async function queueWebhookDelivery(
   }
 
   const webhook = webhooks[0];
+  if (!webhook) {
+    throw new Error('Webhook not found or inactive');
+  }
 
   const result = await query<{ id: string }>(
     `INSERT INTO webhook_deliveries (webhook_id, url, payload, status, attempts)
@@ -156,7 +159,10 @@ export async function queueWebhookDelivery(
     [webhookId, webhook.url, JSON.stringify(payload)]
   );
 
-  const deliveryId = result[0].id;
+  const deliveryId = result[0]?.id;
+  if (!deliveryId) {
+    throw new Error('Failed to create webhook delivery');
+  }
 
   // Process immediately (in production, use job queue)
   processWebhookDelivery({
