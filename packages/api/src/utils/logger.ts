@@ -5,7 +5,7 @@
 
 import winston from 'winston';
 import { redact } from './redaction';
-import { trace, context } from '@opentelemetry/api';
+import { trace } from '@opentelemetry/api';
 import { config } from '../config';
 
 // Get current trace and span IDs from OpenTelemetry context

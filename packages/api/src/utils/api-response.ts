@@ -90,7 +90,7 @@ export function sendPaginated<T>(
       page: meta.page,
       limit: meta.limit,
       total: meta.total,
-      cursor: meta.cursor,
+      ...(meta.cursor !== undefined && { cursor: meta.cursor }),
     },
   };
 

@@ -4,7 +4,7 @@
  * Processes transaction events in real-time and updates the graph.
  */
 
-import { ReconciliationNode, ReconciliationEdge } from './types';
+import { ReconciliationNode } from './types';
 import { graphEngine, MatchingRule } from './graph-engine';
 import { EventEmitter } from 'events';
 
@@ -80,11 +80,11 @@ export class StreamProcessor extends EventEmitter {
       id: event.id,
       type: 'transaction',
       jobId: event.jobId,
-      sourceId: event.sourceId,
-      targetId: event.targetId,
+      ...(event.sourceId !== undefined && { sourceId: event.sourceId }),
+      ...(event.targetId !== undefined && { targetId: event.targetId }),
       data: event.data,
-      amount: event.amount,
-      currency: event.currency,
+      ...(event.amount !== undefined && { amount: event.amount }),
+      ...(event.currency !== undefined && { currency: event.currency }),
       timestamp: event.timestamp,
       metadata: {
         processedAt: new Date(),
@@ -124,7 +124,7 @@ export class StreamProcessor extends EventEmitter {
    * Get matching rules for a job
    * In production, this would fetch from database
    */
-  private async getMatchingRules(jobId: string): Promise<MatchingRule[]> {
+  private async getMatchingRules(_jobId: string): Promise<MatchingRule[]> {
     // TODO: Fetch from database
     // For now, return default rules
     return [

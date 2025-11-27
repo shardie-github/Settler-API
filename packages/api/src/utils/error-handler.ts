@@ -6,7 +6,7 @@
 import { Response } from 'express';
 import { sendError } from './api-response';
 import { logError } from './logger';
-import { ApiError, isApiError, toApiError } from './typed-errors';
+import { isApiError, toApiError } from './typed-errors';
 
 /**
  * Safely extracts error message from unknown error type
@@ -56,7 +56,7 @@ export function handleRouteError(
   res: Response,
   error: unknown,
   defaultMessage: string = 'An error occurred',
-  defaultStatusCode: number = 500,
+  _defaultStatusCode: number = 500,
   context?: Record<string, unknown>
 ): void {
   const apiError = toApiError(error);
