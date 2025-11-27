@@ -7,7 +7,7 @@
 
 import { EnhancedAdapter } from '@settler/adapters/enhanced-base';
 import { NormalizedEvent } from '@settler/adapters/enhanced-base';
-import { Transaction, Settlement } from '../../domain/canonical/types';
+import { Transaction, Settlement } from '@settler/types';
 import { query } from '../../db';
 import { StripeEnhancedAdapter } from '@settler/adapters/stripe-enhanced';
 import { PayPalEnhancedAdapter } from '@settler/adapters/paypal-enhanced';

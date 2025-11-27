@@ -8,7 +8,7 @@
  * - Fuzzy matching (reference ID variations, amount tolerance)
  */
 
-import { Transaction, Settlement, ReconciliationMatch, MatchingRulesConfig, MatchType, Exception, ExceptionCategory } from '../../domain/canonical/types';
+import { Transaction, Settlement, ReconciliationMatch, MatchingRulesConfig, MatchType, Exception, ExceptionCategory } from '@settler/types';
 import { query } from '../../db';
 
 export interface MatchResult {

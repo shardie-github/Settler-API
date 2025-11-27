@@ -9,16 +9,7 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./domain/canonical/types": {
-      "types": "./dist/domain/canonical/types.d.ts",
-      "default": "./dist/domain/canonical/types.js"
-    },
     "./package.json": "./package.json"
-  },
-  "typesVersions": {
-    "*": {
-      "domain/canonical/types": ["./dist/domain/canonical/types.d.ts"]
-    }
   },
   "scripts": {
     "build": "tsc",
@@ -35,6 +26,7 @@
   },
   "dependencies": {
     "@settler/adapters": "*",
+    "@settler/types": "*",
     "@settler/sdk": "*",
     "express": "^4.18.2",
     "cors": "^2.8.5",

@@ -4,7 +4,7 @@
  * Exports reconciled data to generic CSV format with customizable columns
  */
 
-import { Transaction, Settlement, Fee } from '../../domain/canonical/types';
+import { Transaction, Settlement, Fee } from '@settler/types';
 import { query } from '../../db';
 
 export interface CSVExportOptions {

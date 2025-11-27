@@ -1,20 +1,21 @@
 {
-  "name": "@settler/adapters",
+  "name": "@settler/types",
   "version": "1.0.0",
-  "description": "Settler Adapters - Platform adapters for reconciliation",
+  "description": "Settler Types - Shared canonical data model types",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "test": "jest",
-    "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
-  },
-  "dependencies": {
-    "@settler/types": "*",
-    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

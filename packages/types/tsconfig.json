@@ -8,10 +8,5 @@
     "declarationMap": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"],
-  "references": [
-    {
-      "path": "../types"
-    }
-  ]
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

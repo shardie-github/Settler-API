@@ -5,7 +5,7 @@
  * as specified in the Product & Technical Specification.
  */
 
-import { Transaction, Fee, FeeType, Money } from '../../domain/canonical/types';
+import { Transaction, Fee, FeeType, Money } from '@settler/types';
 
 export interface FeeExtractionResult {
   fees: Fee[];

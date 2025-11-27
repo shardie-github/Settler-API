@@ -19,7 +19,8 @@
       "@settler/sdk": ["./packages/sdk/src"],
       "@settler/api": ["./packages/api/src"],
       "@settler/api/*": ["./packages/api/src/*"],
-      "@settler/adapters": ["./packages/adapters/src"]
+      "@settler/adapters": ["./packages/adapters/src"],
+      "@settler/types": ["./packages/types/src"]
     }
   },
   "exclude": ["node_modules", "dist", "build", ".next"]

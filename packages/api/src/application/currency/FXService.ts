@@ -5,7 +5,7 @@
  * and currency-aware matching as specified in the Product & Technical Specification.
  */
 
-import { FXConversion, Money } from '../../domain/canonical/types';
+import { FXConversion, Money } from '@settler/types';
 import { query } from '../../db';
 
 export interface FXRate {

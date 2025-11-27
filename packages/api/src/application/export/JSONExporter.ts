@@ -4,7 +4,7 @@
  * Exports reconciled data to JSON format for programmatic access
  */
 
-import { Transaction, Settlement, Fee, ReconciliationMatch } from '../../domain/canonical/types';
+import { Transaction, Settlement, Fee, ReconciliationMatch } from '@settler/types';
 import { query } from '../../db';
 
 export interface JSONExportOptions {

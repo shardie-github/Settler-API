@@ -6,7 +6,7 @@
  */
 
 import { EnhancedAdapter, AdapterConfig, DateRange, NormalizedEvent, WebhookVerificationResult } from './enhanced-base';
-import { Transaction, Settlement, Fee, RefundDispute, TransactionType, TransactionStatus, SettlementStatus, RefundDisputeType, RefundDisputeStatus } from '@settler/api/domain/canonical/types';
+import { Transaction, Settlement, Fee, RefundDispute, TransactionType, TransactionStatus, SettlementStatus, RefundDisputeType, RefundDisputeStatus } from '@settler/types';
 import crypto from 'crypto';
 
 export class PayPalEnhancedAdapter implements EnhancedAdapter {
