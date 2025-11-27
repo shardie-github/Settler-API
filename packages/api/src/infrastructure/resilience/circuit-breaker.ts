@@ -26,7 +26,7 @@ const DEFAULT_CONFIG: Required<CircuitBreakerConfig> = {
 export function createCircuitBreaker<T extends unknown[], R>(
   fn: (...args: T) => Promise<R>,
   config: CircuitBreakerConfig = {}
-): CircuitBreaker {
+): CircuitBreaker<R> {
   const opts = { ...DEFAULT_CONFIG, ...config };
   
   const breakerOptions: CircuitBreakerOptions = {
@@ -81,7 +81,7 @@ export function createCircuitBreaker<T extends unknown[], R>(
 export function createApiCircuitBreaker<T extends unknown[], R>(
   fn: (...args: T) => Promise<R>,
   apiName: string
-): CircuitBreaker {
+): CircuitBreaker<R> {
   return createCircuitBreaker(fn, {
     name: `api-${apiName}`,
     timeout: 30000,

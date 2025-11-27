@@ -92,24 +92,36 @@ export async function rotateRefreshToken(oldRefreshToken: string): Promise<Token
 
     // Generate new token pair
     const newRefreshTokenId = uuidv4();
+    if (!config.jwt.secret) {
+      throw new Error('JWT secret not configured');
+    }
+    
+    const jwtSecret = config.jwt.secret as string;
+    const accessTokenExpiry: string | number = typeof config.jwt.accessTokenExpiry === 'string' 
+      ? config.jwt.accessTokenExpiry 
+      : (typeof config.jwt.accessTokenExpiry === 'number' ? config.jwt.accessTokenExpiry : '15m');
     const newAccessToken = jwt.sign(
       { userId: decoded.userId, type: 'access' },
-      config.jwt.secret!,
+      jwtSecret,
       {
-        expiresIn: config.jwt.accessTokenExpiry,
+        expiresIn: accessTokenExpiry,
         issuer: 'settler-api',
         audience: 'settler-client',
-      }
+      } as jwt.SignOptions
     );
 
+    const refreshSecret = (config.jwt.refreshSecret || jwtSecret) as string;
+    const refreshTokenExpiry: string | number = typeof config.jwt.refreshTokenExpiry === 'string'
+      ? config.jwt.refreshTokenExpiry
+      : (typeof config.jwt.refreshTokenExpiry === 'number' ? config.jwt.refreshTokenExpiry : '7d');
     const newRefreshToken = jwt.sign(
       { userId: decoded.userId, tokenId: newRefreshTokenId, type: 'refresh' },
-      config.jwt.refreshSecret || config.jwt.secret!,
+      refreshSecret,
       {
-        expiresIn: config.jwt.refreshTokenExpiry,
+        expiresIn: refreshTokenExpiry,
         issuer: 'settler-api',
         audience: 'settler-client',
-      }
+      } as jwt.SignOptions
     );
 
     // Store new refresh token in database

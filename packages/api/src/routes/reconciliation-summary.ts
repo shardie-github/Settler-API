@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { validateRequest } from '../middleware/validation';
 import { AuthRequest } from '../middleware/auth';
 import { requirePermission } from '../middleware/authorization';
+import { Permission } from '../infrastructure/security/Permissions';
 import { apiGatewayCache, cacheConfigs } from '../middleware/api-gateway-cache';
 import { cacheInvalidation } from '../middleware/api-gateway-cache';
 import { getReconciliationSummary, getJobPerformance, getMatchAccuracy } from '../infrastructure/query-optimization';
@@ -32,7 +33,7 @@ const getSummarySchema = z.object({
 // Get reconciliation summary (cached, uses materialized view)
 router.get(
   '/:jobId',
-  requirePermission('reports', 'read'),
+  requirePermission(Permission.REPORTS_READ),
   apiGatewayCache(cacheConfigs.reconciliationSummary()),
   validateRequest(getSummarySchema),
   async (req: AuthRequest, res: Response) => {
@@ -61,7 +62,7 @@ router.get(
 // Get job performance metrics
 router.get(
   '/:jobId/performance',
-  requirePermission('reports', 'read'),
+  requirePermission(Permission.REPORTS_READ),
   apiGatewayCache({ ttl: 300, includeUserId: true }),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -85,7 +86,7 @@ router.get(
 // Get match accuracy
 router.get(
   '/:jobId/accuracy',
-  requirePermission('reports', 'read'),
+  requirePermission(Permission.REPORTS_READ),
   apiGatewayCache({ ttl: 300, includeUserId: true }),
   async (req: AuthRequest, res: Response) => {
     try {

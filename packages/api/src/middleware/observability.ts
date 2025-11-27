@@ -4,9 +4,9 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { trace, Span, SpanStatusCode, context } from '@opentelemetry/api';
+import { trace, SpanStatusCode, context } from '@opentelemetry/api';
 import { httpRequestDuration, httpRequestTotal, httpRequestErrors } from '../infrastructure/observability/metrics';
-import { logInfo, logError, logPerformance } from '../utils/logger';
+import { logPerformance } from '../utils/logger';
 import { AuthRequest } from './auth';
 
 const tracer = trace.getTracer('settler-api');
@@ -35,24 +35,36 @@ export function observabilityMiddleware(
   const ctx = trace.setSpan(context.active(), span);
 
   // Wrap response handlers
-  const originalSend = res.send;
-  const originalJson = res.json;
-  const originalEnd = res.end;
+  const originalSend = res.send.bind(res);
+  const originalJson = res.json.bind(res);
+  const originalEnd = res.end.bind(res);
 
-  res.send = function (body: unknown) {
+  res.send = function (this: Response, body: unknown) {
     recordMetrics();
     return originalSend.call(this, body);
   };
 
-  res.json = function (body: unknown) {
+  res.json = function (this: Response, body: unknown) {
     recordMetrics();
     return originalJson.call(this, body);
   };
 
-  res.end = function (chunk?: unknown, encoding?: BufferEncoding) {
+  res.end = function (this: Response, chunk?: unknown, encoding?: BufferEncoding | (() => void), cb?: () => void) {
     recordMetrics();
-    return originalEnd.call(this, chunk, encoding);
-  };
+    if (typeof encoding === 'function') {
+      // encoding is actually a callback function (two-arg overload: end(chunk, cb))
+      originalEnd(chunk, encoding);
+    } else if (encoding !== undefined && typeof encoding === 'string') {
+      // encoding is a BufferEncoding string (three-arg overload: end(chunk, encoding, cb))
+      originalEnd(chunk, encoding, cb);
+    } else if (cb !== undefined) {
+      // cb is provided but encoding is not (two-arg overload: end(chunk, cb))
+      originalEnd(chunk, cb);
+    } else {
+      // Only chunk provided (one-arg overload: end(chunk))
+      originalEnd(chunk);
+    }
+  } as typeof originalEnd;
 
   function recordMetrics() {
     const duration = (Date.now() - startTime) / 1000;

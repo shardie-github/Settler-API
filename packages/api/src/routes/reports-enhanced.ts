@@ -8,6 +8,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 import { NotFoundError } from "../utils/typed-errors";
@@ -28,7 +29,7 @@ const getEnhancedReportSchema = z.object({
 // Get enhanced report with visual summaries
 router.get(
   "/reports/:jobId/enhanced",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(getEnhancedReportSchema),
   async (req: AuthRequest, res: Response) => {
     try {

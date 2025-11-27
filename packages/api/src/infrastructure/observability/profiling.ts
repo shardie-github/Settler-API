@@ -65,13 +65,20 @@ export function profilingMiddleware(req: Request, res: Response, next: NextFunct
 
     // Call original end with proper typing
     if (typeof encoding === 'function') {
+      // encoding is actually a callback function
       originalEnd(chunk as unknown, encoding as unknown as () => void);
     } else if (typeof chunk === 'function') {
+      // chunk is actually a callback function
       originalEnd(chunk as unknown as () => void);
-    } else if (typeof encoding === 'string') {
+    } else if (encoding !== undefined && typeof encoding === 'string') {
+      // encoding is a BufferEncoding string
       originalEnd(chunk as unknown, encoding as BufferEncoding, cb);
+    } else if (cb !== undefined) {
+      // cb is provided but encoding is not - call with chunk and cb only
+      originalEnd(chunk as unknown, cb);
     } else {
-      originalEnd(chunk as unknown, encoding as unknown, cb);
+      // Only chunk provided
+      originalEnd(chunk as unknown);
     }
   } as typeof originalEnd;
 

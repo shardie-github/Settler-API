@@ -8,7 +8,7 @@ import { config } from '../../config';
 import { User, UserRole } from '../../domain/entities/User';
 import { verifyApiKey } from '../../utils/hash';
 import { query } from '../../db';
-import { logWarn, logError } from '../../utils/logger';
+// Logger imports removed - not used in this file
 
 export interface TokenPayload {
   userId: string;

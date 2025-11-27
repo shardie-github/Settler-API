@@ -9,6 +9,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 
@@ -24,7 +25,7 @@ const dashboardQuerySchema = z.object({
 // Activation Dashboard
 router.get(
   "/dashboards/activation",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(dashboardQuerySchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -139,7 +140,7 @@ router.get(
 // Usage Dashboard
 router.get(
   "/dashboards/usage",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(dashboardQuerySchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -258,18 +259,18 @@ router.get(
 // Revenue Dashboard (placeholder - requires billing integration)
 router.get(
   "/dashboards/revenue",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(dashboardQuerySchema),
   async (req: AuthRequest, res: Response) => {
     try {
-      const userId = req.userId!;
+      const _userId = req.userId!;
       const { startDate, endDate } = req.query as {
         startDate?: string;
         endDate?: string;
       };
 
-      const start = startDate ? new Date(startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-      const end = endDate ? new Date(endDate) : new Date();
+      const _start = startDate ? new Date(startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      const _end = endDate ? new Date(endDate) : new Date();
 
       // Placeholder - requires billing/plan tracking
       res.json({
@@ -291,7 +292,7 @@ router.get(
 // Support Dashboard
 router.get(
   "/dashboards/support",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(dashboardQuerySchema),
   async (req: AuthRequest, res: Response) => {
     try {

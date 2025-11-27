@@ -1,7 +1,6 @@
 import { Router, Request, Response } from "express";
 import { query } from "../db";
 import { pool } from "../db";
-import { logError } from "../utils/logger";
 import { HealthCheckService } from "../infrastructure/observability/health";
 
 const router = Router();
@@ -13,6 +12,7 @@ interface HealthCheck {
   error?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function checkDatabase(): Promise<HealthCheck> {
   const start = Date.now();
   try {
@@ -25,6 +25,7 @@ async function checkDatabase(): Promise<HealthCheck> {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function checkConnectionPool(): Promise<HealthCheck> {
   try {
     const totalConnections = pool.totalCount;
@@ -55,7 +56,7 @@ async function checkConnectionPool(): Promise<HealthCheck> {
 }
 
 // Basic health check (liveness probe)
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", async (_req: Request, res: Response) => {
   const health = await healthCheckService.checkLive();
   res.json({
     status: health.status,
@@ -66,7 +67,7 @@ router.get("/", async (req: Request, res: Response) => {
 });
 
 // Detailed health check with dependency checks
-router.get("/detailed", async (req: Request, res: Response) => {
+router.get("/detailed", async (_req: Request, res: Response) => {
   const health = await healthCheckService.checkAll();
   res.status(health.status === 'healthy' ? 200 : 503).json({
     status: health.status,
@@ -78,13 +79,13 @@ router.get("/detailed", async (req: Request, res: Response) => {
 });
 
 // Liveness probe (always returns OK if process is alive)
-router.get("/live", async (req: Request, res: Response) => {
+router.get("/live", async (_req: Request, res: Response) => {
   const health = await healthCheckService.checkLive();
   res.status(200).json(health);
 });
 
 // Readiness probe (returns ready only if dependencies are healthy)
-router.get("/ready", async (req: Request, res: Response) => {
+router.get("/ready", async (_req: Request, res: Response) => {
   const health = await healthCheckService.checkReady();
   res.status(health.status === 'ready' ? 200 : 503).json(health);
 });

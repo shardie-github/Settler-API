@@ -8,6 +8,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 import { NotFoundError } from "../utils/typed-errors";
@@ -23,7 +24,7 @@ const getStatusSchema = z.object({
 // Get reconciliation execution status with progress
 router.get(
   "/executions/:executionId/status",
-  requirePermission("jobs", "read"),
+  requirePermission(Permission.JOBS_READ),
   validateRequest(getStatusSchema),
   async (req: AuthRequest, res: Response) => {
     try {

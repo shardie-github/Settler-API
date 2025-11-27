@@ -8,6 +8,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { handleRouteError } from "../utils/error-handler";
 import { query } from "../db";
 
@@ -27,7 +28,7 @@ const aiQuerySchema = z.object({
 // AI assistant chat endpoint
 router.post(
   "/ai/assistant",
-  requirePermission("jobs", "read"),
+  requirePermission(Permission.JOBS_READ),
   validateRequest(aiQuerySchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -55,7 +56,7 @@ router.post(
 // AI-powered optimization suggestions
 router.get(
   "/jobs/:jobId/ai-optimize",
-  requirePermission("jobs", "read"),
+  requirePermission(Permission.JOBS_READ),
   async (req: AuthRequest, res: Response) => {
     try {
       const { jobId } = req.params;
@@ -64,11 +65,12 @@ router.get(
       // Get job details
       const jobs = await query<{ id: string; rules: unknown; source_adapter: string; target_adapter: string }>(
         `SELECT id, rules, source_adapter, target_adapter FROM jobs WHERE id = $1 AND user_id = $2`,
-        [jobId, userId]
+        [jobId || null, userId]
       );
 
-      if (jobs.length === 0) {
-        return res.status(404).json({ error: "Job not found" });
+      if (jobs.length === 0 || !jobs[0]) {
+        res.status(404).json({ error: "Job not found" });
+        return;
       }
 
       const job = jobs[0];
@@ -87,7 +89,7 @@ router.get(
            AVG((summary->>'matched')::int::float / NULLIF((summary->>'total')::int, 0)) as match_rate
          FROM executions e
          WHERE job_id = $1`,
-        [jobId]
+        [jobId || null]
       );
 
       const m = metrics[0] || {
@@ -122,8 +124,8 @@ router.get(
 
 async function generateAIResponse(
   query: string,
-  context?: { jobId?: string; adapter?: string; error?: string },
-  userId?: string
+  _context?: { jobId?: string; adapter?: string; error?: string },
+  _userId?: string
 ): Promise<{
   answer: string;
   suggestions: string[];

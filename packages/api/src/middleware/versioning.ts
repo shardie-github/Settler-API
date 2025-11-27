@@ -55,7 +55,7 @@ export function deprecateEndpoint(
   sunsetDate: string,
   migrationGuideUrl?: string
 ) {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (_req: Request, res: Response, next: NextFunction): void => {
     res.setHeader('Deprecation', 'true');
     res.setHeader('Sunset', sunsetDate);
 

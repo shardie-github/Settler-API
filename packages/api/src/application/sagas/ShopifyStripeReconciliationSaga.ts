@@ -17,8 +17,8 @@ import { createCircuitBreaker } from '../../infrastructure/resilience/circuit-br
 import { CircuitBreaker } from 'opossum';
 
 export class ShopifyStripeReconciliationSaga {
-  private shopifyCircuitBreaker: CircuitBreaker;
-  private stripeCircuitBreaker: CircuitBreaker;
+  private shopifyCircuitBreaker: CircuitBreaker<any>;
+  private stripeCircuitBreaker: CircuitBreaker<any>;
 
   constructor(
     private eventStore: IEventStore,
@@ -211,6 +211,8 @@ export class ShopifyStripeReconciliationSaga {
           const reconciliationId = state.aggregateId;
           const orders = state.data.shopify_orders as any[];
           const payments = state.data.stripe_payments as any[];
+          // Matching rules reserved for future use
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const _matchingRules = state.data.matching_rules as any;
 
           const matched: any[] = [];

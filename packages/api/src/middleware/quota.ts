@@ -3,7 +3,7 @@
  * Enforces quotas before processing requests
  */
 
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { TenantRequest } from './tenant';
 import { QuotaService, QuotaType } from '../application/services/QuotaService';
 import { Container } from '../infrastructure/di/Container';
@@ -16,7 +16,8 @@ export function quotaMiddleware(quotaType: QuotaType, requestedValue: number = 1
         return;
       }
 
-      const quotaService = Container.get<QuotaService>('QuotaService');
+      const container = Container.getInstance();
+      const quotaService = container.get<QuotaService>('QuotaService');
       await quotaService.enforceQuota(req.tenantId, quotaType, requestedValue);
       next();
     } catch (error: unknown) {

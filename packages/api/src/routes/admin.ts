@@ -3,7 +3,7 @@
  * Admin/debug endpoints for inspecting sagas and events
  */
 
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
 import { AdminService } from '../application/admin/AdminService';
 import { handleRouteError } from '../utils/error-handler';
 
@@ -16,7 +16,8 @@ export function createAdminRouter(adminService: AdminService): Router {
       const { sagaType, sagaId } = req.params;
       const status = await adminService.getSagaStatus(sagaId, sagaType);
       if (!status) {
-        return res.status(404).json({ error: 'Saga not found' });
+        res.status(404).json({ error: 'Saga not found' });
+        return;
       }
       res.json(status);
     } catch (error: unknown) {

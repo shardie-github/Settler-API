@@ -25,7 +25,7 @@ export function idempotencyMiddleware() {
       [req.userId, idempotencyKey]
     );
 
-    if (cached.length > 0) {
+    if (cached.length > 0 && cached[0]) {
       // Return cached response
       const cachedResponse = cached[0].response;
       res.status(cachedResponse.statusCode || 200).json(cachedResponse.data);
@@ -53,7 +53,7 @@ export function idempotencyMiddleware() {
     // Call next middleware
     await new Promise<void>((resolve) => {
       const originalEnd = res.end.bind(res);
-      res.end = function(...args: unknown[]) {
+      res.end = function(chunk?: unknown, encoding?: BufferEncoding, cb?: () => void) {
         // Cache successful responses (2xx)
         if (statusCode >= 200 && statusCode < 300) {
           query(
@@ -61,15 +61,21 @@ export function idempotencyMiddleware() {
              VALUES ($1, $2, $3, NOW() + INTERVAL '24 hours')
              ON CONFLICT (user_id, key) DO NOTHING`,
             [
-              req.userId,
+              req.userId || null,
               idempotencyKey,
               JSON.stringify({ statusCode, data: responseData }),
             ]
           ).catch(err => console.error('Failed to cache idempotency key', err));
         }
-        originalEnd(...args);
+        if (encoding !== undefined && typeof encoding === 'string') {
+          originalEnd(chunk, encoding, cb);
+        } else if (cb !== undefined) {
+          originalEnd(chunk, cb);
+        } else {
+          originalEnd(chunk);
+        }
         resolve();
-      };
+      } as typeof originalEnd;
       next();
     });
   };

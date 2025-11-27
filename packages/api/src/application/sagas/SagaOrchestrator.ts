@@ -64,7 +64,10 @@ export class SagaOrchestrator {
 
   constructor(
     private db: Pool = pool,
+    // Event store and bus are reserved for future event sourcing implementation
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private _eventStore: IEventStore,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private _eventBus: IEventBus
   ) {}
 

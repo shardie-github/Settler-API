@@ -3,6 +3,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission, requireResourceOwnership } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
 import { logInfo, logError } from "../utils/logger";
 import { handleRouteError } from "../utils/error-handler";
@@ -33,7 +34,7 @@ const paginationSchema = z.object({
 // Get reconciliation report with pagination
 router.get(
   "/:jobId",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(getReportSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -198,7 +199,7 @@ router.get(
 // Get report history with pagination
 router.get(
   "/",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(paginationSchema),
   async (req: AuthRequest, res: Response) => {
     try {

@@ -44,7 +44,7 @@ export function eventTrackingMiddleware(
  * Track page view events (for web UI)
  */
 export function trackPageView(page: string) {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     const authReq = req as AuthRequest;
     if (authReq.userId) {
       trackEventAsync(
