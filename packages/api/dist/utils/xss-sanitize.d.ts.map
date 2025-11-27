@@ -1,0 +1,1 @@
+{"version":3,"file":"xss-sanitize.d.ts","sourceRoot":"","sources":["../../src/utils/xss-sanitize.ts"],"names":[],"mappings":"AACA,wBAAgB,YAAY,CAAC,GAAG,EAAE,MAAM,GAAG,MAAM,CAQhD;AAED,wBAAgB,kBAAkB,CAAC,IAAI,EAAE,GAAG,GAAG,GAAG,CAkBjD"}

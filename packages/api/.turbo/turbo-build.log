@@ -1,0 +1,987 @@
+npm warn config optional Use `--omit=optional` to exclude optional dependencies, or
+npm warn config `--include=optional` to include them.
+npm warn config
+npm warn config       Default value does install optional deps unless otherwise omitted.
+
+> @settler/api@1.0.0 build
+> tsc
+
+../adapters/src/index.ts(1,15): error TS6059: File '/workspace/packages/adapters/src/base.ts' is not under 'rootDir' '/workspace/packages/api/src'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via "./base" from file '/workspace/packages/adapters/src/index.ts'
+    Imported via "./base" from file '/workspace/packages/adapters/src/stripe.ts'
+    Imported via "./base" from file '/workspace/packages/adapters/src/paypal.ts'
+    Imported via "./base" from file '/workspace/packages/adapters/src/shopify.ts'
+    Imported via "./base" from file '/workspace/packages/adapters/src/quickbooks.ts'
+../adapters/src/index.ts(1,15): error TS6307: File '/workspace/packages/adapters/src/base.ts' is not listed within the file list of project '/workspace/packages/api/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via "./base" from file '/workspace/packages/adapters/src/index.ts'
+    Imported via "./base" from file '/workspace/packages/adapters/src/stripe.ts'
+    Imported via "./base" from file '/workspace/packages/adapters/src/paypal.ts'
+    Imported via "./base" from file '/workspace/packages/adapters/src/shopify.ts'
+    Imported via "./base" from file '/workspace/packages/adapters/src/quickbooks.ts'
+../adapters/src/index.ts(2,15): error TS6059: File '/workspace/packages/adapters/src/enhanced-base.ts' is not under 'rootDir' '/workspace/packages/api/src'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via "./enhanced-base" from file '/workspace/packages/adapters/src/index.ts'
+    Imported via './enhanced-base' from file '/workspace/packages/adapters/src/stripe-enhanced.ts'
+    Imported via './enhanced-base' from file '/workspace/packages/adapters/src/paypal-enhanced.ts'
+    Imported via './enhanced-base' from file '/workspace/packages/adapters/src/square-enhanced.ts'
+../adapters/src/index.ts(2,15): error TS6307: File '/workspace/packages/adapters/src/enhanced-base.ts' is not listed within the file list of project '/workspace/packages/api/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via "./enhanced-base" from file '/workspace/packages/adapters/src/index.ts'
+    Imported via './enhanced-base' from file '/workspace/packages/adapters/src/stripe-enhanced.ts'
+    Imported via './enhanced-base' from file '/workspace/packages/adapters/src/paypal-enhanced.ts'
+    Imported via './enhanced-base' from file '/workspace/packages/adapters/src/square-enhanced.ts'
+../adapters/src/index.ts(3,15): error TS6059: File '/workspace/packages/adapters/src/stripe.ts' is not under 'rootDir' '/workspace/packages/api/src'. 'rootDir' is expected to contain all source files.
+../adapters/src/index.ts(3,15): error TS6307: File '/workspace/packages/adapters/src/stripe.ts' is not listed within the file list of project '/workspace/packages/api/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+../adapters/src/index.ts(4,15): error TS6059: File '/workspace/packages/adapters/src/stripe-enhanced.ts' is not under 'rootDir' '/workspace/packages/api/src'. 'rootDir' is expected to contain all source files.
+../adapters/src/index.ts(4,15): error TS6307: File '/workspace/packages/adapters/src/stripe-enhanced.ts' is not listed within the file list of project '/workspace/packages/api/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+../adapters/src/index.ts(5,15): error TS6059: File '/workspace/packages/adapters/src/paypal.ts' is not under 'rootDir' '/workspace/packages/api/src'. 'rootDir' is expected to contain all source files.
+../adapters/src/index.ts(5,15): error TS6307: File '/workspace/packages/adapters/src/paypal.ts' is not listed within the file list of project '/workspace/packages/api/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+../adapters/src/index.ts(6,15): error TS6059: File '/workspace/packages/adapters/src/paypal-enhanced.ts' is not under 'rootDir' '/workspace/packages/api/src'. 'rootDir' is expected to contain all source files.
+../adapters/src/index.ts(6,15): error TS6307: File '/workspace/packages/adapters/src/paypal-enhanced.ts' is not listed within the file list of project '/workspace/packages/api/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+../adapters/src/index.ts(7,15): error TS6059: File '/workspace/packages/adapters/src/square-enhanced.ts' is not under 'rootDir' '/workspace/packages/api/src'. 'rootDir' is expected to contain all source files.
+../adapters/src/index.ts(7,15): error TS6307: File '/workspace/packages/adapters/src/square-enhanced.ts' is not listed within the file list of project '/workspace/packages/api/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+../adapters/src/index.ts(8,15): error TS6059: File '/workspace/packages/adapters/src/shopify.ts' is not under 'rootDir' '/workspace/packages/api/src'. 'rootDir' is expected to contain all source files.
+../adapters/src/index.ts(8,15): error TS6307: File '/workspace/packages/adapters/src/shopify.ts' is not listed within the file list of project '/workspace/packages/api/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+../adapters/src/index.ts(9,15): error TS6059: File '/workspace/packages/adapters/src/quickbooks.ts' is not under 'rootDir' '/workspace/packages/api/src'. 'rootDir' is expected to contain all source files.
+../adapters/src/index.ts(9,15): error TS6307: File '/workspace/packages/adapters/src/quickbooks.ts' is not listed within the file list of project '/workspace/packages/api/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+src/__tests__/type-tests.ts(6,30): error TS2307: Cannot find module 'vitest' or its corresponding type declarations.
+src/__tests__/type-tests.ts(8,18): error TS6133: 'Option' is declared but its value is never read.
+src/__tests__/type-tests.ts(8,26): error TS6133: 'isNotNull' is declared but its value is never read.
+src/__tests__/type-tests.ts(36,13): error TS6133: 'failure' is declared but its value is never read.
+src/__tests__/type-tests.ts(42,30): error TS2339: Property 'error' does not exist on type 'never'.
+src/application/admin/AdminService.ts(90,5): error TS6133: 'reconciliationId' is declared but its value is never read.
+src/application/cqrs/commands/ReconciliationCommandHandlers.ts(31,7): error TS2379: Argument of type '{ reconciliation_id: string; job_id: string; source_adapter: string; target_adapter: string; date_range: { start: string; end: string; }; initiated_by: string | undefined; }' is not assignable to parameter of type 'ReconciliationStartedData' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'initiated_by' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/application/cqrs/commands/ReconciliationCommandHandlers.ts(73,53): error TS18048: 'lastEvent' is possibly 'undefined'.
+src/application/cqrs/commands/ReconciliationCommandHandlers.ts(78,7): error TS2379: Argument of type '{ reconciliation_id: string; job_id: any; source_adapter: any; target_adapter: any; date_range: any; initiated_by: string | undefined; }' is not assignable to parameter of type 'ReconciliationStartedData' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'initiated_by' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/application/cqrs/commands/ReconciliationCommandHandlers.ts(80,18): error TS18048: 'lastEvent' is possibly 'undefined'.
+src/application/cqrs/commands/ReconciliationCommandHandlers.ts(81,26): error TS18048: 'lastEvent' is possibly 'undefined'.
+src/application/cqrs/commands/ReconciliationCommandHandlers.ts(82,26): error TS18048: 'lastEvent' is possibly 'undefined'.
+src/application/cqrs/commands/ReconciliationCommandHandlers.ts(83,22): error TS18048: 'lastEvent' is possibly 'undefined'.
+src/application/cqrs/commands/ReconciliationCommandHandlers.ts(108,53): error TS18048: 'lastEvent' is possibly 'undefined'.
+src/application/cqrs/commands/ReconciliationCommandHandlers.ts(131,35): error TS6133: 'command' is declared but its value is never read.
+src/application/cqrs/commands/ReconciliationCommandHandlers.ts(136,36): error TS6133: 'command' is declared but its value is never read.
+src/application/currency/FXService.ts(34,11): error TS2375: Type '{ id: string; tenantId: string; transactionId: string; fromCurrency: string; toCurrency: string; fromAmount: number; toAmount: number; fxRate: number; provider: string | undefined; rateDate: Date; createdAt: Date; }' is not assignable to type 'FXConversion' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'provider' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/application/currency/FXService.ts(63,9): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/currency/FXService.ts(102,12): error TS2532: Object is possibly 'undefined'.
+src/application/currency/FXService.ts(140,30): error TS2532: Object is possibly 'undefined'.
+src/application/currency/FXService.ts(141,7): error TS2322: Type '{}' is not assignable to type 'string'.
+src/application/currency/FXService.ts(141,14): error TS2532: Object is possibly 'undefined'.
+src/application/export/CSVExporter.ts(7,1): error TS6192: All imports in import declaration are unused.
+src/application/export/CSVExporter.ts(83,12): error TS2322: Type 'unknown' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/export/CSVExporter.ts(145,7): error TS2322: Type '{}' is not assignable to type 'string'.
+src/application/export/CSVExporter.ts(147,5): error TS2322: Type '{}' is not assignable to type 'string'.
+src/application/export/JSONExporter.ts(118,11): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/application/export/JSONExporter.ts(119,11): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/application/export/JSONExporter.ts(120,11): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/application/export/JSONExporter.ts(121,11): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/application/export/JSONExporter.ts(136,12): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/export/JSONExporter.ts(149,27): error TS2379: Argument of type '{ match: { id: string; tenantId: string; executionId: string; jobId: string; transactionId: string; settlementId: string; matchType: string; confidenceScore: number; matchingRules: unknown; matchedAt: string; createdAt: string; }; transaction: Transaction; settlement: Settlement; fees?: Fee[]; }' is not assignable to parameter of type '{ match: ReconciliationMatch; transaction: Transaction; settlement: Settlement; fees?: Fee[]; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  The types of 'match.matchType' are incompatible between these types.
+    Type 'string' is not assignable to type 'MatchType'.
+src/application/export/QuickBooksExporter.ts(8,1): error TS6192: All imports in import declaration are unused.
+src/application/fees/FeeExtractionService.ts(8,28): error TS6133: 'FeeType' is declared but its value is never read.
+src/application/fees/FeeExtractionService.ts(21,11): error TS6133: 'fees' is declared but its value is never read.
+src/application/matching/MatchingEngine.ts(11,77): error TS6133: 'MatchType' is declared but its value is never read.
+src/application/matching/MatchingEngine.ts(11,99): error TS6133: 'ExceptionCategory' is declared but its value is never read.
+src/application/matching/MatchingEngine.ts(12,1): error TS6133: 'query' is declared but its value is never read.
+src/application/matching/MatchingEngine.ts(92,23): error TS2379: Argument of type '{ id: string; tenantId: string; executionId: string | undefined; jobId: string | undefined; transactionId: string; category: "missing_settlement"; severity: "medium"; description: string; resolutionStatus: "open"; createdAt: Date; updatedAt: Date; }' is not assignable to parameter of type 'Exception' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'executionId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/application/matching/MatchingEngine.ts(108,23): error TS2379: Argument of type '{ id: string; tenantId: string; executionId: string | undefined; jobId: string | undefined; settlementId: string; category: "missing_transaction"; severity: "medium"; description: string; resolutionStatus: "open"; createdAt: Date; updatedAt: Date; }' is not assignable to parameter of type 'Exception' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'executionId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/application/matching/MatchingEngine.ts(137,11): error TS6133: 'matches' is declared but its value is never read.
+src/application/matching/MatchingEngine.ts(138,11): error TS6133: 'exceptions' is declared but its value is never read.
+src/application/matching/MatchingEngine.ts(167,5): error TS6133: 'rule' is declared but its value is never read.
+src/application/matching/MatchingEngine.ts(190,22): error TS2379: Argument of type '{ id: string; tenantId: string; executionId: string | undefined; jobId: string | undefined; transactionId: string; settlementId: string; matchType: "1-to-1"; confidenceScore: number; matchingRules: { ...; }; matchedAt: Date; createdAt: Date; }' is not assignable to parameter of type 'ReconciliationMatch' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'executionId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/application/matching/MatchingEngine.ts(250,26): error TS2379: Argument of type '{ id: string; tenantId: string; executionId: string | undefined; jobId: string | undefined; transactionId: string; settlementId: string; matchType: "1-to-1"; confidenceScore: number; matchingRules: { ...; }; matchedAt: Date; createdAt: Date; }' is not assignable to parameter of type 'ReconciliationMatch' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'executionId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/application/matching/MatchingEngine.ts(302,26): error TS2379: Argument of type '{ id: string; tenantId: string; executionId: string | undefined; jobId: string | undefined; transactionId: string; settlementId: string; matchType: "1-to-1"; confidenceScore: number; matchingRules: { ...; }; matchedAt: Date; createdAt: Date; }' is not assignable to parameter of type 'ReconciliationMatch' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'executionId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/application/matching/MatchingEngine.ts(353,24): error TS2379: Argument of type '{ id: string; tenantId: string; executionId: string | undefined; jobId: string | undefined; transactionId: string; settlementId: string; matchType: "1-to-1"; confidenceScore: number; matchingRules: { ...; }; matchedAt: Date; createdAt: Date; }' is not assignable to parameter of type 'ReconciliationMatch' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'executionId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/application/matching/MatchingEngine.ts(378,5): error TS6133: 'transactions' is declared but its value is never read.
+src/application/matching/MatchingEngine.ts(379,5): error TS6133: 'settlements' is declared but its value is never read.
+src/application/matching/MatchingEngine.ts(380,5): error TS6133: 'rule' is declared but its value is never read.
+src/application/matching/MatchingEngine.ts(381,5): error TS6133: 'tenantId' is declared but its value is never read.
+src/application/matching/MatchingEngine.ts(382,5): error TS6133: 'executionId' is declared but its value is never read.
+src/application/matching/MatchingEngine.ts(383,5): error TS6133: 'jobId' is declared but its value is never read.
+src/application/matching/MatchingEngine.ts(449,7): error TS2532: Object is possibly 'undefined'.
+src/application/matching/MatchingEngine.ts(455,11): error TS2532: Object is possibly 'undefined'.
+src/application/matching/MatchingEngine.ts(455,11): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+src/application/matching/MatchingEngine.ts(455,26): error TS2532: Object is possibly 'undefined'.
+src/application/matching/MatchingEngine.ts(457,11): error TS2532: Object is possibly 'undefined'.
+src/application/matching/MatchingEngine.ts(458,13): error TS2532: Object is possibly 'undefined'.
+src/application/matching/MatchingEngine.ts(458,13): error TS2532: Object is possibly 'undefined'.
+src/application/matching/MatchingEngine.ts(459,13): error TS2532: Object is possibly 'undefined'.
+src/application/matching/MatchingEngine.ts(459,13): error TS2532: Object is possibly 'undefined'.
+src/application/matching/MatchingEngine.ts(460,13): error TS2532: Object is possibly 'undefined'.
+src/application/matching/MatchingEngine.ts(460,13): error TS2532: Object is possibly 'undefined'.
+src/application/matching/MatchingEngine.ts(466,5): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+src/application/matching/MatchingEngine.ts(466,12): error TS2532: Object is possibly 'undefined'.
+src/application/reconciliation/ReconciliationService.ts(46,50): error TS2345: Argument of type '(event: { reconciliationId: string; jobId: string; correlationId: string; }) => Promise<void>' is not assignable to parameter of type '(event: DomainEvent) => Promise<void>'.
+  Types of parameters 'event' and 'event' are incompatible.
+    Type 'DomainEvent' is missing the following properties from type '{ reconciliationId: string; jobId: string; correlationId: string; }': reconciliationId, jobId, correlationId
+src/application/reconciliation/ReconciliationService.ts(58,29): error TS2339: Property 'dateRange' does not exist on type '{ reconciliationId: string; jobId: string; correlationId: string; }'.
+src/application/reconciliation/ReconciliationService.ts(59,33): error TS2339: Property 'shopifyConfig' does not exist on type '{ reconciliationId: string; jobId: string; correlationId: string; }'.
+src/application/reconciliation/ReconciliationService.ts(60,32): error TS2339: Property 'stripeConfig' does not exist on type '{ reconciliationId: string; jobId: string; correlationId: string; }'.
+src/application/reconciliation/ReconciliationService.ts(61,33): error TS2339: Property 'matchingRules' does not exist on type '{ reconciliationId: string; jobId: string; correlationId: string; }'.
+src/application/reconciliation/ReconciliationService.ts(63,15): error TS2339: Property 'tenantId' does not exist on type '{ reconciliationId: string; jobId: string; correlationId: string; }'.
+src/application/sagas/SagaOrchestrator.ts(10,1): error TS6133: 'DomainEvent' is declared but its value is never read.
+src/application/sagas/SagaOrchestrator.ts(67,13): error TS6138: Property 'eventStore' is declared but its value is never read.
+src/application/sagas/SagaOrchestrator.ts(68,13): error TS6138: Property 'eventBus' is declared but its value is never read.
+src/application/sagas/SagaOrchestrator.ts(257,11): error TS2339: Property 'status' does not exist on type 'SagaState'.
+src/application/sagas/SagaOrchestrator.ts(267,11): error TS18048: 'step' is possibly 'undefined'.
+src/application/sagas/SagaOrchestrator.ts(269,29): error TS18048: 'step' is possibly 'undefined'.
+src/application/sagas/SagaOrchestrator.ts(274,19): error TS18048: 'step' is possibly 'undefined'.
+src/application/sagas/SagaOrchestrator.ts(275,53): error TS18048: 'step' is possibly 'undefined'.
+src/application/sagas/SagaOrchestrator.ts(277,59): error TS18048: 'step' is possibly 'undefined'.
+src/application/sagas/SagaOrchestrator.ts(390,49): error TS6133: 'step' is declared but its value is never read.
+src/application/sagas/SagaOrchestrator.ts(416,45): error TS6133: 'stepName' is declared but its value is never read.
+src/application/sagas/ShopifyStripeReconciliationSaga.ts(12,32): error TS6059: File '/workspace/packages/adapters/src/index.ts' is not under 'rootDir' '/workspace/packages/api/src'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via '@settler/adapters' from file '/workspace/packages/api/src/application/sagas/ShopifyStripeReconciliationSaga.ts'
+    Imported via '@settler/adapters' from file '/workspace/packages/api/src/application/sagas/ShopifyStripeReconciliationSaga.ts'
+    Imported via '@settler/adapters' from file '/workspace/packages/api/src/application/reconciliation/ReconciliationService.ts'
+    Imported via '@settler/adapters' from file '/workspace/packages/api/src/application/reconciliation/ReconciliationService.ts'
+src/application/sagas/ShopifyStripeReconciliationSaga.ts(12,32): error TS6307: File '/workspace/packages/adapters/src/index.ts' is not listed within the file list of project '/workspace/packages/api/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via '@settler/adapters' from file '/workspace/packages/api/src/application/sagas/ShopifyStripeReconciliationSaga.ts'
+    Imported via '@settler/adapters' from file '/workspace/packages/api/src/application/sagas/ShopifyStripeReconciliationSaga.ts'
+    Imported via '@settler/adapters' from file '/workspace/packages/api/src/application/reconciliation/ReconciliationService.ts'
+    Imported via '@settler/adapters' from file '/workspace/packages/api/src/application/reconciliation/ReconciliationService.ts'
+src/application/sagas/ShopifyStripeReconciliationSaga.ts(17,32): error TS7016: Could not find a declaration file for module 'opossum'. '/workspace/node_modules/opossum/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/opossum` if it exists or add a new declaration (.d.ts) file containing `declare module 'opossum';`
+src/application/sagas/ShopifyStripeReconciliationSaga.ts(88,35): error TS7006: Parameter 'order' implicitly has an 'any' type.
+src/application/sagas/ShopifyStripeReconciliationSaga.ts(160,39): error TS7006: Parameter 'payment' implicitly has an 'any' type.
+src/application/sagas/ShopifyStripeReconciliationSaga.ts(214,17): error TS6133: 'matchingRules' is declared but its value is never read.
+src/application/sagas/ShopifyStripeReconciliationSaga.ts(355,23): error TS6133: 'state' is declared but its value is never read.
+src/application/sagas/ShopifyStripeReconciliationSaga.ts(475,9): error TS2375: Type '{ type: string; message: string; stack: string | undefined; }' is not assignable to type '{ type: string; message: string; stack?: string; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'stack' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/application/services/FeatureFlagService.ts(102,30): error TS2322: Type 'FeatureFlag | undefined' is not assignable to type 'FeatureFlag | null'.
+  Type 'undefined' is not assignable to type 'FeatureFlag | null'.
+src/application/services/FeatureFlagService.ts(135,11): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/services/JobRouteService.ts(7,17): error TS6133: 'transaction' is declared but its value is never read.
+src/application/services/JobRouteService.ts(70,11): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/services/JobRouteService.ts(74,21): error TS2532: Object is possibly 'undefined'.
+src/application/services/JobRouteService.ts(89,7): error TS2375: Type '{ id: string; userId: string; name: string; source: { adapter: string; }; target: { adapter: string; }; rules: { matching: Array<{ field: string; type: "exact" | "fuzzy" | "range"; tolerance?: number; days?: number; threshold?: number; }>; conflictResolution?: "first-wins" | "last-wins" | "manual-review"; }; schedul...' is not assignable to type 'JobResponse' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'schedule' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/application/services/JobRouteService.ts(137,45): error TS18048: 'job' is possibly 'undefined'.
+src/application/services/JobRouteService.ts(138,45): error TS18048: 'job' is possibly 'undefined'.
+src/application/services/JobRouteService.ts(160,11): error TS18048: 'job' is possibly 'undefined'.
+src/application/services/JobRouteService.ts(161,15): error TS18048: 'job' is possibly 'undefined'.
+src/application/services/JobRouteService.ts(162,13): error TS18048: 'job' is possibly 'undefined'.
+src/application/services/JobRouteService.ts(164,18): error TS18048: 'job' is possibly 'undefined'.
+src/application/services/JobRouteService.ts(165,9): error TS2353: Object literal may only specify known properties, and 'config' does not exist in type '{ adapter: string; }'.
+src/application/services/JobRouteService.ts(168,18): error TS18048: 'job' is possibly 'undefined'.
+src/application/services/JobRouteService.ts(169,9): error TS2353: Object literal may only specify known properties, and 'config' does not exist in type '{ adapter: string; }'.
+src/application/services/JobRouteService.ts(171,25): error TS18048: 'job' is possibly 'undefined'.
+src/application/services/JobRouteService.ts(172,17): error TS18048: 'job' is possibly 'undefined'.
+src/application/services/JobRouteService.ts(173,15): error TS18048: 'job' is possibly 'undefined'.
+src/application/services/JobRouteService.ts(174,18): error TS18048: 'job' is possibly 'undefined'.
+src/application/services/JobRouteService.ts(211,28): error TS2532: Object is possibly 'undefined'.
+src/application/services/JobRouteService.ts(214,7): error TS2322: Type '{ id: string; userId: string; name: string; source: { adapter: string; }; target: { adapter: string; }; rules: {}; status: string; createdAt: string; }[]' is not assignable to type 'JobResponse[]'.
+  Type '{ id: string; userId: string; name: string; source: { adapter: string; }; target: { adapter: string; }; rules: {}; status: string; createdAt: string; }' is not assignable to type 'JobResponse'.
+    Types of property 'rules' are incompatible.
+      Property 'matching' is missing in type '{}' but required in type '{ matching: { field: string; type: "exact" | "fuzzy" | "range"; tolerance?: number; days?: number; threshold?: number; }[]; conflictResolution?: "first-wins" | "last-wins" | "manual-review"; }'.
+src/application/services/JobService.ts(27,28): error TS2379: Argument of type '{ userId: string; name: string; sourceAdapter: string; sourceConfigEncrypted: string; targetAdapter: string; targetConfigEncrypted: string; rules: ReconciliationRules; schedule: string | undefined; }' is not assignable to parameter of type 'Omit<JobProps, "status" | "id" | "createdAt" | "updatedAt" | "version">' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'schedule' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/application/services/JobService.ts(63,5): error TS2375: Type '{ id: string; userId: string; name: string; sourceAdapter: string; targetAdapter: string; rules: ReconciliationRules; schedule: string | undefined; status: JobStatus; createdAt: Date; updatedAt: Date; }' is not assignable to type 'GetJobQueryResult' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'schedule' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/application/services/NoisyNeighborDetection.ts(7,1): error TS6192: All imports in import declaration are unused.
+src/application/services/QuotaService.ts(7,1): error TS6133: 'Tenant' is declared but its value is never read.
+src/application/services/TenantService.ts(11,19): error TS6133: 'logError' is declared but its value is never read.
+src/application/services/TenantService.ts(34,34): error TS2379: Argument of type '{ name: string; slug: string; parentTenantId: string | undefined; tier: TenantTier; status: TenantStatus.TRIAL; quotas: TenantQuotas; config: { customDomainVerified: false; ... 4 more ...; maxRetries: number; }; metadata: {}; }' is not assignable to parameter of type 'Omit<TenantProps, "id" | "createdAt" | "updatedAt">' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'parentTenantId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/application/services/TenantService.ts(61,31): error TS2379: Argument of type '{ tenantId: string; email: string; passwordHash: string; name: string | undefined; role: UserRole.OWNER; dataResidencyRegion: string; dataRetentionDays: number; }' is not assignable to parameter of type 'Omit<UserProps, "id" | "createdAt" | "updatedAt">' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'name' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/application/services/UserService.ts(30,30): error TS2379: Argument of type '{ email: string; passwordHash: string; name: string | undefined; role: UserRole; dataResidencyRegion: string; dataRetentionDays: number; }' is not assignable to parameter of type 'Omit<UserProps, "id" | "createdAt" | "updatedAt">' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Property 'tenantId' is missing in type '{ email: string; passwordHash: string; name: string | undefined; role: UserRole; dataResidencyRegion: string; dataRetentionDays: number; }' but required in type 'Omit<UserProps, "id" | "createdAt" | "updatedAt">'.
+src/application/services/UserService.ts(79,37): error TS2552: Cannot find name 'UserDeletedEvent'. Did you mean 'UserCreatedEvent'?
+src/application/webhooks/WebhookIngestionService.ts(8,33): error TS2307: Cannot find module '@settler/adapters/enhanced-base' or its corresponding type declarations.
+src/application/webhooks/WebhookIngestionService.ts(9,33): error TS2307: Cannot find module '@settler/adapters/enhanced-base' or its corresponding type declarations.
+src/application/webhooks/WebhookIngestionService.ts(12,39): error TS2307: Cannot find module '@settler/adapters/stripe-enhanced' or its corresponding type declarations.
+src/application/webhooks/WebhookIngestionService.ts(13,39): error TS2307: Cannot find module '@settler/adapters/paypal-enhanced' or its corresponding type declarations.
+src/application/webhooks/WebhookIngestionService.ts(14,39): error TS2307: Cannot find module '@settler/adapters/square-enhanced' or its corresponding type declarations.
+src/application/webhooks/WebhookIngestionService.ts(127,5): error TS2375: Type '{ success: boolean; events: NormalizedEvent[]; errors: string[] | undefined; }' is not assignable to type 'WebhookIngestionResult' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'errors' are incompatible.
+    Type 'string[] | undefined' is not assignable to type 'string[]'.
+      Type 'undefined' is not assignable to type 'string[]'.
+src/application/webhooks/WebhookIngestionService.ts(175,9): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/webhooks/WebhookIngestionService.ts(181,9): error TS2322: Type 'number | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/webhooks/WebhookIngestionService.ts(182,9): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/webhooks/WebhookIngestionService.ts(215,9): error TS2322: Type 'number | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/webhooks/WebhookIngestionService.ts(217,9): error TS2322: Type 'Date | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/webhooks/WebhookIngestionService.ts(242,9): error TS18046: 'refundDispute.amount' is of type 'unknown'.
+src/application/webhooks/WebhookIngestionService.ts(243,9): error TS18046: 'refundDispute.amount' is of type 'unknown'.
+src/application/webhooks/WebhookIngestionService.ts(266,9): error TS2322: Type 'unknown' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/webhooks/WebhookIngestionService.ts(268,9): error TS2322: Type 'unknown' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/webhooks/WebhookIngestionService.ts(269,9): error TS2322: Type 'unknown' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/webhooks/WebhookIngestionService.ts(270,9): error TS2322: Type 'unknown' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/webhooks/WebhookIngestionService.ts(271,9): error TS2322: Type 'unknown' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/webhooks/WebhookIngestionService.ts(272,9): error TS2322: Type 'unknown' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/webhooks/WebhookIngestionService.ts(273,9): error TS2322: Type 'unknown' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/webhooks/WebhookIngestionService.ts(274,9): error TS2322: Type 'unknown' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/webhooks/WebhookIngestionService.ts(275,9): error TS2322: Type 'unknown' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/webhooks/WebhookIngestionService.ts(276,9): error TS2322: Type 'unknown' is not assignable to type 'string | number | boolean | Date | null'.
+src/application/webhooks/WebhookIngestionService.ts(305,9): error TS2322: Type '{} | null' is not assignable to type 'string | null'.
+  Type '{}' is not assignable to type 'string'.
+src/application/webhooks/WebhookIngestionService.ts(307,9): error TS2322: Type '{} | null' is not assignable to type 'string | null'.
+  Type '{}' is not assignable to type 'string'.
+src/application/webhooks/WebhookIngestionService.ts(309,9): error TS2322: Type '{} | null' is not assignable to type 'string | null'.
+  Type '{}' is not assignable to type 'string'.
+src/application/webhooks/WebhookIngestionService.ts(311,9): error TS2322: Type '{} | null' is not assignable to type 'string | null'.
+  Type '{}' is not assignable to type 'string'.
+src/config/validation.ts(6,53): error TS6133: 'email' is declared but its value is never read.
+src/config/validation.ts(6,60): error TS6133: 'json' is declared but its value is never read.
+src/db/migrate.ts(139,30): error TS2304: Cannot find name 'useSupabase'.
+src/db/migrate.ts(159,35): error TS2304: Cannot find name 'useSupabase'.
+src/domain/entities/Job.ts(142,5): error TS2412: Type 'string | undefined' is not assignable to type 'string' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+  Type 'undefined' is not assignable to type 'string'.
+src/domain/eventsourcing/EventEnvelope.ts(44,3): error TS2375: Type '{ tenant_id: string; user_id: string | undefined; timestamp: string; correlation_id: string; causation_id: string | undefined; }' is not assignable to type 'EventMetadata' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'user_id' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/index.ts(7,1): error TS6133: 'validateRequest' is declared but its value is never read.
+src/index.ts(9,1): error TS6133: 'jobsRouter' is declared but its value is never read.
+src/index.ts(10,1): error TS6133: 'reportsRouter' is declared but its value is never read.
+src/index.ts(11,1): error TS6133: 'webhooksRouter' is declared but its value is never read.
+src/index.ts(12,1): error TS6133: 'adaptersRouter' is declared but its value is never read.
+src/index.ts(16,1): error TS6133: 'usersRouter' is declared but its value is never read.
+src/index.ts(33,1): error TS6133: 'etagMiddleware' is declared but its value is never read.
+src/index.ts(111,12): error TS6133: 'req' is declared but its value is never read.
+src/index.ts(111,17): error TS6133: 'res' is declared but its value is never read.
+src/infrastructure/di/Container.ts(8,1): error TS6133: 'IExecutionRepository' is declared but its value is never read.
+src/infrastructure/di/Container.ts(9,1): error TS6133: 'IApiKeyRepository' is declared but its value is never read.
+src/infrastructure/observability/health.ts(7,1): error TS6133: 'logError' is declared but its value is never read.
+src/infrastructure/observability/health.ts(9,1): error TS6133: 'config' is declared but its value is never read.
+src/infrastructure/observability/tracing.ts(59,39): error TS2379: Argument of type '{ attributes: Record<string, string | number | boolean> | undefined; }' is not assignable to parameter of type 'SpanOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'attributes' are incompatible.
+    Type 'Record<string, string | number | boolean> | undefined' is not assignable to type 'Attributes'.
+      Type 'undefined' is not assignable to type 'Attributes'.
+src/infrastructure/query-optimization.ts(6,23): error TS2307: Cannot find module '../../db' or its corresponding type declarations.
+src/infrastructure/query-optimization.ts(7,35): error TS2307: Cannot find module '../../utils/logger' or its corresponding type declarations.
+src/infrastructure/query-optimization.ts(138,11): error TS7006: Parameter 'results' implicitly has an 'any' type.
+src/infrastructure/query-optimization.ts(280,45): error TS7006: Parameter 'results' implicitly has an 'any' type.
+src/infrastructure/queue/PrioritizedQueue.ts(36,22): error TS2769: No overload matches this call.
+  Overload 1 of 8, '(options: RedisOptions): Redis', gave the following error.
+    Object literal may only specify known properties, and 'url' does not exist in type 'RedisOptions'.
+  Overload 2 of 8, '(port: number): Redis', gave the following error.
+    Argument of type '{ host: string; port: number; url: string | undefined; }' is not assignable to parameter of type 'number'.
+  Overload 3 of 8, '(path: string): Redis', gave the following error.
+    Argument of type '{ host: string; port: number; url: string | undefined; }' is not assignable to parameter of type 'string'.
+src/infrastructure/queue/PrioritizedQueue.ts(96,11): error TS2379: Argument of type '{ priority: number; delay: number | undefined; jobId: string | undefined; }' is not assignable to parameter of type 'JobsOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Type '{ priority: number; delay: number | undefined; jobId: string | undefined; }' is not assignable to type 'BaseJobOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+    Types of property 'jobId' are incompatible.
+      Type 'string | undefined' is not assignable to type 'string'.
+        Type 'undefined' is not assignable to type 'string'.
+src/infrastructure/rate-limiting/TokenBucket.ts(19,22): error TS2769: No overload matches this call.
+  Overload 1 of 8, '(options: RedisOptions): Redis', gave the following error.
+    Object literal may only specify known properties, and 'url' does not exist in type 'RedisOptions'.
+  Overload 2 of 8, '(port: number): Redis', gave the following error.
+    Argument of type '{ host: string; port: number; url: string | undefined; retryStrategy: (times: number) => number; }' is not assignable to parameter of type 'number'.
+  Overload 3 of 8, '(path: string): Redis', gave the following error.
+    Argument of type '{ host: string; port: number; url: string | undefined; retryStrategy: (times: number) => number; }' is not assignable to parameter of type 'string'.
+src/infrastructure/rate-limiting/TokenBucket.ts(126,5): error TS6133: 'key' is declared but its value is never read.
+src/infrastructure/redis/client.ts(12,1): error TS6133: 'config' is declared but its value is never read.
+src/infrastructure/repositories/JobRepository.ts(78,11): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/infrastructure/repositories/JobRepository.ts(106,11): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/infrastructure/repositories/JobRepository.ts(125,21): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/repositories/TenantRepository.ts(2,31): error TS6133: 'TenantTier' is declared but its value is never read.
+src/infrastructure/repositories/TenantRepository.ts(2,43): error TS6133: 'TenantStatus' is declared but its value is never read.
+src/infrastructure/repositories/TenantRepository.ts(3,17): error TS6133: 'transaction' is declared but its value is never read.
+src/infrastructure/repositories/TenantRepository.ts(11,53): error TS2345: Argument of type 'TenantProps | undefined' is not assignable to parameter of type 'TenantProps'.
+  Type 'undefined' is not assignable to type 'TenantProps'.
+src/infrastructure/repositories/TenantRepository.ts(19,53): error TS2345: Argument of type 'TenantProps | undefined' is not assignable to parameter of type 'TenantProps'.
+  Type 'undefined' is not assignable to type 'TenantProps'.
+src/infrastructure/repositories/TenantRepository.ts(30,53): error TS2345: Argument of type 'TenantProps | undefined' is not assignable to parameter of type 'TenantProps'.
+  Type 'undefined' is not assignable to type 'TenantProps'.
+src/infrastructure/repositories/TenantRepository.ts(47,31): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/repositories/TenantRepository.ts(50,26): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/repositories/UserRepository.ts(60,11): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/infrastructure/repositories/UserRepository.ts(64,11): error TS2322: Type 'Date | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/infrastructure/repositories/UserRepository.ts(65,11): error TS2322: Type 'Date | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/infrastructure/repositories/UserRepository.ts(82,11): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/infrastructure/repositories/UserRepository.ts(86,11): error TS2322: Type 'Date | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/infrastructure/repositories/UserRepository.ts(87,11): error TS2322: Type 'Date | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/infrastructure/repositories/UserRepository.ts(113,21): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/repositories/UserRepository.ts(117,5): error TS2375: Type '{ id: any; tenantId: any; email: any; passwordHash: any; name: any; role: UserRole; dataResidencyRegion: any; dataRetentionDays: any; deletedAt: Date | undefined; deletionScheduledAt: Date | undefined; createdAt: Date; updatedAt: Date; }' is not assignable to type 'UserProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'deletedAt' are incompatible.
+    Type 'Date | undefined' is not assignable to type 'Date'.
+      Type 'undefined' is not assignable to type 'Date'.
+src/infrastructure/resilience/DeadLetterQueue.ts(96,5): error TS2322: Type '{ id: any; saga_id: any; event_id: any; error_type: any; error_message: any; error_stack: any; payload: any; retry_count: any; max_retries: any; tenant_id: any; correlation_id: any; created_at: Date; resolved_at: Date | undefined; resolution_notes: any; }[]' is not assignable to type 'DeadLetterEntry[]'.
+  Type '{ id: any; saga_id: any; event_id: any; error_type: any; error_message: any; error_stack: any; payload: any; retry_count: any; max_retries: any; tenant_id: any; correlation_id: any; created_at: Date; resolved_at: Date | undefined; resolution_notes: any; }' is not assignable to type 'DeadLetterEntry' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+    Types of property 'resolved_at' are incompatible.
+      Type 'Date | undefined' is not assignable to type 'Date'.
+        Type 'undefined' is not assignable to type 'Date'.
+src/infrastructure/resilience/DeadLetterQueue.ts(163,5): error TS2322: Type '{ id: any; saga_id: any; event_id: any; error_type: any; error_message: any; error_stack: any; payload: any; retry_count: any; max_retries: any; tenant_id: any; correlation_id: any; created_at: Date; resolved_at: Date | undefined; resolution_notes: any; }[]' is not assignable to type 'DeadLetterEntry[]'.
+  Type '{ id: any; saga_id: any; event_id: any; error_type: any; error_message: any; error_stack: any; payload: any; retry_count: any; max_retries: any; tenant_id: any; correlation_id: any; created_at: Date; resolved_at: Date | undefined; resolution_notes: any; }' is not assignable to type 'DeadLetterEntry' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+    Types of property 'resolved_at' are incompatible.
+      Type 'Date | undefined' is not assignable to type 'Date'.
+        Type 'undefined' is not assignable to type 'Date'.
+src/infrastructure/resilience/circuit-breaker.ts(6,55): error TS7016: Could not find a declaration file for module 'opossum'. '/workspace/node_modules/opossum/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/opossum` if it exists or add a new declaration (.d.ts) file containing `declare module 'opossum';`
+src/infrastructure/resilience/retry.ts(7,19): error TS6133: 'logError' is declared but its value is never read.
+src/infrastructure/security/InputValidation.ts(174,44): error TS2694: Namespace 'global.Express' has no exported member 'Multer'.
+src/infrastructure/security/SecretsManager.ts(96,38): error TS6133: 'secretName' is declared but its value is never read.
+src/infrastructure/security/ZeroTrustAuth.ts(9,1): error TS6133: 'ApiKey' is declared but its value is never read.
+src/infrastructure/security/ZeroTrustAuth.ts(12,1): error TS6192: All imports in import declaration are unused.
+src/infrastructure/security/ZeroTrustAuth.ts(213,48): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/infrastructure/security/ZeroTrustAuth.ts(218,33): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/infrastructure/security/ZeroTrustAuth.ts(224,9): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/infrastructure/security/ZeroTrustAuth.ts(229,9): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/infrastructure/security/ZeroTrustAuth.ts(229,42): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/infrastructure/security/ZeroTrustAuth.ts(234,9): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/infrastructure/security/ZeroTrustAuth.ts(234,35): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/infrastructure/security/ZeroTrustAuth.ts(235,12): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/infrastructure/security/ZeroTrustAuth.ts(239,34): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/infrastructure/security/ZeroTrustAuth.ts(248,8): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/infrastructure/security/ZeroTrustAuth.ts(252,15): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/infrastructure/security/ZeroTrustAuth.ts(253,17): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/infrastructure/security/ZeroTrustAuth.ts(254,13): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/infrastructure/security/ZeroTrustAuth.ts(255,15): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/infrastructure/security/ZeroTrustAuth.ts(256,17): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/infrastructure/security/ZeroTrustAuth.ts(286,12): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/supabase/client.ts(89,6): error TS2551: Property 'catch' does not exist on type 'PostgrestFilterBuilder<any, any, any, any, "exec_sql", null, "RPC">'. Did you mean 'match'?
+src/infrastructure/supabase/client.ts(97,6): error TS2551: Property 'catch' does not exist on type 'PostgrestFilterBuilder<any, any, any, any, "exec_sql", null, "RPC">'. Did you mean 'match'?
+src/middleware/api-gateway-cache.ts(9,25): error TS6133: 'cacheKey' is declared but its value is never read.
+src/middleware/api-gateway-cache.ts(10,1): error TS6133: 'generateCacheKey' is declared but its value is never read.
+src/middleware/api-gateway-cache.ts(10,10): error TS2305: Module '"../utils/cache-invalidation"' has no exported member 'generateCacheKey'.
+src/middleware/api-gateway-cache.ts(68,5): error TS6133: 'includeQueryParams' is declared but its value is never read.
+src/middleware/api-gateway-cache.ts(69,5): error TS6133: 'includeUserId' is declared but its value is never read.
+src/middleware/api-gateway-cache.ts(91,9): error TS2322: Type 'Response<any, Record<string, any>>' is not assignable to type 'void'.
+src/middleware/api-gateway-cache.ts(145,5): error TS2322: Type '(chunk?: unknown, encoding?: BufferEncoding | undefined) => Response<any, Record<string, any>>' is not assignable to type '{ (cb?: (() => void) | undefined): Response<any, Record<string, any>>; (chunk: any, cb?: (() => void) | undefined): Response<any, Record<string, any>>; (chunk: any, encoding: BufferEncoding, cb?: (() => void) | undefined): Response<...>; }'.
+  Types of parameters 'encoding' and 'cb' are incompatible.
+    Type '(() => void) | undefined' is not assignable to type 'BufferEncoding | undefined'.
+      Type '() => void' is not assignable to type 'BufferEncoding | undefined'.
+src/middleware/api-gateway-cache.ts(153,33): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(chunk: any, cb?: (() => void) | undefined): Response<any, Record<string, any>>', gave the following error.
+    Argument of type 'BufferEncoding | undefined' is not assignable to parameter of type '(() => void) | undefined'.
+      Type 'string' is not assignable to type '() => void'.
+  Overload 2 of 3, '(chunk: any, encoding: BufferEncoding, cb?: (() => void) | undefined): Response<any, Record<string, any>>', gave the following error.
+    Argument of type 'BufferEncoding | undefined' is not assignable to parameter of type 'BufferEncoding'.
+      Type 'undefined' is not assignable to type 'BufferEncoding'.
+src/middleware/api-gateway-cache.ts(180,13): error TS2552: Cannot find name 'delPattern'. Did you mean 'pattern'?
+src/middleware/auth.ts(34,9): error TS2322: Type 'Response<any, Record<string, any>>' is not assignable to type 'void'.
+src/middleware/auth.ts(54,9): error TS2322: Type 'Response<any, Record<string, any>>' is not assignable to type 'void'.
+src/middleware/auth.ts(103,9): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/middleware/auth.ts(104,9): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/middleware/auth.ts(115,46): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/middleware/auth.ts(123,9): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/middleware/auth.ts(124,9): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/middleware/auth.ts(125,9): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/middleware/auth.ts(134,7): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/middleware/auth.ts(138,7): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/middleware/auth.ts(138,40): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/middleware/auth.ts(145,6): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/middleware/auth.ts(149,16): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/middleware/auth.ts(150,18): error TS18048: 'keyRecord' is possibly 'undefined'.
+src/middleware/authorization.ts(6,10): error TS6133: 'Request' is declared but its value is never read.
+src/middleware/authorization.ts(7,1): error TS6133: 'AuthRequest' is declared but its value is never read.
+src/middleware/authorization.ts(52,15): error TS2339: Property 'role' does not exist on type '{ role: UserRole; scopes: string[]; } | undefined'.
+src/middleware/authorization.ts(52,21): error TS2339: Property 'scopes' does not exist on type '{ role: UserRole; scopes: string[]; } | undefined'.
+src/middleware/authorization.ts(70,13): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/middleware/authorization.ts(71,13): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/middleware/authorization.ts(128,15): error TS2339: Property 'role' does not exist on type '{ role: UserRole; scopes: string[]; } | undefined'.
+src/middleware/authorization.ts(128,21): error TS2339: Property 'scopes' does not exist on type '{ role: UserRole; scopes: string[]; } | undefined'.
+src/middleware/authorization.ts(144,13): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/middleware/authorization.ts(145,13): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/middleware/compression.ts(8,10): error TS2724: '"zlib"' has no exported member named 'zlib'. Did you mean 'Zlib'?
+src/middleware/compression.ts(79,14): error TS7006: Parameter 'compressed' implicitly has an 'any' type.
+src/middleware/compression.ts(84,15): error TS7006: Parameter 'error' implicitly has an 'any' type.
+src/middleware/error.ts(6,10): error TS6133: 'ApiError' is declared but its value is never read.
+src/middleware/error.ts(6,20): error TS6133: 'isApiError' is declared but its value is never read.
+src/middleware/error.ts(12,3): error TS6133: 'next' is declared but its value is never read.
+src/middleware/error.ts(45,24): error TS2339: Property 'email' does not exist on type 'AuthRequest'.
+src/middleware/error.ts(51,9): error TS2375: Type '{ error: string; errorCode: string; message: string; traceId: string | undefined; }' is not assignable to type '{ error: string; errorCode: string; message: string; traceId?: string; stack?: string; details?: unknown; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'traceId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/middleware/error.ts(72,5): error TS2412: Type 'string | undefined' is not assignable to type 'string' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+  Type 'undefined' is not assignable to type 'string'.
+src/middleware/idempotency.ts(30,30): error TS2532: Object is possibly 'undefined'.
+src/middleware/idempotency.ts(56,7): error TS2322: Type '(...args: unknown[]) => void' is not assignable to type '{ (cb?: (() => void) | undefined): Response<any, Record<string, any>>; (chunk: any, cb?: (() => void) | undefined): Response<any, Record<string, any>>; (chunk: any, encoding: BufferEncoding, cb?: (() => void) | undefined): Response<...>; }'.
+  Type 'void' is not assignable to type 'Response<any, Record<string, any>>'.
+src/middleware/idempotency.ts(64,15): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/middleware/idempotency.ts(70,21): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '(() => void) | undefined'.
+src/middleware/observability-enhanced.ts(7,1): error TS6133: 'AuthRequest' is declared but its value is never read.
+src/middleware/observability-enhanced.ts(9,1): error TS6133: 'logDebug' is declared but its value is never read.
+src/middleware/observability-enhanced.ts(79,9): error TS6133: 'startTime' is declared but its value is never read.
+src/middleware/observability.ts(7,17): error TS6133: 'Span' is declared but its value is never read.
+src/middleware/observability.ts(9,10): error TS6133: 'logInfo' is declared but its value is never read.
+src/middleware/observability.ts(9,19): error TS6133: 'logError' is declared but its value is never read.
+src/middleware/observability.ts(22,41): error TS2339: Property 'tenantId' does not exist on type 'AuthRequest'.
+src/middleware/observability.ts(52,3): error TS2322: Type '(chunk?: unknown, encoding?: BufferEncoding | undefined) => Response<any, Record<string, any>>' is not assignable to type '{ (cb?: (() => void) | undefined): Response<any, Record<string, any>>; (chunk: any, cb?: (() => void) | undefined): Response<any, Record<string, any>>; (chunk: any, encoding: BufferEncoding, cb?: (() => void) | undefined): Response<...>; }'.
+  Types of parameters 'encoding' and 'cb' are incompatible.
+    Type '(() => void) | undefined' is not assignable to type 'BufferEncoding | undefined'.
+      Type '() => void' is not assignable to type 'BufferEncoding | undefined'.
+src/middleware/observability.ts(54,42): error TS2345: Argument of type 'BufferEncoding | undefined' is not assignable to parameter of type 'BufferEncoding'.
+  Type 'undefined' is not assignable to type 'BufferEncoding'.
+src/middleware/quota.ts(6,10): error TS6133: 'Request' is declared but its value is never read.
+src/middleware/quota.ts(19,38): error TS2339: Property 'get' does not exist on type 'typeof Container'.
+src/middleware/request-timeout.ts(7,1): error TS6133: 'config' is declared but its value is never read.
+src/middleware/request-timeout.ts(54,5): error TS2322: Type '(...args: unknown[]) => void' is not assignable to type '{ (cb?: (() => void) | undefined): Response<any, Record<string, any>>; (chunk: any, cb?: (() => void) | undefined): Response<any, Record<string, any>>; (chunk: any, encoding: BufferEncoding, cb?: (() => void) | undefined): Response<...>; }'.
+  Type 'void' is not assignable to type 'Response<any, Record<string, any>>'.
+src/middleware/request-timeout.ts(58,30): error TS2345: Argument of type 'unknown[]' is not assignable to parameter of type '[chunk: any, encoding: BufferEncoding, cb?: (() => void) | undefined]'.
+  Target requires 2 element(s) but source may have fewer.
+src/middleware/sentry.ts(35,39): error TS2379: Argument of type '{ app: undefined; }' is not assignable to parameter of type '{ app?: Router; router?: Router; methods?: Method[]; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'app' are incompatible.
+    Type 'undefined' is not assignable to type 'Router'.
+src/middleware/sentry.ts(37,23): error TS6133: 'hint' is declared but its value is never read.
+src/middleware/sentry.ts(56,13): error TS6133: 'req' is declared but its value is never read.
+src/middleware/sentry.ts(56,27): error TS6133: 'res' is declared but its value is never read.
+src/middleware/sentry.ts(71,13): error TS6133: 'req' is declared but its value is never read.
+src/middleware/sentry.ts(71,27): error TS6133: 'res' is declared but its value is never read.
+src/middleware/sentry.ts(83,25): error TS6133: 'req' is declared but its value is never read.
+src/middleware/sentry.ts(83,39): error TS6133: 'res' is declared but its value is never read.
+src/middleware/sentry.ts(106,18): error TS2379: Argument of type '{ id: string; email: any; ip_address: string | undefined; }' is not assignable to parameter of type 'User' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'ip_address' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/middleware/sentry.ts(108,16): error TS2339: Property 'email' does not exist on type 'AuthRequest'.
+src/middleware/sentry.ts(124,31): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Context | null'.
+src/middleware/sentry.ts(142,31): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Context | null'.
+src/middleware/tenant.ts(6,10): error TS6133: 'Request' is declared but its value is never read.
+src/middleware/tenant.ts(32,34): error TS2339: Property 'get' does not exist on type 'typeof Container'.
+src/middleware/tenant.ts(58,24): error TS2339: Property 'user' does not exist on type 'TenantRequest'.
+src/middleware/tenant.ts(60,32): error TS2339: Property 'user' does not exist on type 'TenantRequest'.
+src/middleware/versioning.ts(58,11): error TS6133: 'req' is declared but its value is never read.
+src/routes/adapters.ts(2,1): error TS6133: 'AuthRequest' is declared but its value is never read.
+src/routes/adapters.ts(4,1): error TS6133: 'logError' is declared but its value is never read.
+src/routes/adapters.ts(57,17): error TS7030: Not all code paths return a value.
+src/routes/adapters.ts(57,24): error TS6133: 'req' is declared but its value is never read.
+src/routes/adapters.ts(89,13): error TS18048: 'id' is possibly 'undefined'.
+src/routes/adapters.ts(89,42): error TS18048: 'id' is possibly 'undefined'.
+src/routes/admin.ts(6,18): error TS6133: 'Request' is declared but its value is never read.
+src/routes/admin.ts(6,27): error TS6133: 'Response' is declared but its value is never read.
+src/routes/admin.ts(14,42): error TS7030: Not all code paths return a value.
+src/routes/auth.ts(7,10): error TS6133: 'hashPassword' is declared but its value is never read.
+src/routes/auth.ts(8,19): error TS6133: 'logError' is declared but its value is never read.
+src/routes/auth.ts(41,3): error TS7030: Not all code paths return a value.
+src/routes/auth.ts(59,54): error TS18048: 'user' is possibly 'undefined'.
+src/routes/auth.ts(66,31): error TS2769: No overload matches this call.
+  Overload 1 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: null, options?: (SignOptions & { algorithm: "none"; }) | undefined): string', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'null'.
+  Overload 2 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: Buffer<ArrayBufferLike> | Secret | JsonWebKeyInput | PrivateKeyInput, options?: SignOptions | undefined): string', gave the following error.
+    Type 'string' is not assignable to type 'number | StringValue | undefined'.
+  Overload 3 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: Buffer<ArrayBufferLike> | Secret | JsonWebKeyInput | PrivateKeyInput, callback: SignCallback): void', gave the following error.
+    Object literal may only specify known properties, and 'expiresIn' does not exist in type 'SignCallback'.
+src/routes/auth.ts(67,19): error TS18048: 'user' is possibly 'undefined'.
+src/routes/auth.ts(77,32): error TS2769: No overload matches this call.
+  Overload 1 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: null, options?: (SignOptions & { algorithm: "none"; }) | undefined): string', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'null'.
+  Overload 2 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: Buffer<ArrayBufferLike> | Secret | JsonWebKeyInput | PrivateKeyInput, options?: SignOptions | undefined): string', gave the following error.
+    Type 'string' is not assignable to type 'number | StringValue | undefined'.
+  Overload 3 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: Buffer<ArrayBufferLike> | Secret | JsonWebKeyInput | PrivateKeyInput, callback: SignCallback): void', gave the following error.
+    Object literal may only specify known properties, and 'expiresIn' does not exist in type 'SignCallback'.
+src/routes/auth.ts(78,19): error TS18048: 'user' is possibly 'undefined'.
+src/routes/auth.ts(93,11): error TS18048: 'user' is possibly 'undefined'.
+src/routes/auth.ts(98,43): error TS18048: 'user' is possibly 'undefined'.
+src/routes/auth.ts(106,17): error TS18048: 'user' is possibly 'undefined'.
+src/routes/auth.ts(108,19): error TS18048: 'user' is possibly 'undefined'.
+src/routes/auth.ts(122,3): error TS7030: Not all code paths return a value.
+src/routes/auth.ts(137,33): error TS2769: No overload matches this call.
+  Overload 1 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: null, options?: (SignOptions & { algorithm: "none"; }) | undefined): string', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'null'.
+  Overload 2 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: Buffer<ArrayBufferLike> | Secret | JsonWebKeyInput | PrivateKeyInput, options?: SignOptions | undefined): string', gave the following error.
+    Type 'string' is not assignable to type 'number | StringValue | undefined'.
+  Overload 3 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: Buffer<ArrayBufferLike> | Secret | JsonWebKeyInput | PrivateKeyInput, callback: SignCallback): void', gave the following error.
+    Object literal may only specify known properties, and 'expiresIn' does not exist in type 'SignCallback'.
+src/routes/auth.ts(168,21): error TS2345: Argument of type '"api_keys"' is not assignable to parameter of type 'Permission'.
+src/routes/auth.ts(200,38): error TS2532: Object is possibly 'undefined'.
+src/routes/auth.ts(204,54): error TS2532: Object is possibly 'undefined'.
+src/routes/auth.ts(209,15): error TS2532: Object is possibly 'undefined'.
+src/routes/health.ts(4,1): error TS6133: 'logError' is declared but its value is never read.
+src/routes/health.ts(16,16): error TS6133: 'checkDatabase' is declared but its value is never read.
+src/routes/health.ts(28,16): error TS6133: 'checkConnectionPool' is declared but its value is never read.
+src/routes/health.ts(58,24): error TS6133: 'req' is declared but its value is never read.
+src/routes/health.ts(69,32): error TS6133: 'req' is declared but its value is never read.
+src/routes/health.ts(81,28): error TS6133: 'req' is declared but its value is never read.
+src/routes/health.ts(87,29): error TS6133: 'req' is declared but its value is never read.
+src/routes/jobs.ts(1,18): error TS6133: 'Request' is declared but its value is never read.
+src/routes/jobs.ts(5,29): error TS2305: Module '"../middleware/authorization"' has no exported member 'requireResourceOwnership'.
+src/routes/jobs.ts(6,17): error TS6133: 'transaction' is declared but its value is never read.
+src/routes/jobs.ts(10,34): error TS6133: 'sendPaginated' is declared but its value is never read.
+src/routes/jobs.ts(83,21): error TS2345: Argument of type '"jobs"' is not assignable to parameter of type 'Permission'.
+src/routes/jobs.ts(106,21): error TS2345: Argument of type '"jobs"' is not assignable to parameter of type 'Permission'.
+src/routes/jobs.ts(135,30): error TS2532: Object is possibly 'undefined'.
+src/routes/jobs.ts(161,21): error TS2345: Argument of type '"jobs"' is not assignable to parameter of type 'Permission'.
+src/routes/jobs.ts(176,43): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/jobs.ts(191,21): error TS2345: Argument of type '"jobs"' is not assignable to parameter of type 'Permission'.
+src/routes/jobs.ts(193,3): error TS7030: Not all code paths return a value.
+src/routes/jobs.ts(196,31): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/jobs.ts(211,10): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/jobs.ts(220,11): error TS18048: 'job' is possibly 'undefined'.
+src/routes/jobs.ts(230,10): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/jobs.ts(230,22): error TS18048: 'job' is possibly 'undefined'.
+src/routes/jobs.ts(242,10): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/jobs.ts(245,27): error TS2532: Object is possibly 'undefined'.
+src/routes/jobs.ts(270,14): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/jobs.ts(280,14): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/jobs.ts(307,21): error TS2345: Argument of type '"jobs"' is not assignable to parameter of type 'Permission'.
+src/routes/jobs.ts(322,50): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/metrics.ts(11,24): error TS6133: 'req' is declared but its value is never read.
+src/routes/openapi.ts(372,30): error TS6133: 'req' is declared but its value is never read.
+src/routes/openapi.ts(378,24): error TS6133: 'req' is declared but its value is never read.
+src/routes/realtime.ts(6,18): error TS6133: 'Request' is declared but its value is never read.
+src/routes/realtime.ts(10,1): error TS6133: 'handleRouteError' is declared but its value is never read.
+src/routes/realtime.ts(23,3): error TS7030: Not all code paths return a value.
+src/routes/realtime.ts(25,26): error TS2339: Property 'tenantId' does not exist on type 'AuthRequest'.
+src/routes/realtime.ts(84,26): error TS18048: 'execution' is possibly 'undefined'.
+src/routes/realtime.ts(85,21): error TS18048: 'execution' is possibly 'undefined'.
+src/routes/realtime.ts(86,24): error TS18048: 'execution' is possibly 'undefined'.
+src/routes/realtime.ts(87,26): error TS18048: 'execution' is possibly 'undefined'.
+src/routes/realtime.ts(88,20): error TS18048: 'execution' is possibly 'undefined'.
+src/routes/realtime.ts(89,22): error TS18048: 'execution' is possibly 'undefined'.
+src/routes/reconciliation-summary.ts(6,18): error TS6133: 'Request' is declared but its value is never read.
+src/routes/reconciliation-summary.ts(12,1): error TS6133: 'cacheInvalidation' is declared but its value is never read.
+src/routes/reconciliation-summary.ts(15,1): error TS6133: 'logError' is declared but its value is never read.
+src/routes/reconciliation-summary.ts(35,21): error TS2345: Argument of type '"reports"' is not assignable to parameter of type 'Permission'.
+src/routes/reconciliation-summary.ts(47,54): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/reconciliation-summary.ts(64,21): error TS2345: Argument of type '"reports"' is not assignable to parameter of type 'Permission'.
+src/routes/reconciliation-summary.ts(69,51): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/reconciliation-summary.ts(88,21): error TS2345: Argument of type '"reports"' is not assignable to parameter of type 'Permission'.
+src/routes/reports.ts(1,18): error TS6133: 'Request' is declared but its value is never read.
+src/routes/reports.ts(5,29): error TS2305: Module '"../middleware/authorization"' has no exported member 'requireResourceOwnership'.
+src/routes/reports.ts(5,29): error TS6133: 'requireResourceOwnership' is declared but its value is never read.
+src/routes/reports.ts(7,1): error TS6192: All imports in import declaration are unused.
+src/routes/reports.ts(35,21): error TS2345: Argument of type '"reports"' is not assignable to parameter of type 'Permission'.
+src/routes/reports.ts(37,3): error TS7030: Not all code paths return a value.
+src/routes/reports.ts(46,10): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/reports.ts(53,11): error TS2532: Object is possibly 'undefined'.
+src/routes/reports.ts(74,10): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/reports.ts(74,17): error TS2322: Type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'ParsedQs' is not assignable to type 'string | number | boolean | Date | null'.
+    Type 'ParsedQs' is missing the following properties from type 'Date': toDateString, toTimeString, toLocaleDateString, toLocaleTimeString, and 37 more.
+src/routes/reports.ts(74,28): error TS2322: Type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'ParsedQs' is not assignable to type 'string | number | boolean | Date | null'.
+    Type 'ParsedQs' is missing the following properties from type 'Date': toDateString, toTimeString, toLocaleDateString, toLocaleTimeString, and 37 more.
+src/routes/reports.ts(82,27): error TS18048: 'execution' is possibly 'undefined'.
+src/routes/reports.ts(85,23): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/routes/reports.ts(85,23): error TS18048: 'page' is possibly 'undefined'.
+src/routes/reports.ts(85,35): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/routes/reports.ts(85,35): error TS18048: 'limit' is possibly 'undefined'.
+src/routes/reports.ts(101,25): error TS2322: Type 'string | ParsedQs | (string | ParsedQs)[] | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/reports.ts(116,25): error TS2322: Type 'string | ParsedQs | (string | ParsedQs)[] | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/reports.ts(128,30): error TS2532: Object is possibly 'undefined'.
+src/routes/reports.ts(129,23): error TS18048: 'execution' is possibly 'undefined'.
+src/routes/reports.ts(185,45): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/routes/reports.ts(185,45): error TS18048: 'limit' is possibly 'undefined'.
+src/routes/reports.ts(200,21): error TS2345: Argument of type '"reports"' is not assignable to parameter of type 'Permission'.
+src/routes/reports.ts(233,30): error TS2532: Object is possibly 'undefined'.
+src/routes/users.ts(1,18): error TS6133: 'Request' is declared but its value is never read.
+src/routes/users.ts(7,10): error TS6133: 'hashPassword' is declared but its value is never read.
+src/routes/users.ts(8,19): error TS6133: 'logError' is declared but its value is never read.
+src/routes/users.ts(10,10): error TS2305: Module '"../middleware/authorization"' has no exported member 'Role'.
+src/routes/users.ts(29,21): error TS2345: Argument of type '"users"' is not assignable to parameter of type 'Permission'.
+src/routes/users.ts(31,3): error TS7030: Not all code paths return a value.
+src/routes/users.ts(44,35): error TS2532: Object is possibly 'undefined'.
+src/routes/users.ts(44,67): error TS2532: Object is possibly 'undefined'.
+src/routes/users.ts(52,10): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/users.ts(59,54): error TS2532: Object is possibly 'undefined'.
+src/routes/users.ts(115,21): error TS2345: Argument of type '"users"' is not assignable to parameter of type 'Permission'.
+src/routes/users.ts(117,3): error TS7030: Not all code paths return a value.
+src/routes/v1/currency.ts(7,18): error TS6133: 'Request' is declared but its value is never read.
+src/routes/v1/currency.ts(45,21): error TS2345: Argument of type '"currency"' is not assignable to parameter of type 'Permission'.
+src/routes/v1/currency.ts(50,28): error TS2339: Property 'tenantId' does not exist on type 'AuthRequest'.
+src/routes/v1/currency.ts(76,21): error TS2345: Argument of type '"currency"' is not assignable to parameter of type 'Permission'.
+src/routes/v1/currency.ts(81,28): error TS2339: Property 'tenantId' does not exist on type 'AuthRequest'.
+src/routes/v1/currency.ts(112,21): error TS2345: Argument of type '"currency"' is not assignable to parameter of type 'Permission'.
+src/routes/v1/currency.ts(115,28): error TS2339: Property 'tenantId' does not exist on type 'AuthRequest'.
+src/routes/v1/currency.ts(130,21): error TS2345: Argument of type '"currency"' is not assignable to parameter of type 'Permission'.
+src/routes/v1/currency.ts(133,28): error TS2339: Property 'tenantId' does not exist on type 'AuthRequest'.
+src/routes/v1/exports.ts(7,18): error TS6133: 'Request' is declared but its value is never read.
+src/routes/v1/exports.ts(45,21): error TS2345: Argument of type '"exports"' is not assignable to parameter of type 'Permission'.
+src/routes/v1/exports.ts(50,28): error TS2339: Property 'tenantId' does not exist on type 'AuthRequest'.
+src/routes/v1/exports.ts(89,69): error TS2345: Argument of type '{ dateRange: { start: Date; end: Date; }; includeRawPayloads: any; }' is not assignable to parameter of type 'JSONExportOptions'.
+  Type '{ dateRange: { start: Date; end: Date; }; includeRawPayloads: any; }' is missing the following properties from type 'JSONExportOptions': includeFees, includeUnmatched
+src/routes/v1/fees.ts(7,18): error TS6133: 'Request' is declared but its value is never read.
+src/routes/v1/fees.ts(13,23): error TS6133: 'sendError' is declared but its value is never read.
+src/routes/v1/fees.ts(46,21): error TS2345: Argument of type '"fees"' is not assignable to parameter of type 'Permission'.
+src/routes/v1/fees.ts(51,28): error TS2339: Property 'tenantId' does not exist on type 'AuthRequest'.
+src/routes/v1/fees.ts(52,23): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/routes/v1/fees.ts(52,23): error TS18048: 'page' is possibly 'undefined'.
+src/routes/v1/fees.ts(52,35): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/routes/v1/fees.ts(52,35): error TS18048: 'limit' is possibly 'undefined'.
+src/routes/v1/fees.ts(60,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/fees.ts(66,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/fees.ts(72,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/fees.ts(78,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/fees.ts(84,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/fees.ts(93,30): error TS2532: Object is possibly 'undefined'.
+src/routes/v1/fees.ts(113,10): error TS2322: Type 'string | number | ParsedQs | (string | ParsedQs)[] | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/v1/fees.ts(113,21): error TS2322: Type 'string | ParsedQs | (string | ParsedQs)[] | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/v1/fees.ts(113,28): error TS2322: Type 'string | number | ParsedQs | (string | ParsedQs)[] | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/v1/fees.ts(116,39): error TS2554: Expected 3 arguments, but got 5.
+src/routes/v1/fees.ts(129,21): error TS2345: Argument of type '"fees"' is not assignable to parameter of type 'Permission'.
+src/routes/v1/fees.ts(134,28): error TS2339: Property 'tenantId' does not exist on type 'AuthRequest'.
+src/routes/v1/fees.ts(142,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/fees.ts(148,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/fees.ts(154,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/fees.ts(160,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/index.ts(7,28): error TS2307: Cannot find module './jobs' or its corresponding type declarations.
+src/routes/v1/index.ts(8,31): error TS2307: Cannot find module './reports' or its corresponding type declarations.
+src/routes/v1/index.ts(9,32): error TS2307: Cannot find module './webhooks' or its corresponding type declarations.
+src/routes/v1/index.ts(10,29): error TS2307: Cannot find module './users' or its corresponding type declarations.
+src/routes/v1/index.ts(11,31): error TS2307: Cannot find module './tenants' or its corresponding type declarations.
+src/routes/v1/index.ts(41,26): error TS6133: 'req' is declared but its value is never read.
+src/routes/v1/settlements.ts(7,18): error TS6133: 'Request' is declared but its value is never read.
+src/routes/v1/settlements.ts(42,21): error TS2345: Argument of type '"settlements"' is not assignable to parameter of type 'Permission'.
+src/routes/v1/settlements.ts(47,28): error TS2339: Property 'tenantId' does not exist on type 'AuthRequest'.
+src/routes/v1/settlements.ts(48,23): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/routes/v1/settlements.ts(48,23): error TS18048: 'page' is possibly 'undefined'.
+src/routes/v1/settlements.ts(48,35): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/routes/v1/settlements.ts(48,35): error TS18048: 'limit' is possibly 'undefined'.
+src/routes/v1/settlements.ts(56,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/settlements.ts(62,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/settlements.ts(68,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/settlements.ts(74,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/settlements.ts(83,30): error TS2532: Object is possibly 'undefined'.
+src/routes/v1/settlements.ts(106,10): error TS2322: Type 'string | number | ParsedQs | (string | ParsedQs)[] | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/v1/settlements.ts(106,21): error TS2322: Type 'string | ParsedQs | (string | ParsedQs)[] | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/v1/settlements.ts(106,28): error TS2322: Type 'string | number | ParsedQs | (string | ParsedQs)[] | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/v1/settlements.ts(109,46): error TS2554: Expected 3 arguments, but got 5.
+src/routes/v1/settlements.ts(122,21): error TS2345: Argument of type '"settlements"' is not assignable to parameter of type 'Permission'.
+src/routes/v1/settlements.ts(127,28): error TS2339: Property 'tenantId' does not exist on type 'AuthRequest'.
+src/routes/v1/transactions.ts(7,18): error TS6133: 'Request' is declared but its value is never read.
+src/routes/v1/transactions.ts(44,21): error TS2345: Argument of type '"transactions"' is not assignable to parameter of type 'Permission'.
+src/routes/v1/transactions.ts(49,28): error TS2339: Property 'tenantId' does not exist on type 'AuthRequest'.
+src/routes/v1/transactions.ts(50,23): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/routes/v1/transactions.ts(50,23): error TS18048: 'page' is possibly 'undefined'.
+src/routes/v1/transactions.ts(50,35): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/routes/v1/transactions.ts(50,35): error TS18048: 'limit' is possibly 'undefined'.
+src/routes/v1/transactions.ts(58,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/transactions.ts(64,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/transactions.ts(70,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/transactions.ts(76,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/transactions.ts(82,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/transactions.ts(88,21): error TS2345: Argument of type 'string | ParsedQs | (string | ParsedQs)[]' is not assignable to parameter of type 'string | number'.
+  Type 'ParsedQs' is not assignable to type 'string | number'.
+src/routes/v1/transactions.ts(97,30): error TS2532: Object is possibly 'undefined'.
+src/routes/v1/transactions.ts(120,10): error TS2322: Type 'string | number | ParsedQs | (string | ParsedQs)[] | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/v1/transactions.ts(120,21): error TS2322: Type 'string | ParsedQs | (string | ParsedQs)[] | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/v1/transactions.ts(120,28): error TS2322: Type 'string | number | ParsedQs | (string | ParsedQs)[] | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/v1/transactions.ts(123,47): error TS2554: Expected 3 arguments, but got 5.
+src/routes/v1/transactions.ts(136,21): error TS2345: Argument of type '"transactions"' is not assignable to parameter of type 'Permission'.
+src/routes/v1/transactions.ts(141,28): error TS2339: Property 'tenantId' does not exist on type 'AuthRequest'.
+src/routes/v1/webhooks/receive.ts(11,1): error TS6133: 'AuthRequest' is declared but its value is never read.
+src/routes/v1/webhooks/receive.ts(40,45): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v1/webhooks/receive.ts(48,9): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v1/webhooks/receive.ts(72,50): error TS6133: 'tenantId' is declared but its value is never read.
+src/routes/v2/ai-agents.ts(29,24): error TS6133: 'req' is declared but its value is never read.
+src/routes/v2/ai-agents.ts(45,25): error TS7030: Not all code paths return a value.
+src/routes/v2/ai-agents.ts(48,46): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v2/ai-agents.ts(82,7): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v2/ai-agents.ts(99,33): error TS7030: Not all code paths return a value.
+src/routes/v2/ai-agents.ts(102,46): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v2/ai-agents.ts(129,34): error TS7030: Not all code paths return a value.
+src/routes/v2/ai-agents.ts(132,46): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v2/ai-agents.ts(159,29): error TS6133: 'req' is declared but its value is never read.
+src/routes/v2/compliance.ts(19,25): error TS7030: Not all code paths return a value.
+src/routes/v2/compliance.ts(50,24): error TS7030: Not all code paths return a value.
+src/routes/v2/compliance.ts(75,28): error TS7030: Not all code paths return a value.
+src/routes/v2/compliance.ts(78,54): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v2/compliance.ts(99,33): error TS6133: 'req' is declared but its value is never read.
+src/routes/v2/compliance.ts(116,33): error TS7030: Not all code paths return a value.
+src/routes/v2/index.ts(31,26): error TS6133: 'req' is declared but its value is never read.
+src/routes/v2/knowledge.ts(38,7): error TS2412: Type 'string | undefined' is not assignable to type '"proposed" | "accepted" | "rejected" | "superseded" | undefined' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+src/routes/v2/knowledge.ts(61,30): error TS7030: Not all code paths return a value.
+src/routes/v2/knowledge.ts(64,46): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v2/knowledge.ts(73,53): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v2/knowledge.ts(90,41): error TS7030: Not all code paths return a value.
+src/routes/v2/knowledge.ts(101,55): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v2/knowledge.ts(116,33): error TS7030: Not all code paths return a value.
+src/routes/v2/knowledge.ts(143,29): error TS6133: 'req' is declared but its value is never read.
+src/routes/v2/network-effects.ts(19,37): error TS7030: Not all code paths return a value.
+src/routes/v2/network-effects.ts(47,38): error TS7030: Not all code paths return a value.
+src/routes/v2/network-effects.ts(75,44): error TS7030: Not all code paths return a value.
+src/routes/v2/network-effects.ts(101,45): error TS6133: 'req' is declared but its value is never read.
+src/routes/v2/network-effects.ts(117,36): error TS7030: Not all code paths return a value.
+src/routes/v2/network-effects.ts(145,36): error TS7030: Not all code paths return a value.
+src/routes/v2/network-effects.ts(181,37): error TS7030: Not all code paths return a value.
+src/routes/v2/network-effects.ts(208,44): error TS7030: Not all code paths return a value.
+src/routes/v2/network-effects.ts(235,29): error TS6133: 'req' is declared but its value is never read.
+src/routes/v2/reconciliation-graph.ts(25,7): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v2/reconciliation-graph.ts(36,25): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v2/reconciliation-graph.ts(41,7): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v2/reconciliation-graph.ts(77,25): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v2/reconciliation-graph.ts(96,7): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v2/reconciliation-graph.ts(126,29): error TS7030: Not all code paths return a value.
+src/routes/v2/reconciliation-graph.ts(129,45): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/v2/reconciliation-graph.ts(164,45): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/webhooks.ts(5,29): error TS2305: Module '"../middleware/authorization"' has no exported member 'requireResourceOwnership'.
+src/routes/webhooks.ts(7,34): error TS6133: 'generateWebhookSignature' is declared but its value is never read.
+src/routes/webhooks.ts(43,21): error TS2345: Argument of type '"webhooks"' is not assignable to parameter of type 'Permission'.
+src/routes/webhooks.ts(45,3): error TS7030: Not all code paths return a value.
+src/routes/webhooks.ts(69,25): error TS2532: Object is possibly 'undefined'.
+src/routes/webhooks.ts(104,21): error TS2345: Argument of type '"webhooks"' is not assignable to parameter of type 'Permission'.
+src/routes/webhooks.ts(133,30): error TS2532: Object is possibly 'undefined'.
+src/routes/webhooks.ts(161,3): error TS7030: Not all code paths return a value.
+src/routes/webhooks.ts(189,54): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/routes/webhooks.ts(204,10): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/routes/webhooks.ts(224,21): error TS2345: Argument of type '"webhooks"' is not assignable to parameter of type 'Permission'.
+src/routes/webhooks.ts(241,10): error TS2322: Type 'string | undefined' is not assignable to type 'string | number | boolean | Date | null'.
+  Type 'undefined' is not assignable to type 'string | number | boolean | Date | null'.
+src/services/ai-agents/anomaly-detector.ts(27,11): error TS6133: 'detectionRules' is declared but its value is never read.
+src/services/ai-agents/anomaly-detector.ts(58,27): error TS2551: Property 'getStats' does not exist on type 'AnomalyDetectorAgent'. Did you mean 'getStatus'?
+src/services/ai-agents/anomaly-detector.ts(70,5): error TS2375: Type '{ enabled: boolean; lastExecution: Date | undefined; metrics: { totalAnomalies: number; criticalAnomalies: number; falsePositiveRate: number; }; }' is not assignable to type '{ enabled: boolean; lastExecution?: Date; metrics?: Record<string, unknown>; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'lastExecution' are incompatible.
+    Type 'Date | undefined' is not assignable to type 'Date'.
+      Type 'undefined' is not assignable to type 'Date'.
+src/services/ai-agents/infrastructure-optimizer.ts(12,1): error TS6133: 'prometheusClient' is declared but its value is never read.
+src/services/ai-agents/infrastructure-optimizer.ts(12,10): error TS2305: Module '"../../infrastructure/observability/metrics"' has no exported member 'prometheusClient'.
+src/services/ai-agents/infrastructure-optimizer.ts(61,27): error TS2551: Property 'getStats' does not exist on type 'InfrastructureOptimizerAgent'. Did you mean 'getStatus'?
+src/services/ai-agents/infrastructure-optimizer.ts(73,5): error TS2375: Type '{ enabled: boolean; lastExecution: Date | undefined; metrics: { opportunitiesFound: number; autoApplied: number; }; }' is not assignable to type '{ enabled: boolean; lastExecution?: Date; metrics?: Record<string, unknown>; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'lastExecution' are incompatible.
+    Type 'Date | undefined' is not assignable to type 'Date'.
+      Type 'undefined' is not assignable to type 'Date'.
+src/services/ai-agents/orchestrator.ts(120,22): error TS2445: Property 'enabled' is protected and only accessible within class 'BaseAgent' and its subclasses.
+src/services/ai-agents/orchestrator.ts(135,16): error TS2445: Property 'enabled' is protected and only accessible within class 'BaseAgent' and its subclasses.
+src/services/ai-agents/orchestrator.ts(223,69): error TS2445: Property 'enabled' is protected and only accessible within class 'BaseAgent' and its subclasses.
+src/services/compliance/export-system.ts(157,5): error TS6133: 'jurisdiction' is declared but its value is never read.
+src/services/compliance/export-system.ts(177,5): error TS6133: 'jurisdiction' is declared but its value is never read.
+src/services/compliance/export-system.ts(233,5): error TS6133: 'data' is declared but its value is never read.
+src/services/compliance/export-system.ts(234,5): error TS6133: 'format' is declared but its value is never read.
+src/services/knowledge/ai-assistant.ts(84,36): error TS6133: 'question' is declared but its value is never read.
+src/services/knowledge/ai-assistant.ts(113,14): error TS2538: Type 'undefined' cannot be used as an index type.
+src/services/knowledge/ai-assistant.ts(113,30): error TS2538: Type 'undefined' cannot be used as an index type.
+src/services/knowledge/decision-log.ts(242,15): error TS6133: 'content' is declared but its value is never read.
+src/services/network-effects/performance-pools.ts(122,40): error TS6133: 'useCase' is declared but its value is never read.
+src/services/network-effects/performance-pools.ts(204,7): error TS2322: Type '{ adapter: string | undefined; ruleType: string | undefined; avgAccuracy: number; }[]' is not assignable to type '{ adapter: string; ruleType: string; avgAccuracy: number; }[]'.
+  Type '{ adapter: string | undefined; ruleType: string | undefined; avgAccuracy: number; }' is not assignable to type '{ adapter: string; ruleType: string; avgAccuracy: number; }'.
+    Types of property 'adapter' are incompatible.
+      Type 'string | undefined' is not assignable to type 'string'.
+        Type 'undefined' is not assignable to type 'string'.
+src/services/privacy-preserving/edge-agent.ts(207,7): error TS2532: Object is possibly 'undefined'.
+src/services/privacy-preserving/edge-agent.ts(213,11): error TS2532: Object is possibly 'undefined'.
+src/services/privacy-preserving/edge-agent.ts(213,11): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+src/services/privacy-preserving/edge-agent.ts(213,26): error TS2532: Object is possibly 'undefined'.
+src/services/privacy-preserving/edge-agent.ts(215,11): error TS2532: Object is possibly 'undefined'.
+src/services/privacy-preserving/edge-agent.ts(216,13): error TS2532: Object is possibly 'undefined'.
+src/services/privacy-preserving/edge-agent.ts(216,13): error TS2532: Object is possibly 'undefined'.
+src/services/privacy-preserving/edge-agent.ts(217,13): error TS2532: Object is possibly 'undefined'.
+src/services/privacy-preserving/edge-agent.ts(217,13): error TS2532: Object is possibly 'undefined'.
+src/services/privacy-preserving/edge-agent.ts(218,13): error TS2532: Object is possibly 'undefined'.
+src/services/privacy-preserving/edge-agent.ts(218,13): error TS2532: Object is possibly 'undefined'.
+src/services/privacy-preserving/edge-agent.ts(224,5): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+src/services/privacy-preserving/edge-agent.ts(224,12): error TS2532: Object is possibly 'undefined'.
+src/services/reconciliation-graph/graph-engine-supabase.ts(19,11): error TS6133: 'nodesChannel' is declared but its value is never read.
+src/services/reconciliation-graph/graph-engine-supabase.ts(41,11): error TS6133: 'edgesChannel' is declared but its value is never read.
+src/services/reconciliation-graph/graph-engine-supabase.ts(111,17): error TS6133: 'jobId' is declared but its value is never read.
+src/services/reconciliation-graph/graph-engine.ts(8,83): error TS6133: 'GraphUpdate' is declared but its value is never read.
+src/services/reconciliation-graph/graph-engine.ts(90,11): error TS6133: 'sourceNodes' is declared but its value is never read.
+src/services/reconciliation-graph/graph-engine.ts(219,7): error TS2532: Object is possibly 'undefined'.
+src/services/reconciliation-graph/graph-engine.ts(225,11): error TS2532: Object is possibly 'undefined'.
+src/services/reconciliation-graph/graph-engine.ts(225,11): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+src/services/reconciliation-graph/graph-engine.ts(225,26): error TS2532: Object is possibly 'undefined'.
+src/services/reconciliation-graph/graph-engine.ts(227,11): error TS2532: Object is possibly 'undefined'.
+src/services/reconciliation-graph/graph-engine.ts(228,13): error TS2532: Object is possibly 'undefined'.
+src/services/reconciliation-graph/graph-engine.ts(228,13): error TS2532: Object is possibly 'undefined'.
+src/services/reconciliation-graph/graph-engine.ts(229,13): error TS2532: Object is possibly 'undefined'.
+src/services/reconciliation-graph/graph-engine.ts(229,13): error TS2532: Object is possibly 'undefined'.
+src/services/reconciliation-graph/graph-engine.ts(230,13): error TS2532: Object is possibly 'undefined'.
+src/services/reconciliation-graph/graph-engine.ts(230,13): error TS2532: Object is possibly 'undefined'.
+src/services/reconciliation-graph/graph-engine.ts(236,5): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+src/services/reconciliation-graph/graph-engine.ts(236,12): error TS2532: Object is possibly 'undefined'.
+src/services/reconciliation-graph/stream-processor.ts(7,30): error TS6133: 'ReconciliationEdge' is declared but its value is never read.
+src/services/reconciliation-graph/stream-processor.ts(79,11): error TS2375: Type '{ id: string; type: "transaction"; jobId: string; sourceId: string | undefined; targetId: string | undefined; data: Record<string, unknown>; amount: number | undefined; currency: string | undefined; timestamp: Date; metadata: { ...; }; }' is not assignable to type 'ReconciliationNode' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'sourceId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/services/reconciliation-graph/stream-processor.ts(127,34): error TS6133: 'jobId' is declared but its value is never read.
+src/utils/api-response.ts(89,5): error TS2375: Type '{ page: number; limit: number; total: number; cursor: string | undefined; }' is not assignable to type '{ page?: number; limit?: number; total?: number; cursor?: string; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'cursor' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/utils/error-handler.ts(9,10): error TS6133: 'ApiError' is declared but its value is never read.
+src/utils/error-handler.ts(59,3): error TS6133: 'defaultStatusCode' is declared but its value is never read.
+src/utils/logger.ts(8,17): error TS6133: 'context' is declared but its value is never read.
+src/utils/logger.ts(54,62): error TS2339: Property 'substring' does not exist on type '{}'.
+src/utils/logger.ts(55,58): error TS2339: Property 'substring' does not exist on type '{}'.
+src/utils/logger.ts(86,46): error TS2339: Property 'stack' does not exist on type 'Error | { message: string; }'.
+  Property 'stack' does not exist on type '{ message: string; }'.
+src/utils/pagination.ts(50,9): error TS6133: 'limit' is declared but its value is never read.
+src/utils/pagination.ts(116,35): error TS18048: 'lastItem' is possibly 'undefined'.
+src/utils/pagination.ts(116,56): error TS18048: 'lastItem' is possibly 'undefined'.
+src/utils/pagination.ts(119,33): error TS18048: 'firstItem' is possibly 'undefined'.
+src/utils/pagination.ts(119,55): error TS18048: 'firstItem' is possibly 'undefined'.
+src/utils/pagination.ts(123,35): error TS18048: 'firstItem' is possibly 'undefined'.
+src/utils/pagination.ts(123,57): error TS18048: 'firstItem' is possibly 'undefined'.
+src/utils/pagination.ts(126,33): error TS18048: 'lastItem' is possibly 'undefined'.
+src/utils/pagination.ts(126,54): error TS18048: 'lastItem' is possibly 'undefined'.
+src/utils/pagination.ts(130,3): error TS2375: Type '{ items: T[]; nextCursor: string | undefined; prevCursor: string | undefined; hasMore: boolean; }' is not assignable to type 'CursorPaginationResult<T>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'nextCursor' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/utils/pagination.ts(142,3): error TS2375: Type '{ cursor: string | undefined; limit: number | undefined; direction: "next" | "prev"; }' is not assignable to type 'CursorPaginationParams' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'cursor' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/utils/rate-limiter.ts(39,15): error TS2532: Object is possibly 'undefined'.
+src/utils/tracing.ts(6,1): error TS6133: 'config' is declared but its value is never read.
+src/utils/typed-errors.ts(28,7): error TS2698: Spread types may only be created from object types.
+src/utils/typed-errors.ts(40,5): error TS2412: Type 'string | undefined' is not assignable to type 'string' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+  Type 'undefined' is not assignable to type 'string'.
+src/utils/typed-errors.ts(62,5): error TS2412: Type 'string | undefined' is not assignable to type 'string' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+  Type 'undefined' is not assignable to type 'string'.
+src/utils/typed-errors.ts(63,5): error TS2412: Type 'string | undefined' is not assignable to type 'string' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+  Type 'undefined' is not assignable to type 'string'.
+src/utils/typed-errors.ts(87,5): error TS2412: Type 'number | undefined' is not assignable to type 'number' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+  Type 'undefined' is not assignable to type 'number'.
+src/utils/typed-errors.ts(88,5): error TS2412: Type 'number | undefined' is not assignable to type 'number' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+  Type 'undefined' is not assignable to type 'number'.
+src/utils/typed-errors.ts(89,5): error TS2412: Type 'number | undefined' is not assignable to type 'number' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+  Type 'undefined' is not assignable to type 'number'.
+src/utils/typed-errors.ts(105,5): error TS2412: Type 'number | undefined' is not assignable to type 'number' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+  Type 'undefined' is not assignable to type 'number'.
+src/utils/validation-helpers.ts(25,3): error TS6133: 'errorMessage' is declared but its value is never read.
+src/utils/webhook-queue.ts(156,17): error TS18048: 'webhook' is possibly 'undefined'.
+src/utils/webhook-queue.ts(159,22): error TS2532: Object is possibly 'undefined'.
+src/utils/webhook-queue.ts(165,10): error TS18048: 'webhook' is possibly 'undefined'.
+src/utils/webhook-queue.ts(167,13): error TS18048: 'webhook' is possibly 'undefined'.
+src/utils/webhook-signature.ts(26,31): error TS18048: 'config' is possibly 'undefined'.
+src/utils/webhook-signature.ts(40,31): error TS18048: 'config' is possibly 'undefined'.
+src/utils/webhook-signature.ts(53,31): error TS18048: 'config' is possibly 'undefined'.
+src/utils/webhook-signature.ts(65,25): error TS18048: 'config' is possibly 'undefined'.
+src/utils/webhook-signature.ts(68,33): error TS18048: 'config' is possibly 'undefined'.
+src/utils/xml-safe.ts(4,29): error TS2307: Cannot find module 'xml2js' or its corresponding type declarations.
+src/utils/xml-safe.ts(22,9): error TS7006: Parameter 'err' implicitly has an 'any' type.
+src/utils/xml-safe.ts(22,14): error TS7006: Parameter 'result' implicitly has an 'any' type.
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path /workspace/packages/api
+npm error workspace @settler/api@1.0.0
+npm error location /workspace/packages/api
+npm error command failed
+npm error command sh -c tsc
