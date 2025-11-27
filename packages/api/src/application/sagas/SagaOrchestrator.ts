@@ -7,7 +7,6 @@ import { Pool } from 'pg';
 import { pool } from '../../db';
 import { IEventStore } from '../../infrastructure/eventsourcing/EventStore';
 import { IEventBus } from '../../infrastructure/events/IEventBus';
-import { DomainEvent } from '../../domain/events/DomainEvent';
 
 export enum SagaStatus {
   RUNNING = 'running',
@@ -41,6 +40,7 @@ export interface SagaState {
   sagaType: string;
   aggregateId: string;
   currentStep: string;
+  status?: SagaStatus;
   stepHistory: Array<{
     step: string;
     status: 'started' | 'completed' | 'failed' | 'compensated';
@@ -264,6 +264,9 @@ export class SagaOrchestrator {
     // Compensate in reverse order
     for (let i = failedStepIndex - 1; i >= 0; i--) {
       const step = saga.steps[i];
+      if (!step) {
+        continue;
+      }
       if (step.compensate) {
         const stepCompleted = state.stepHistory.some(
           (h) => h.step === step.name && h.status === 'completed'
@@ -311,7 +314,7 @@ export class SagaOrchestrator {
       state.aggregateId,
       state.currentStep,
       JSON.stringify(state),
-      (state as any).status || SagaStatus.RUNNING,
+      state.status || SagaStatus.RUNNING,
       state.tenantId,
       state.correlationId,
     ]);
@@ -347,15 +350,15 @@ export class SagaOrchestrator {
     const history = state.stepHistory.find((h) => h.step === stepName && h.status === 'completed');
     if (history) {
       history.status = 'compensated';
+      await this.saveSagaState(state);
     }
-    await this.saveSagaState(state);
   }
 
   /**
    * Mark saga as completed
    */
   private async markSagaCompleted(state: SagaState): Promise<void> {
-    (state as any).status = SagaStatus.COMPLETED;
+    state.status = SagaStatus.COMPLETED;
     await this.saveSagaState(state);
 
     const query = `
@@ -370,7 +373,7 @@ export class SagaOrchestrator {
    * Mark saga as failed
    */
   private async markSagaFailed(state: SagaState, errorMessage: string): Promise<void> {
-    (state as any).status = SagaStatus.FAILED;
+    state.status = SagaStatus.FAILED;
     await this.saveSagaState(state);
 
     const query = `
@@ -443,7 +446,7 @@ export class SagaOrchestrator {
     }
 
     const state: SagaState = JSON.parse(result.rows[0].state);
-    (state as any).status = SagaStatus.RUNNING;
+    state.status = SagaStatus.RUNNING;
 
     await this.saveSagaState(state);
     await this.executeSaga(state);

@@ -178,12 +178,20 @@ export class JSONExporter {
         reconciliationMatch.settlementId = matchObj.settlementId;
       }
       
-      result.matches.push({
+      const matchEntryResult: {
+        match: ReconciliationMatch;
+        transaction: Transaction;
+        settlement: Settlement;
+        fees?: Fee[];
+      } = {
         match: reconciliationMatch,
         transaction,
         settlement,
-        fees: matchEntry.fees,
-      });
+      };
+      if (matchEntry.fees) {
+        matchEntryResult.fees = matchEntry.fees;
+      }
+      result.matches.push(matchEntryResult);
     }
 
     // Add unmatched if included

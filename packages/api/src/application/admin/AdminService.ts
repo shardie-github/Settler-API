@@ -87,7 +87,7 @@ export class AdminService {
    * Dry-run reconciliation using historical events
    */
   async dryRunReconciliation(
-    reconciliationId: string,
+    _reconciliationId: string,
     events: EventEnvelope[]
   ): Promise<{
     matched: number;

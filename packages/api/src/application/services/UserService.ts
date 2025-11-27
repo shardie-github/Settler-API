@@ -3,11 +3,11 @@
  * Application service for user operations
  */
 
-import { User, UserRole } from '../../domain/entities/User';
+import { User, UserRole, UserProps } from '../../domain/entities/User';
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
 import { CreateUserCommand, CreateUserCommandResult } from '../commands/CreateUserCommand';
 import { hashPassword } from '../../infrastructure/security/password';
-import { UserCreatedEvent } from '../../domain/events/DomainEvent';
+import { UserCreatedEvent, UserDeletedEvent } from '../../domain/events/DomainEvent';
 import { IEventBus } from '../../infrastructure/events/IEventBus';
 
 export class UserService {
@@ -27,14 +27,18 @@ export class UserService {
     const passwordHash = await hashPassword(command.password);
 
     // Create user entity
-    const user = User.create({
+    const userProps: Omit<UserProps, 'id' | 'createdAt' | 'updatedAt'> = {
       email: command.email,
       passwordHash,
-      name: command.name,
+      tenantId: 'default', // TODO: Get from context
       role: (command.role as UserRole) || UserRole.DEVELOPER,
       dataResidencyRegion: command.dataResidencyRegion || 'us',
       dataRetentionDays: 365,
-    });
+    };
+    if (command.name !== undefined) {
+      userProps.name = command.name;
+    }
+    const user = User.create(userProps);
 
     // Save user
     const savedUser = await this.userRepository.save(user);

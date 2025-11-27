@@ -57,7 +57,7 @@ src/components/ui/tabs.tsx(3,41): error TS6133: 'onValueChange' is declared but 
 src/components/ui/tabs.tsx(11,41): error TS6133: 'value' is declared but its value is never read.
 src/components/ui/tabs.tsx(15,41): error TS6133: 'value' is declared but its value is never read.
 npm error Lifecycle script `typecheck` failed with error:
-npm error code 2
+npm error code 1
 npm error path /workspace/packages/web
 npm error workspace @settler/web@1.0.0
 npm error location /workspace/packages/web

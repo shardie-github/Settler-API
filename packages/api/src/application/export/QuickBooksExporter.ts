@@ -5,7 +5,6 @@
  * as specified in the Product & Technical Specification.
  */
 
-import { Transaction, Settlement, Fee, ReconciliationMatch } from '@settler/types';
 import { query } from '../../db';
 
 export interface QuickBooksExportOptions {

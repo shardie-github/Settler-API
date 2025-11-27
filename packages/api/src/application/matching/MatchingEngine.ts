@@ -8,8 +8,7 @@
  * - Fuzzy matching (reference ID variations, amount tolerance)
  */
 
-import { Transaction, Settlement, ReconciliationMatch, MatchingRulesConfig, MatchType, Exception, ExceptionCategory } from '@settler/types';
-import { query } from '../../db';
+import { Transaction, Settlement, ReconciliationMatch, MatchingRulesConfig, Exception } from '@settler/types';
 
 export interface MatchResult {
   match: ReconciliationMatch;
@@ -144,9 +143,6 @@ export class MatchingEngine {
     executionId?: string,
     jobId?: string
   ): Promise<{ matches: ReconciliationMatch[]; exceptions: Exception[] }> {
-    const matches: ReconciliationMatch[] = [];
-    const exceptions: Exception[] = [];
-
     switch (rule.field) {
       case 'transactionId':
       case 'providerTransactionId':
@@ -405,12 +401,12 @@ export class MatchingEngine {
    * Match by multiple fields (composite matching)
    */
   private async matchByMultipleFields(
-    transactions: Transaction[],
-    settlements: Settlement[],
-    rule: MatchingRulesConfig['strategies'][0],
-    tenantId: string,
-    executionId?: string,
-    jobId?: string
+    _transactions: Transaction[],
+    _settlements: Settlement[],
+    _rule: MatchingRulesConfig['strategies'][0],
+    _tenantId: string,
+    _executionId?: string,
+    _jobId?: string
   ): Promise<{ matches: ReconciliationMatch[]; exceptions: Exception[] }> {
     const matches: ReconciliationMatch[] = [];
     const exceptions: Exception[] = [];

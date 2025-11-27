@@ -28,7 +28,14 @@ export function parseOrThrow<T extends z.ZodType>(
   if (!result.success) {
     const error = new z.ZodError(result.error.errors);
     if (errorMessage) {
-      error.message = errorMessage;
+      // Create a new error with the custom message since message is read-only
+      const customError = new z.ZodError(result.error.errors);
+      Object.defineProperty(customError, 'message', {
+        value: errorMessage,
+        writable: true,
+        configurable: true
+      });
+      throw customError;
     }
     throw error;
   }
