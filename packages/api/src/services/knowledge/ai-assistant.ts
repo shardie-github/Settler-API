@@ -109,8 +109,11 @@ For "${query.question}", I recommend reviewing our decision logs and documentati
     const byType: Record<string, number> = {};
     
     for (const key of this.knowledgeBase.keys()) {
-      const type = key.split(':')[0];
-      byType[type] = (byType[type] || 0) + 1;
+      const parts = key.split(':');
+      const type = parts[0];
+      if (type) {
+        byType[type] = (byType[type] || 0) + 1;
+      }
     }
 
     return {

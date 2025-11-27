@@ -179,8 +179,10 @@ router.post(
           insights,
         },
       });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, "Failed to preview rules", 500, { userId: req.userId });
+      return;
     }
   }
 );

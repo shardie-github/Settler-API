@@ -131,36 +131,58 @@ export function createCursorPaginationResponse<T extends { created_at: Date | st
 
     if (direction === 'next') {
       // For next page, use last item as cursor
-      if (hasMore) {
+      if (hasMore && lastItem) {
         nextCursor = encodeCursor(lastItem.created_at, lastItem.id);
       }
       // For previous page, use first item as cursor (reversed)
-      prevCursor = encodeCursor(firstItem.created_at, firstItem.id);
+      if (firstItem) {
+        prevCursor = encodeCursor(firstItem.created_at, firstItem.id);
+      }
     } else {
       // For prev page, use first item as cursor
-      if (hasMore) {
+      if (hasMore && firstItem) {
         prevCursor = encodeCursor(firstItem.created_at, firstItem.id);
       }
       // For next page, use last item as cursor (reversed)
-      nextCursor = encodeCursor(lastItem.created_at, lastItem.id);
+      if (lastItem) {
+        nextCursor = encodeCursor(lastItem.created_at, lastItem.id);
+      }
     }
   }
 
-  return {
+  const result: {
+    items: T[];
+    nextCursor?: string;
+    prevCursor?: string;
+    hasMore: boolean;
+  } = {
     items: paginatedItems,
-    nextCursor,
-    prevCursor,
     hasMore,
   };
+  if (nextCursor) {
+    result.nextCursor = nextCursor;
+  }
+  if (prevCursor) {
+    result.prevCursor = prevCursor;
+  }
+  return result;
 }
 
 /**
  * Parse pagination params from query string
  */
 export function parseCursorPaginationParams(req: { query: Record<string, string | undefined> }): CursorPaginationParams {
-  return {
-    cursor: req.query.cursor,
-    limit: req.query.limit ? parseInt(req.query.limit, 10) : undefined,
-    direction: (req.query.direction as 'next' | 'prev') || 'next',
-  };
+  const result: {
+    cursor?: string;
+    limit?: number;
+    direction?: 'next' | 'prev';
+  } = {};
+  if (req.query.cursor) {
+    result.cursor = req.query.cursor;
+  }
+  if (req.query.limit) {
+    result.limit = parseInt(req.query.limit, 10);
+  }
+  result.direction = (req.query.direction as 'next' | 'prev') || 'next';
+  return result as CursorPaginationParams;
 }

@@ -58,7 +58,7 @@ export class InfrastructureOptimizerAgent extends BaseAgent {
         return this.optimizationHistory;
       
       case 'get_stats':
-        return await this.getStats();
+        return await this.getStatus();
       
       default:
         throw new Error(`Unknown action: ${action}`);
@@ -70,14 +70,21 @@ export class InfrastructureOptimizerAgent extends BaseAgent {
     lastExecution?: Date;
     metrics?: Record<string, unknown>;
   }> {
-    return {
-      enabled: this.enabled,
-      lastExecution: this.lastOptimization,
-      metrics: {
-        opportunitiesFound: this.optimizationHistory.length,
-        autoApplied: this.optimizationHistory.filter(o => o.recommendedAction === 'auto-apply').length,
-      },
+    const status: {
+      enabled: boolean;
+      lastExecution?: Date;
+      metrics?: Record<string, unknown>;
+    } = {
+      enabled: (this as any).enabled,
     };
+    if (this.lastOptimization) {
+      status.lastExecution = this.lastOptimization;
+    }
+    status.metrics = {
+      opportunitiesFound: this.optimizationHistory.length,
+      autoApplied: this.optimizationHistory.filter(o => o.recommendedAction === 'auto-apply').length,
+    };
+    return status;
   }
 
   /**

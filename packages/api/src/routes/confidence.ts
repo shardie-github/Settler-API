@@ -13,6 +13,7 @@ import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 import { NotFoundError } from "../utils/typed-errors";
 import { calculateConfidenceScore, explainConfidenceScore } from "../services/confidence-scoring";
+import { MatchingRule } from "../domain/entities/Job";
 
 const router = Router();
 
@@ -79,9 +80,9 @@ router.get(
           targetId: match.target_id,
           sourceData: (match.source_data as Record<string, unknown>) || {},
           targetData: (match.target_data as Record<string, unknown>) || {},
-          rules: rules as Array<{ field: string; type: string; tolerance?: number; threshold?: number; days?: number }>,
+          rules: rules as MatchingRule[],
         },
-        rules as Array<{ field: string; type: string; tolerance?: number; threshold?: number; days?: number }>
+        rules as MatchingRule[]
       );
 
       // Explain confidence score

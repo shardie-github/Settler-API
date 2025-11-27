@@ -4,13 +4,14 @@
  * Future-forward: AI-powered examples, instant feedback, visual results
  */
 
-import { Router, Response } from "express";
+import { Router, Response, RequestHandler } from "express";
 import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 import { calculateConfidenceScore } from "../services/confidence-scoring";
 import { validateAdapterConfig } from "../utils/adapter-config-validator";
+import { MatchingRule } from "../domain/entities/Job";
 
 const router = Router();
 
@@ -35,7 +36,7 @@ const playgroundReconcileSchema = z.object({
 // Get playground examples (pre-filled)
 router.get(
   "/playground/examples",
-  async (req: Request, res: Response) => {
+  (async (req: Request, res: Response): Promise<void> => {
     try {
       const examples = [
         {
@@ -150,26 +151,35 @@ router.get(
         data: examples,
         count: examples.length,
       });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, "Failed to get playground examples", 500);
+      return;
     }
-  }
+  }) as unknown as RequestHandler
 );
 
 // Run playground reconciliation (no auth, rate-limited)
 router.post(
   "/playground/reconcile",
   validateRequest(playgroundReconcileSchema),
-  async (req: Request, res: Response) => {
+  (async (req: Request, res: Response): Promise<void> => {
     try {
-      const { sourceAdapter, sourceData, targetAdapter, targetData, rules } = req.body;
+      const body = req.body as unknown as {
+        sourceAdapter: string;
+        sourceData: Array<Record<string, unknown>>;
+        targetAdapter: string;
+        targetData: Array<Record<string, unknown>>;
+        rules: Array<{ field: string; type: string; tolerance?: number; threshold?: number; days?: number }>;
+      };
+      const { sourceAdapter, sourceData, targetAdapter, targetData, rules } = body;
 
       // Validate adapter configs (without actual API keys)
       try {
         validateAdapterConfig(sourceAdapter, { apiKey: "test" });
         validateAdapterConfig(targetAdapter, { apiKey: "test" });
       } catch (error) {
-        return res.status(400).json({
+        res.status(400).json({
           error: {
             code: "VALIDATION_ERROR",
             message: "Invalid adapter configuration",
@@ -204,9 +214,9 @@ router.post(
               targetId: String(target.id || target.transaction_id || target.charge_id || "unknown"),
               sourceData: source,
               targetData: target,
-              rules,
+              rules: rules as MatchingRule[],
             },
-            rules
+            rules as MatchingRule[]
           );
 
           if (!bestMatch || confidence.score > bestMatch.confidence) {
@@ -222,9 +232,9 @@ router.post(
           matches.push({
             sourceId: String(source.id || source.order_id || source.charge_id || "unknown"),
             targetId: String(
-              bestMatch.target.id ||
-                (bestMatch.target as any).transaction_id ||
-                (bestMatch.target as any).charge_id ||
+              (bestMatch.target as Record<string, unknown>).id ||
+                (bestMatch.target as Record<string, unknown>).transaction_id ||
+                (bestMatch.target as Record<string, unknown>).charge_id ||
                 "unknown"
             ),
             confidence: bestMatch.confidence,
@@ -276,16 +286,18 @@ router.post(
         playground: true, // Indicates this is a playground result
         message: "This is a simulation. Sign up to run real reconciliations.",
       });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, "Failed to run playground reconciliation", 500);
+      return;
     }
-  }
+  }) as unknown as RequestHandler
 );
 
 // Get playground adapter schemas (for UI)
 router.get(
   "/playground/adapters",
-  async (req: Request, res: Response) => {
+  (async (req: Request, res: Response): Promise<void> => {
     try {
       const adapters = [
         {
@@ -330,10 +342,12 @@ router.get(
         data: adapters,
         count: adapters.length,
       });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, "Failed to get playground adapters", 500);
+      return;
     }
-  }
+  }) as unknown as RequestHandler
 );
 
 export { router as playgroundRouter };

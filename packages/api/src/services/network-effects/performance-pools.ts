@@ -187,13 +187,19 @@ export class PerformanceTuningPools extends EventEmitter {
 
     const topPerformers = Array.from(adapterRuleStats.entries())
       .map(([key, stats]) => {
-        const [adapter, ruleType] = key.split(':');
+        const parts = key.split(':');
+        const adapter = parts[0];
+        const ruleType = parts[1];
+        if (!adapter || !ruleType) {
+          return null;
+        }
         return {
           adapter,
           ruleType,
           avgAccuracy: stats.accuracy / stats.count,
         };
       })
+      .filter((item): item is { adapter: string; ruleType: string; avgAccuracy: number } => item !== null)
       .sort((a, b) => b.avgAccuracy - a.avgAccuracy)
       .slice(0, 10);
 

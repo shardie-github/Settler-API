@@ -117,7 +117,7 @@ export class AgentOrchestrator extends EventEmitter {
       id: agent.id,
       name: agent.name,
       type: agent.type,
-      enabled: agent.enabled,
+      enabled: (agent as any).enabled,
       config: agent['config'],
     }));
   }
@@ -132,7 +132,7 @@ export class AgentOrchestrator extends EventEmitter {
       throw new Error(`Agent ${request.agentId} not found`);
     }
 
-    if (!agent.enabled) {
+    if (!(agent as any).enabled) {
       throw new Error(`Agent ${request.agentId} is not enabled`);
     }
 
@@ -220,7 +220,7 @@ export class AgentOrchestrator extends EventEmitter {
   } {
     return {
       totalAgents: this.agents.size,
-      enabledAgents: Array.from(this.agents.values()).filter(a => a.enabled).length,
+      enabledAgents: Array.from(this.agents.values()).filter(a => (a as any).enabled).length,
       queueLength: this.requestQueue.length,
       isProcessing: this.isProcessing,
     };

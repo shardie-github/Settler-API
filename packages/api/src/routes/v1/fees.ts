@@ -4,11 +4,12 @@
  * REST API endpoints for fee visibility and reporting
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { z } from 'zod';
 import { validateRequest } from '../../middleware/validation';
 import { AuthRequest } from '../../middleware/auth';
 import { requirePermission } from '../../middleware/authorization';
+import { Permission } from '../../infrastructure/security/Permissions';
 import { query } from '../../db';
 import { sendSuccess, sendError, sendPaginated } from '../../utils/api-response';
 import { handleRouteError } from '../../utils/error-handler';
@@ -43,11 +44,12 @@ const getEffectiveRateSchema = z.object({
  */
 router.get(
   '/',
-  requirePermission('fees', 'read'),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(getFeesSchema),
   async (req: AuthRequest, res: Response) => {
     try {
-      const { page, limit, transactionId, settlementId, type, startDate, endDate } = req.query;
+      const queryParams = getFeesSchema.parse({ query: req.query });
+      const { page, limit, transactionId, settlementId, type, startDate, endDate } = queryParams.query;
       const tenantId = req.tenantId!;
       const offset = (page - 1) * limit;
 
@@ -75,13 +77,13 @@ router.get(
 
       if (startDate) {
         whereClause += ` AND created_at >= $${paramIndex}`;
-        params.push(startDate);
+        params.push(new Date(startDate).toISOString());
         paramIndex++;
       }
 
       if (endDate) {
         whereClause += ` AND created_at <= $${paramIndex}`;
-        params.push(endDate);
+        params.push(new Date(endDate).toISOString());
         paramIndex++;
       }
 
@@ -90,6 +92,9 @@ router.get(
         `SELECT COUNT(*) as count FROM fees WHERE ${whereClause}`,
         params
       );
+      if (!countResult[0]) {
+        throw new Error('Failed to get fee count');
+      }
       const total = parseInt(countResult[0].count, 10);
 
       // Get fees
@@ -113,7 +118,8 @@ router.get(
         [...params, limit, offset]
       );
 
-      sendPaginated(res, fees, total, page, limit);
+      sendPaginated(res, fees, { page, limit, total });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, 'Failed to fetch fees', 500);
     }
@@ -126,11 +132,12 @@ router.get(
  */
 router.get(
   '/effective-rate',
-  requirePermission('fees', 'read'),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(getEffectiveRateSchema),
   async (req: AuthRequest, res: Response) => {
     try {
-      const { transactionId, provider, startDate, endDate } = req.query;
+      const queryParams = getEffectiveRateSchema.parse({ query: req.query });
+      const { transactionId, provider, startDate, endDate } = queryParams.query;
       const tenantId = req.tenantId!;
 
       let whereClause = 't.tenant_id = $1';
@@ -151,13 +158,13 @@ router.get(
 
       if (startDate) {
         whereClause += ` AND t.created_at >= $${paramIndex}`;
-        params.push(startDate);
+        params.push(new Date(startDate).toISOString());
         paramIndex++;
       }
 
       if (endDate) {
         whereClause += ` AND t.created_at <= $${paramIndex}`;
-        params.push(endDate);
+        params.push(new Date(endDate).toISOString());
         paramIndex++;
       }
 
@@ -181,8 +188,10 @@ router.get(
       );
 
       sendSuccess(res, result);
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, 'Failed to calculate effective rate', 500);
+      return;
     }
   }
 );

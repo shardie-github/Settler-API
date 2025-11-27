@@ -45,7 +45,10 @@ function generateSuggestion(error: ApiError, details?: unknown): string | undefi
       };
 
       const firstError = fieldErrors[0];
-      return suggestions[firstError?.code] || "Check the field requirements in the adapter documentation.";
+      if (firstError?.code) {
+        return suggestions[firstError.code] || "Check the field requirements in the adapter documentation.";
+      }
+      return "Check the field requirements in the adapter documentation.";
     }
   }
 
@@ -138,28 +141,72 @@ export function handleEnhancedError(
     const example = generateExample(error, error.details);
     const docLink = getDocLink(error, error.details);
 
+    const errorResponse: {
+      code: string;
+      message: string;
+      type: string;
+      details?: Array<{
+        field: string;
+        message: string;
+        code: string;
+        suggestion?: string;
+        example?: string;
+        docLink?: string;
+      }>;
+      suggestion?: string;
+      docLink?: string;
+      example?: string;
+      traceId?: string;
+    } = {
+      code: error.errorCode,
+      message: error.message,
+      type: error.constructor.name,
+    };
+    if (error.details) {
+      if (Array.isArray(error.details)) {
+        errorResponse.details = (error.details as Array<{ field: string; message: string; code: string }>).map(d => {
+          const detail: {
+            field: string;
+            message: string;
+            code: string;
+            suggestion?: string;
+            example?: string;
+            docLink?: string;
+          } = {
+            field: d.field,
+            message: d.message,
+            code: d.code,
+          };
+          const suggestion = generateSuggestion(error, [d]);
+          const example = generateExample(error, [d]);
+          const docLink = getDocLink(error, [d]);
+          if (suggestion) {
+            detail.suggestion = suggestion;
+          }
+          if (example) {
+            detail.example = example;
+          }
+          if (docLink) {
+            detail.docLink = docLink;
+          }
+          return detail;
+        });
+      }
+    }
+    if (suggestion) {
+      errorResponse.suggestion = suggestion;
+    }
+    if (example) {
+      errorResponse.example = example;
+    }
+    if (docLink) {
+      errorResponse.docLink = docLink;
+    }
+    if (traceId) {
+      errorResponse.traceId = traceId;
+    }
     const response: EnhancedErrorResponse = {
-      error: {
-        code: error.errorCode,
-        message: error.message,
-        type: error.constructor.name,
-        ...(error.details && {
-          details: Array.isArray(error.details)
-            ? (error.details as Array<{ field: string; message: string; code: string }>).map(d => ({
-                field: d.field,
-                message: d.message,
-                code: d.code,
-                suggestion: generateSuggestion(error, [d]),
-                example: generateExample(error, [d]),
-                docLink: getDocLink(error, [d]),
-              }))
-            : undefined,
-        }),
-        ...(suggestion && { suggestion }),
-        ...(example && { example }),
-        ...(docLink && { docLink }),
-        ...(traceId && { traceId }),
-      },
+      error: errorResponse,
     };
 
     res.status(error.statusCode).json(response);

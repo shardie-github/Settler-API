@@ -51,8 +51,8 @@ export const logger = winston.createLogger({
         winston.format.colorize(),
         winston.format.printf(({ timestamp, level, message, trace_id, span_id, tenant_id, ...meta }) => {
           const metaStr = Object.keys(meta).length ? JSON.stringify(redact(meta)) : '';
-          const traceInfo = trace_id ? `[trace_id=${trace_id.substring(0, 16)}]` : '';
-          const spanInfo = span_id ? `[span_id=${span_id.substring(0, 16)}]` : '';
+          const traceInfo = trace_id && typeof trace_id === 'string' ? `[trace_id=${trace_id.substring(0, 16)}]` : '';
+          const spanInfo = span_id && typeof span_id === 'string' ? `[span_id=${span_id.substring(0, 16)}]` : '';
           const tenantInfo = tenant_id ? `[tenant_id=${tenant_id}]` : '';
           return `${timestamp} [${level}]${traceInfo}${spanInfo}${tenantInfo}: ${message} ${metaStr}`;
         })
@@ -83,7 +83,7 @@ export function logError(message: string, error?: unknown, meta?: Record<string,
   logger.error(message, {
     ...redact(meta),
     error: errorObj.message,
-    stack: error instanceof Error ? errorObj.stack : undefined,
+    stack: error instanceof Error && 'stack' in errorObj && errorObj.stack ? String(errorObj.stack) : undefined,
   });
 }
 

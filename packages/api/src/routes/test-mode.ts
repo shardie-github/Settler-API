@@ -8,6 +8,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 import { trackEventAsync } from "../utils/event-tracker";
@@ -23,7 +24,7 @@ const toggleTestModeSchema = z.object({
 // Get test mode status
 router.get(
   "/test-mode",
-  requirePermission("users", "read"),
+  requirePermission(Permission.USERS_READ),
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.userId!;
@@ -35,7 +36,7 @@ router.get(
         [userId]
       );
 
-      if (users.length === 0) {
+      if (users.length === 0 || !users[0]) {
         return res.status(404).json({ error: "User not found" });
       }
 
@@ -44,8 +45,10 @@ router.get(
           enabled: users[0].test_mode_enabled,
         },
       });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, "Failed to get test mode status", 500, { userId: req.userId });
+      return;
     }
   }
 );
@@ -53,7 +56,7 @@ router.get(
 // Toggle test mode
 router.post(
   "/test-mode",
-  requirePermission("users", "update"),
+  requirePermission(Permission.USERS_WRITE),
   validateRequest(toggleTestModeSchema),
   async (req: AuthRequest, res: Response) => {
     try {

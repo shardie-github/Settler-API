@@ -35,8 +35,10 @@ router.post('/intelligence/opt-in', async (req: Request, res: Response) => {
       },
       message: 'Successfully opted in to cross-customer intelligence',
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to opt in', 400);
+    return;
   }
 });
 
@@ -63,8 +65,10 @@ router.post('/intelligence/opt-out', async (req: Request, res: Response) => {
       },
       message: 'Successfully opted out of cross-customer intelligence',
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to opt out', 400);
+    return;
   }
 });
 
@@ -89,8 +93,10 @@ router.post('/intelligence/check-pattern', async (req: Request, res: Response) =
       data: match,
       matched: match !== null,
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to check pattern', 400);
+    return;
   }
 });
 
@@ -105,8 +111,10 @@ router.get('/intelligence/insights', async (req: Request, res: Response) => {
     res.json({
       data: insights,
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to get insights', 500);
+    return;
   }
 });
 
@@ -133,8 +141,10 @@ router.post('/performance/opt-in', async (req: Request, res: Response) => {
       },
       message: 'Successfully opted in to performance tuning pools',
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to opt in', 400);
+    return;
   }
 });
 
@@ -169,8 +179,10 @@ router.post('/performance/submit', async (req: Request, res: Response) => {
       },
       message: 'Performance metrics submitted successfully',
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to submit metrics', 400);
+    return;
   }
 });
 
@@ -196,8 +208,10 @@ router.get('/performance/insights', async (req: Request, res: Response) => {
     res.json({
       data: insights,
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to get insights', 500);
+    return;
   }
 });
 
@@ -223,8 +237,10 @@ router.get('/performance/recommendations', async (req: Request, res: Response) =
     res.json({
       data: recommendations,
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to get recommendations', 500);
+    return;
   }
 });
 
@@ -243,8 +259,10 @@ router.get('/stats', async (req: Request, res: Response) => {
         performance: performanceStats,
       },
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to get stats', 500);
+    return;
   }
 });
 

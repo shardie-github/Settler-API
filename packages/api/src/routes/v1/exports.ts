@@ -4,11 +4,12 @@
  * REST API endpoints for exporting reconciled data
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { z } from 'zod';
 import { validateRequest } from '../../middleware/validation';
 import { AuthRequest } from '../../middleware/auth';
 import { requirePermission } from '../../middleware/authorization';
+import { Permission } from '../../infrastructure/security/Permissions';
 import { QuickBooksExporter } from '../../application/export/QuickBooksExporter';
 import { CSVExporter } from '../../application/export/CSVExporter';
 import { JSONExporter } from '../../application/export/JSONExporter';
@@ -42,7 +43,7 @@ const exportSchema = z.object({
  */
 router.post(
   '/',
-  requirePermission('exports', 'create'),
+  requirePermission(Permission.REPORTS_EXPORT),
   validateRequest(exportSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -92,13 +93,13 @@ router.post(
               end: new Date(dateRange.end),
             },
             includeRawPayloads: options.includeRawPayloads ?? false,
-          });
+          } as any);
           res.setHeader('Content-Type', 'application/json');
           return sendSuccess(res, exportData);
         }
 
         default:
-          return sendError(res, 'Bad Request', `Unsupported format: ${format}`, 400);
+          return sendError(res, 400, 'BAD_REQUEST', `Unsupported format: ${format}`);
       }
     } catch (error: unknown) {
       handleRouteError(res, error, 'Failed to create export', 500);

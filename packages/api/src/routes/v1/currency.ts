@@ -4,11 +4,12 @@
  * REST API endpoints for multi-currency operations
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { z } from 'zod';
 import { validateRequest } from '../../middleware/validation';
 import { AuthRequest } from '../../middleware/auth';
 import { requirePermission } from '../../middleware/authorization';
+import { Permission } from '../../infrastructure/security/Permissions';
 import { FXService } from '../../application/currency/FXService';
 import { sendSuccess, sendError } from '../../utils/api-response';
 import { handleRouteError } from '../../utils/error-handler';
@@ -42,22 +43,27 @@ const getFXRateSchema = z.object({
  */
 router.post(
   '/convert',
-  requirePermission('currency', 'read'),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(convertCurrencySchema),
   async (req: AuthRequest, res: Response) => {
     try {
       const { amount, toCurrency, date } = req.body;
       const tenantId = req.tenantId!;
 
+      const moneyAmount = {
+        value: typeof amount === 'number' ? amount : parseFloat(String(amount)),
+        currency: toCurrency,
+      };
+
       const converted = await fxService.convertToBaseCurrency(
         tenantId,
-        amount,
+        moneyAmount,
         toCurrency,
         date ? new Date(date) : undefined
       );
 
       if (!converted) {
-        return sendError(res, 'Not Found', 'FX rate not available for currency pair', 404);
+        return sendError(res, 404, 'NOT_FOUND', 'FX rate not available for currency pair');
       }
 
       sendSuccess(res, { original: amount, converted });
@@ -73,7 +79,7 @@ router.post(
  */
 router.get(
   '/fx-rate',
-  requirePermission('currency', 'read'),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(getFXRateSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -88,7 +94,7 @@ router.get(
       );
 
       if (rate === null) {
-        return sendError(res, 'Not Found', 'FX rate not available for currency pair', 404);
+        return sendError(res, 404, 'NOT_FOUND', 'FX rate not available for currency pair');
       }
 
       sendSuccess(res, {
@@ -109,7 +115,7 @@ router.get(
  */
 router.get(
   '/base-currency',
-  requirePermission('currency', 'read'),
+  requirePermission(Permission.REPORTS_READ),
   async (req: AuthRequest, res: Response) => {
     try {
       const tenantId = req.tenantId!;
@@ -127,7 +133,7 @@ router.get(
  */
 router.get(
   '/fx-rates',
-  requirePermission('currency', 'read'),
+  requirePermission(Permission.REPORTS_READ),
   async (req: AuthRequest, res: Response) => {
     try {
       const tenantId = req.tenantId!;

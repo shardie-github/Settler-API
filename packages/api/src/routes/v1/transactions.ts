@@ -4,11 +4,12 @@
  * REST API endpoints for transaction management
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { z } from 'zod';
 import { validateRequest } from '../../middleware/validation';
 import { AuthRequest } from '../../middleware/auth';
 import { requirePermission } from '../../middleware/authorization';
+import { Permission } from '../../infrastructure/security/Permissions';
 import { query } from '../../db';
 import { sendSuccess, sendError, sendPaginated } from '../../utils/api-response';
 import { handleRouteError } from '../../utils/error-handler';
@@ -41,11 +42,12 @@ const getTransactionSchema = z.object({
  */
 router.get(
   '/',
-  requirePermission('transactions', 'read'),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(getTransactionsSchema),
   async (req: AuthRequest, res: Response) => {
     try {
-      const { page, limit, provider, status, type, paymentId, startDate, endDate } = req.query;
+      const queryParams = getTransactionsSchema.parse({ query: req.query });
+      const { page, limit, provider, status, type, paymentId, startDate, endDate } = queryParams.query;
       const tenantId = req.tenantId!;
       const offset = (page - 1) * limit;
 
@@ -79,13 +81,13 @@ router.get(
 
       if (startDate) {
         whereClause += ` AND created_at >= $${paramIndex}`;
-        params.push(startDate);
+        params.push(new Date(startDate).toISOString());
         paramIndex++;
       }
 
       if (endDate) {
         whereClause += ` AND created_at <= $${paramIndex}`;
-        params.push(endDate);
+        params.push(new Date(endDate).toISOString());
         paramIndex++;
       }
 
@@ -94,6 +96,9 @@ router.get(
         `SELECT COUNT(*) as count FROM transactions WHERE ${whereClause}`,
         params
       );
+      if (!countResult[0]) {
+        throw new Error('Failed to get transaction count');
+      }
       const total = parseInt(countResult[0].count, 10);
 
       // Get transactions
@@ -120,9 +125,11 @@ router.get(
         [...params, limit, offset]
       );
 
-      sendPaginated(res, transactions, total, page, limit);
+      sendPaginated(res, transactions, { page, limit, total });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, 'Failed to fetch transactions', 500);
+      return;
     }
   }
 );
@@ -133,7 +140,7 @@ router.get(
  */
 router.get(
   '/:id',
-  requirePermission('transactions', 'read'),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(getTransactionSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -158,14 +165,15 @@ router.get(
           updated_at as "updatedAt"
         FROM transactions 
         WHERE id = $1 AND tenant_id = $2`,
-        [id, tenantId]
+        [id || '', tenantId]
       );
 
-      if (transactions.length === 0) {
-        return sendError(res, 'Not Found', 'Transaction not found', 404);
+      if (transactions.length === 0 || !transactions[0]) {
+        return sendError(res, 404, 'NOT_FOUND', 'Transaction not found');
       }
 
       sendSuccess(res, transactions[0]);
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, 'Failed to fetch transaction', 500);
     }

@@ -31,6 +31,10 @@ router.get(
       const { executionId } = req.params;
       const userId = req.userId!;
 
+      if (!executionId || !userId) {
+        throw new NotFoundError("Execution ID and User ID are required", "execution", executionId || "unknown");
+      }
+
       // Get execution details
       const executions = await query<{
         id: string;
@@ -48,7 +52,7 @@ router.get(
         [executionId, userId]
       );
 
-      if (executions.length === 0) {
+      if (executions.length === 0 || !executions[0]) {
         throw new NotFoundError("Execution not found", "execution", executionId);
       }
 
@@ -84,6 +88,8 @@ router.get(
         total?: number;
       } | null;
 
+      const matchCountValue = matchCount[0]?.count || "0";
+
       res.json({
         data: {
           executionId: execution.id,
@@ -92,7 +98,7 @@ router.get(
           progress: {
             percentage: progress,
             message: progressMessage,
-            matched: summary?.matched || parseInt(matchCount[0]?.count || "0"),
+            matched: summary?.matched || parseInt(matchCountValue),
             unmatched: summary?.unmatched || 0,
             total: summary?.total || 0,
           },

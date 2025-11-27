@@ -7,7 +7,10 @@ import { config } from '../config';
 import { initDatabase } from '../db';
 import { getRedisClient } from './cache';
 import { logInfo, logError, logWarn } from './logger';
-import { getRequiredEnvVars, validateEnvVar } from '../../config/env.schema';
+// Import env schema functions - using require to avoid rootDir issues
+const envSchema = require('../../../../config/env.schema');
+const getRequiredEnvVars = envSchema.getRequiredEnvVars as (environment: 'local' | 'development' | 'preview' | 'staging' | 'production') => Array<{ name: string; required: boolean; defaultValue?: string }>;
+const validateEnvVar = envSchema.validateEnvVar as (spec: { name: string; required: boolean; defaultValue?: string }, value: string) => { valid: boolean; error?: string };
 
 export interface ValidationResult {
   name: string;

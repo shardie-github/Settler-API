@@ -4,11 +4,12 @@
  * REST API endpoints for settlement management
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { z } from 'zod';
 import { validateRequest } from '../../middleware/validation';
 import { AuthRequest } from '../../middleware/auth';
 import { requirePermission } from '../../middleware/authorization';
+import { Permission } from '../../infrastructure/security/Permissions';
 import { query } from '../../db';
 import { sendSuccess, sendError, sendPaginated } from '../../utils/api-response';
 import { handleRouteError } from '../../utils/error-handler';
@@ -39,11 +40,12 @@ const getSettlementSchema = z.object({
  */
 router.get(
   '/',
-  requirePermission('settlements', 'read'),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(getSettlementsSchema),
   async (req: AuthRequest, res: Response) => {
     try {
-      const { page, limit, provider, status, startDate, endDate } = req.query;
+      const queryParams = getSettlementsSchema.parse({ query: req.query });
+      const { page, limit, provider, status, startDate, endDate } = queryParams.query;
       const tenantId = req.tenantId!;
       const offset = (page - 1) * limit;
 
@@ -65,13 +67,13 @@ router.get(
 
       if (startDate) {
         whereClause += ` AND settlement_date >= $${paramIndex}`;
-        params.push(startDate);
+        params.push(new Date(startDate).toISOString());
         paramIndex++;
       }
 
       if (endDate) {
         whereClause += ` AND settlement_date <= $${paramIndex}`;
-        params.push(endDate);
+        params.push(new Date(endDate).toISOString());
         paramIndex++;
       }
 
@@ -80,6 +82,9 @@ router.get(
         `SELECT COUNT(*) as count FROM settlements WHERE ${whereClause}`,
         params
       );
+      if (!countResult[0]) {
+        throw new Error('Failed to get settlement count');
+      }
       const total = parseInt(countResult[0].count, 10);
 
       // Get settlements
@@ -106,9 +111,11 @@ router.get(
         [...params, limit, offset]
       );
 
-      sendPaginated(res, settlements, total, page, limit);
+      sendPaginated(res, settlements, { page, limit, total });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, 'Failed to fetch settlements', 500);
+      return;
     }
   }
 );
@@ -119,7 +126,7 @@ router.get(
  */
 router.get(
   '/:id',
-  requirePermission('settlements', 'read'),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(getSettlementSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -144,16 +151,21 @@ router.get(
           updated_at as "updatedAt"
         FROM settlements 
         WHERE id = $1 AND tenant_id = $2`,
-        [id, tenantId]
+        [id || '', tenantId]
       );
 
       if (settlements.length === 0) {
-        return sendError(res, 'Not Found', 'Settlement not found', 404);
+        return sendError(res, 404, 'NOT_FOUND', 'Settlement not found');
       }
 
+      if (!settlements[0]) {
+        return sendError(res, 404, 'NOT_FOUND', 'Settlement not found');
+      }
       sendSuccess(res, settlements[0]);
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, 'Failed to fetch settlement', 500);
+      return;
     }
   }
 );
