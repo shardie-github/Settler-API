@@ -91,10 +91,15 @@ export class XeroAdapter implements Adapter {
       errors.push("Valid date is required");
     }
 
-    return {
+    const result: ValidationResult = {
       valid: errors.length === 0,
-      errors: errors.length > 0 ? errors : undefined,
     };
+
+    if (errors.length > 0) {
+      result.errors = errors;
+    }
+
+    return result;
   }
 
   private async getAccessToken(): Promise<string> {
