@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { AlertTriangle, CheckCircle2, XCircle, Filter, Download, Sparkles } from 'lucide-react';
+import { CheckCircle2, XCircle, Filter, Download, Sparkles } from '@/lib/lucide-react';
 
 interface Exception {
   id: string;
@@ -195,7 +195,7 @@ export function ExceptionQueue({ jobId }: { jobId?: string }) {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="text-sm font-medium mb-2 block">Category</label>
-              <Select value={filters.category} onValueChange={(v) => setFilters({ ...filters, category: v })}>
+              <Select value={filters.category} onValueChange={(v: string) => setFilters({ ...filters, category: v })}>
                 <SelectTrigger>
                   <SelectValue placeholder="All" />
                 </SelectTrigger>
@@ -209,7 +209,7 @@ export function ExceptionQueue({ jobId }: { jobId?: string }) {
             </div>
             <div>
               <label className="text-sm font-medium mb-2 block">Severity</label>
-              <Select value={filters.severity} onValueChange={(v) => setFilters({ ...filters, severity: v })}>
+              <Select value={filters.severity} onValueChange={(v: string) => setFilters({ ...filters, severity: v })}>
                 <SelectTrigger>
                   <SelectValue placeholder="All" />
                 </SelectTrigger>
@@ -223,7 +223,7 @@ export function ExceptionQueue({ jobId }: { jobId?: string }) {
             </div>
             <div>
               <label className="text-sm font-medium mb-2 block">Status</label>
-              <Select value={filters.status} onValueChange={(v) => setFilters({ ...filters, status: v })}>
+              <Select value={filters.status} onValueChange={(v: string) => setFilters({ ...filters, status: v })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -239,7 +239,7 @@ export function ExceptionQueue({ jobId }: { jobId?: string }) {
               <Input
                 placeholder="Search exceptions..."
                 value={filters.search}
-                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters({ ...filters, search: e.target.value })}
               />
             </div>
           </div>

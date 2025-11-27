@@ -9,7 +9,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Play, Sparkles, Code, BarChart3, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import { Play, BarChart3, CheckCircle2, XCircle } from '@/lib/lucide-react';
 import { CodeBlock } from '@/components/ui/code-block';
 
 interface PlaygroundExample {
@@ -110,7 +110,7 @@ export function Playground() {
         </p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)} className="space-y-4">
+      <Tabs value={activeTab} onValueChange={(v: string) => setActiveTab(v as typeof activeTab)} className="space-y-4">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="examples">Examples</TabsTrigger>
           <TabsTrigger value="custom">Custom</TabsTrigger>

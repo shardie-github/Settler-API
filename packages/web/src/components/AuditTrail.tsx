@@ -17,7 +17,7 @@ interface AuditLog {
   metadata?: Record<string, unknown>;
 }
 
-export default function AuditTrail({ client, apiKey, jobId }: AuditTrailProps) {
+export default function AuditTrail({ client: _client, apiKey, jobId }: AuditTrailProps) {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");

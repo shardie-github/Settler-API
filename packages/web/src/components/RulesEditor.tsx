@@ -12,15 +12,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Sparkles, Play, TrendingUp, AlertCircle, CheckCircle2 } from 'lucide-react';
-
-interface MatchingRule {
-  field: string;
-  type: 'exact' | 'fuzzy' | 'range';
-  tolerance?: number;
-  threshold?: number;
-  days?: number;
-}
+import { Sparkles, Play, TrendingUp, AlertCircle, CheckCircle2 } from '@/lib/lucide-react';
+import { MatchingRule } from '@settler/types';
 
 interface RuleTemplate {
   id: string;
@@ -43,7 +36,7 @@ interface PreviewResult {
 export function RulesEditor({ jobId }: { jobId?: string }) {
   const [rules, setRules] = useState<MatchingRule[]>([]);
   const [templates, setTemplates] = useState<RuleTemplate[]>([]);
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [_selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [previewResult, setPreviewResult] = useState<PreviewResult | null>(null);
   const [impactAnalysis, setImpactAnalysis] = useState<any>(null);
   const [aiSuggestions, setAiSuggestions] = useState<MatchingRule[]>([]);
@@ -86,7 +79,7 @@ export function RulesEditor({ jobId }: { jobId?: string }) {
   };
 
   const addRule = () => {
-    setRules([...rules, { field: '', type: 'exact' }]);
+    setRules([...rules, { field: 'transactionId', type: 'exact' }]);
   };
 
   const updateRule = (index: number, updates: Partial<MatchingRule>) => {
@@ -192,7 +185,7 @@ export function RulesEditor({ jobId }: { jobId?: string }) {
                         <Label>Type</Label>
                         <Select
                           value={rule.type}
-                          onValueChange={(value: MatchingRule['type']) => updateRule(index, { type: value })}
+                          onValueChange={(value: string) => updateRule(index, { type: value as MatchingRule['type'] })}
                         >
                           <SelectTrigger>
                             <SelectValue />
@@ -210,8 +203,13 @@ export function RulesEditor({ jobId }: { jobId?: string }) {
                           <Input
                             type="number"
                             step="0.01"
-                            value={rule.tolerance || ''}
-                            onChange={(e) => updateRule(index, { tolerance: parseFloat(e.target.value) || undefined })}
+                            value={rule.tolerance?.amount || ''}
+                            onChange={(e) => {
+                              const value = parseFloat(e.target.value);
+                              updateRule(index, { 
+                                tolerance: isNaN(value) ? undefined : { amount: value }
+                              });
+                            }}
                             placeholder="0.01"
                           />
                         </div>
@@ -225,7 +223,12 @@ export function RulesEditor({ jobId }: { jobId?: string }) {
                             min="0"
                             max="1"
                             value={rule.threshold || ''}
-                            onChange={(e) => updateRule(index, { threshold: parseFloat(e.target.value) || undefined })}
+                            onChange={(e) => {
+                              const value = parseFloat(e.target.value);
+                              updateRule(index, { 
+                                threshold: isNaN(value) ? undefined : value
+                              });
+                            }}
                             placeholder="0.85"
                           />
                         </div>
@@ -235,8 +238,13 @@ export function RulesEditor({ jobId }: { jobId?: string }) {
                           <Label>Days</Label>
                           <Input
                             type="number"
-                            value={rule.days || ''}
-                            onChange={(e) => updateRule(index, { days: parseInt(e.target.value) || undefined })}
+                            value={rule.tolerance?.days || ''}
+                            onChange={(e) => {
+                              const value = parseInt(e.target.value);
+                              updateRule(index, { 
+                                tolerance: isNaN(value) ? undefined : { days: value }
+                              });
+                            }}
                             placeholder="1"
                           />
                         </div>

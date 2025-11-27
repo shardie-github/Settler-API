@@ -12,7 +12,7 @@ interface CodeBlockProps {
   className?: string;
 }
 
-export function CodeBlock({ code, language, className }: CodeBlockProps) {
+export function CodeBlock({ code, language: _language, className }: CodeBlockProps) {
   return (
     <pre
       className={cn(
