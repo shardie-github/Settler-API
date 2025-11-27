@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 interface ExecutionUpdate {
   type: string;
@@ -37,6 +37,14 @@ export default function RealtimeDashboard({ params, searchParams }: PageProps) {
   const [execution, setExecution] = useState<ExecutionUpdate | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
+
+  const addLog = useCallback((message: string) => {
+    setLogs((prev) => [...prev.slice(-99), `${new Date().toISOString()}: ${message}`]);
+  }, []);
+
+  const addError = useCallback((error: string) => {
+    setErrors((prev) => [...prev.slice(-49), `${new Date().toISOString()}: ${error}`]);
+  }, []);
 
   useEffect(() => {
     if (!jobId || !apiKey) {
@@ -93,15 +101,7 @@ export default function RealtimeDashboard({ params, searchParams }: PageProps) {
     return () => {
       eventSource.close();
     };
-  }, [jobId, apiKey]);
-
-  const addLog = (message: string) => {
-    setLogs((prev) => [...prev.slice(-99), `${new Date().toISOString()}: ${message}`]);
-  };
-
-  const addError = (error: string) => {
-    setErrors((prev) => [...prev.slice(-49), `${new Date().toISOString()}: ${error}`]);
-  };
+  }, [jobId, apiKey, addLog, addError]);
 
   const getStatusColor = (status?: string) => {
     switch (status) {
@@ -221,11 +221,11 @@ export default function RealtimeDashboard({ params, searchParams }: PageProps) {
                   </div>
                 </div>
               </div>
-              {execution.summary.accuracy_percentage !== null && (
+              {typeof execution.summary.accuracy_percentage === 'number' && (
                 <div className="mt-4">
                   <div className="text-sm text-gray-600 mb-1">Accuracy</div>
                   <div className="text-3xl font-bold text-green-600">
-                    {execution.summary.accuracy_percentage?.toFixed(2)}%
+                    {execution.summary.accuracy_percentage.toFixed(2)}%
                   </div>
                 </div>
               )}

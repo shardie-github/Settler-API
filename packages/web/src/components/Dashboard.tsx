@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { SettlerClient } from "@settler/sdk";
 
 interface DashboardProps {
@@ -26,11 +26,7 @@ export default function Dashboard({ apiKey }: DashboardProps) {
   const [loading, setLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
 
-  useEffect(() => {
-    loadJobs();
-  }, []);
-
-  async function loadJobs() {
+  const loadJobs = useCallback(async () => {
     try {
       setLoading(true);
       const response = await client.jobs.list({ limit: 100 });
@@ -40,7 +36,11 @@ export default function Dashboard({ apiKey }: DashboardProps) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [client]);
+
+  useEffect(() => {
+    loadJobs();
+  }, [loadJobs]);
 
   async function runJob(jobId: string) {
     try {
@@ -238,11 +238,7 @@ function JobDetailModal({
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadReport();
-  }, [job.id]);
-
-  async function loadReport() {
+  const loadReport = useCallback(async () => {
     try {
       setLoading(true);
       const response = await client.reports.get(job.id);
@@ -252,7 +248,11 @@ function JobDetailModal({
     } finally {
       setLoading(false);
     }
-  }
+  }, [client, job.id]);
+
+  useEffect(() => {
+    loadReport();
+  }, [loadReport]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

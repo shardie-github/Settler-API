@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 interface AuditTrailProps {
   apiKey: string;
@@ -20,11 +20,7 @@ export default function AuditTrail({ apiKey, jobId }: AuditTrailProps) {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
 
-  useEffect(() => {
-    loadLogs();
-  }, [jobId, filter]);
-
-  async function loadLogs() {
+  const loadLogs = useCallback(async () => {
     try {
       setLoading(true);
       // Note: This endpoint would need to be implemented in the API
@@ -44,7 +40,11 @@ export default function AuditTrail({ apiKey, jobId }: AuditTrailProps) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [apiKey, jobId, filter]);
+
+  useEffect(() => {
+    loadLogs();
+  }, [loadLogs]);
 
   const eventIcons: Record<string, string> = {
     job_created: "➕",
