@@ -1,0 +1,711 @@
+openapi: 3.0.3
+info:
+  title: Settler API
+  description: |
+    Developer-first, event-driven payment reconciliation API for ecommerce, SaaS, and marketplace platforms.
+    
+    Settler provides unified, real-time reconciliation across all payment gateways and rails,
+    with automatic fee extraction, multi-currency support, and comprehensive export capabilities:
+    
+    - **Unified Multi-Gateway Reconciliation**: One API, all payment providers
+    - **Real-Time Cash Flow Visibility**: Reconcile as transactions happen, not at month-end
+    - **Protocol-Agnostic Design**: Any payment rail, one canonical model
+    
+    ## Authentication
+    
+    All API requests require authentication via API key or JWT token.
+    
+    Include your API key in the `X-API-Key` header:
+    ```
+    X-API-Key: sk_your_api_key
+    ```
+    
+    Or include a Bearer token in the `Authorization` header:
+    ```
+    Authorization: Bearer your_jwt_token
+    ```
+  version: 1.0.0
+  contact:
+    name: Settler API Support
+    email: support@settler.io
+  license:
+    name: MIT
+
+servers:
+  - url: https://api.settler.io/api/v1
+    description: Production server
+  - url: http://localhost:3000/api/v1
+    description: Development server
+
+tags:
+  - name: Transactions
+    description: Transaction management endpoints
+  - name: Settlements
+    description: Settlement management endpoints
+  - name: Fees
+    description: Fee visibility and reporting endpoints
+  - name: Exports
+    description: Data export endpoints (QuickBooks, CSV, JSON)
+  - name: Currency
+    description: Multi-currency and FX rate endpoints
+  - name: Webhooks
+    description: Webhook ingestion endpoints
+  - name: Jobs
+    description: Reconciliation job management
+  - name: Reports
+    description: Reconciliation reports
+
+paths:
+  /transactions:
+    get:
+      tags:
+        - Transactions
+      summary: List transactions
+      description: List transactions with filtering and pagination
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+        - name: provider
+          in: query
+          schema:
+            type: string
+            enum: [stripe, paypal, square, bank]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, succeeded, failed, refunded, disputed]
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [authorization, capture, refund, chargeback, adjustment]
+        - name: paymentId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /transactions/{id}:
+    get:
+      tags:
+        - Transactions
+      summary: Get transaction by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Transaction'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /settlements:
+    get:
+      tags:
+        - Settlements
+      summary: List settlements
+      description: List settlements with filtering and pagination
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+        - name: provider
+          in: query
+          schema:
+            type: string
+            enum: [stripe, paypal, square, bank]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, completed, failed]
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Settlement'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /settlements/{id}:
+    get:
+      tags:
+        - Settlements
+      summary: Get settlement by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Settlement'
+
+  /fees:
+    get:
+      tags:
+        - Fees
+      summary: List fees
+      description: List fees with filtering and pagination
+      parameters:
+        - name: transactionId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: settlementId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [processing, fx, chargeback, refund, adjustment, other]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Fee'
+
+  /fees/effective-rate:
+    get:
+      tags:
+        - Fees
+      summary: Calculate effective rate
+      description: Calculate effective processing rate for transactions
+      parameters:
+        - name: transactionId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: provider
+          in: query
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        transactionId:
+                          type: string
+                        provider:
+                          type: string
+                        transactionAmount:
+                          type: number
+                        totalFees:
+                          type: number
+                        effectiveRate:
+                          type: number
+
+  /exports:
+    post:
+      tags:
+        - Exports
+      summary: Create export
+      description: Export reconciled data in QuickBooks, CSV, or JSON format
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jobId
+                - format
+                - dateRange
+              properties:
+                jobId:
+                  type: string
+                  format: uuid
+                format:
+                  type: string
+                  enum: [quickbooks, csv, json]
+                dateRange:
+                  type: object
+                  properties:
+                    start:
+                      type: string
+                      format: date-time
+                    end:
+                      type: string
+                      format: date-time
+                options:
+                  type: object
+                  properties:
+                    includeFees:
+                      type: boolean
+                      default: true
+                    includeUnmatched:
+                      type: boolean
+                      default: false
+                    includeRawPayloads:
+                      type: boolean
+                      default: false
+                    columns:
+                      type: array
+                      items:
+                        type: string
+                    glAccountMapping:
+                      type: object
+      responses:
+        '200':
+          description: Success
+          content:
+            text/csv:
+              schema:
+                type: string
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportResult'
+
+  /currency/convert:
+    post:
+      tags:
+        - Currency
+      summary: Convert currency
+      description: Convert amount to base currency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - toCurrency
+              properties:
+                amount:
+                  type: object
+                  properties:
+                    value:
+                      type: number
+                    currency:
+                      type: string
+                toCurrency:
+                  type: string
+                date:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      original:
+                        $ref: '#/components/schemas/Money'
+                      converted:
+                        $ref: '#/components/schemas/Money'
+
+  /currency/fx-rate:
+    get:
+      tags:
+        - Currency
+      summary: Get FX rate
+      description: Get FX rate for currency pair
+      parameters:
+        - name: fromCurrency
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: toCurrency
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      fromCurrency:
+                        type: string
+                      toCurrency:
+                        type: string
+                      rate:
+                        type: number
+                      date:
+                        type: string
+                        format: date-time
+
+  /webhooks/receive/{adapter}:
+    post:
+      tags:
+        - Webhooks
+      summary: Receive webhook
+      description: Receive webhook from payment provider
+      parameters:
+        - name: adapter
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [stripe, paypal, square]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        processed:
+                          type: boolean
+                        events:
+                          type: array
+                          items:
+                            type: object
+
+components:
+  schemas:
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        paymentId:
+          type: string
+          format: uuid
+        provider:
+          type: string
+          enum: [stripe, paypal, square, bank]
+        providerTransactionId:
+          type: string
+        type:
+          type: string
+          enum: [authorization, capture, refund, chargeback, adjustment]
+        amount:
+          $ref: '#/components/schemas/Money'
+        netAmount:
+          $ref: '#/components/schemas/Money'
+        status:
+          type: string
+          enum: [pending, succeeded, failed, refunded, disputed]
+        rawPayload:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Settlement:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        provider:
+          type: string
+        providerSettlementId:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Money'
+        currency:
+          type: string
+        fxRate:
+          type: number
+        settlementDate:
+          type: string
+          format: date-time
+        expectedDate:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [pending, completed, failed]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Fee:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        transactionId:
+          type: string
+          format: uuid
+        settlementId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [processing, fx, chargeback, refund, adjustment, other]
+        amount:
+          $ref: '#/components/schemas/Money'
+        description:
+          type: string
+        rate:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+
+    Money:
+      type: object
+      properties:
+        value:
+          type: number
+        currency:
+          type: string
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+
+    ExportResult:
+      type: object
+      properties:
+        exportDate:
+          type: string
+          format: date-time
+        dateRange:
+          type: object
+          properties:
+            start:
+              type: string
+              format: date-time
+            end:
+              type: string
+              format: date-time
+        summary:
+          type: object
+          properties:
+            totalMatches:
+              type: integer
+            totalUnmatched:
+              type: integer
+            totalFees:
+              type: integer
+        matches:
+          type: array
+          items:
+            type: object
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+
+security:
+  - ApiKeyAuth: []
+  - BearerAuth: []
