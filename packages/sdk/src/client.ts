@@ -168,7 +168,7 @@ export class SettlerClient {
         path,
         headers: {},
         body: options.body,
-        query: options.query,
+        ...(options.query !== undefined && { query: options.query }),
       };
 
       // Execute middleware chain
@@ -177,9 +177,9 @@ export class SettlerClient {
         async (context: RequestContext): Promise<ResponseContext<T>> => {
           return this.executeRequest(context);
         }
-      );
+      ) as ResponseContext<T>;
 
-      return response.data as T;
+      return response.data;
     };
 
     // Apply deduplication if enabled

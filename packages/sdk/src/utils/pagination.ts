@@ -35,31 +35,40 @@ export class PaginatedIterator<T> implements AsyncIterableIterator<T> {
     // If we have items in the current page, return the next one
     if (this.currentIndex < this.currentPage.length) {
       const value = this.currentPage[this.currentIndex++];
-      return { done: false, value };
+      if (value !== undefined) {
+        return { done: false, value };
+      }
     }
 
     // If there are no more pages, we're done
     if (!this.hasMore) {
-      return { done: true, value: undefined };
+      return { done: true, value: undefined as T };
     }
 
     // Fetch the next page
     try {
-      const response = await this.fetchPage({
-        cursor: this.currentCursor,
-      });
+      const options: PaginationOptions = {};
+      if (this.currentCursor !== undefined) {
+        options.cursor = this.currentCursor;
+      }
+      const response = await this.fetchPage(options);
 
       this.currentPage = response.data;
       this.currentIndex = 0;
-      this.currentCursor = response.nextCursor;
+      if (response.nextCursor !== undefined) {
+        this.currentCursor = response.nextCursor;
+      }
       this.hasMore = response.hasMore ?? response.nextCursor !== undefined;
 
       if (this.currentPage.length === 0) {
-        return { done: true, value: undefined };
+        return { done: true, value: undefined as T };
       }
 
       const value = this.currentPage[this.currentIndex++];
-      return { done: false, value };
+      if (value !== undefined) {
+        return { done: false, value };
+      }
+      return { done: true, value: undefined as T };
     } catch (error) {
       throw error;
     }

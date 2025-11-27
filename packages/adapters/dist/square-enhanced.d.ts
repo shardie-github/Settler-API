@@ -5,7 +5,7 @@
  * as specified in the Product & Technical Specification.
  */
 import { EnhancedAdapter, AdapterConfig, DateRange, NormalizedEvent } from './enhanced-base';
-import { Transaction, Settlement, Fee, RefundDispute, RefundDisputeType } from '@settler/api/domain/canonical/types';
+import { Transaction, Settlement, Fee, RefundDispute, RefundDisputeType } from '@settler/types';
 export declare class SquareEnhancedAdapter implements EnhancedAdapter {
     name: string;
     version: string;

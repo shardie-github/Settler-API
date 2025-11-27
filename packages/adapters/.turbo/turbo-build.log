@@ -1,99 +1,74 @@
+npm warn config optional Use `--omit=optional` to exclude optional dependencies, or
+npm warn config `--include=optional` to include them.
+npm warn config
+npm warn config       Default value does install optional deps unless otherwise omitted.
 
 > @settler/adapters@1.0.0 build
 > tsc
 
-src/paypal-enhanced.ts(39,66): error TS1005: ',' expected.
-src/paypal-enhanced.ts(39,67): error TS1109: Expression expected.
-src/paypal-enhanced.ts(39,77): error TS1005: ';' expected.
-src/paypal-enhanced.ts(39,79): error TS1434: Unexpected keyword or identifier.
-src/paypal-enhanced.ts(39,85): error TS1128: Declaration or statement expected.
-src/paypal-enhanced.ts(39,86): error TS1128: Declaration or statement expected.
-src/paypal-enhanced.ts(39,104): error TS1011: An element access expression should take an argument.
-src/paypal-enhanced.ts(39,106): error TS1005: ';' expected.
-src/paypal-enhanced.ts(102,3): error TS1434: Unexpected keyword or identifier.
-src/paypal-enhanced.ts(102,32): error TS1005: ',' expected.
-src/paypal-enhanced.ts(102,58): error TS1005: ',' expected.
-src/paypal-enhanced.ts(102,70): error TS1005: ';' expected.
-src/paypal-enhanced.ts(102,92): error TS1011: An element access expression should take an argument.
-src/paypal-enhanced.ts(103,11): error TS1005: ':' expected.
-src/paypal-enhanced.ts(103,37): error TS1005: ',' expected.
-src/paypal-enhanced.ts(104,11): error TS1005: ':' expected.
-src/paypal-enhanced.ts(104,45): error TS1005: ',' expected.
-src/paypal-enhanced.ts(106,9): error TS1003: Identifier expected.
-src/paypal-enhanced.ts(106,19): error TS1005: ',' expected.
-src/paypal-enhanced.ts(106,35): error TS1005: ';' expected.
-src/paypal-enhanced.ts(122,3): error TS1128: Declaration or statement expected.
-src/paypal-enhanced.ts(127,3): error TS1434: Unexpected keyword or identifier.
-src/paypal-enhanced.ts(127,31): error TS1005: ',' expected.
-src/paypal-enhanced.ts(127,57): error TS1005: ',' expected.
-src/paypal-enhanced.ts(127,69): error TS1005: ';' expected.
-src/paypal-enhanced.ts(127,90): error TS1011: An element access expression should take an argument.
-src/paypal-enhanced.ts(128,11): error TS1005: ':' expected.
-src/paypal-enhanced.ts(128,37): error TS1005: ',' expected.
-src/paypal-enhanced.ts(129,11): error TS1005: ':' expected.
-src/paypal-enhanced.ts(129,45): error TS1005: ',' expected.
-src/paypal-enhanced.ts(131,9): error TS1003: Identifier expected.
-src/paypal-enhanced.ts(131,19): error TS1005: ',' expected.
-src/paypal-enhanced.ts(131,35): error TS1005: ';' expected.
-src/paypal-enhanced.ts(147,3): error TS1128: Declaration or statement expected.
-src/paypal-enhanced.ts(152,3): error TS1434: Unexpected keyword or identifier.
-src/paypal-enhanced.ts(152,32): error TS1005: ',' expected.
-src/paypal-enhanced.ts(152,55): error TS1005: ',' expected.
-src/paypal-enhanced.ts(152,64): error TS1005: ';' expected.
-src/paypal-enhanced.ts(152,78): error TS1011: An element access expression should take an argument.
-src/paypal-enhanced.ts(153,11): error TS1005: ':' expected.
-src/paypal-enhanced.ts(153,15): error TS1005: ',' expected.
-src/paypal-enhanced.ts(153,20): error TS1005: ',' expected.
-src/paypal-enhanced.ts(153,21): error TS1109: Expression expected.
-src/paypal-enhanced.ts(153,23): error TS1005: ':' expected.
-src/paypal-enhanced.ts(153,27): error TS1005: ',' expected.
-src/paypal-enhanced.ts(154,11): error TS1005: ':' expected.
-src/paypal-enhanced.ts(154,43): error TS1005: ',' expected.
-src/paypal-enhanced.ts(157,16): error TS1005: ',' expected.
-src/paypal-enhanced.ts(157,32): error TS1005: ',' expected.
-src/paypal-enhanced.ts(157,34): error TS1136: Property assignment expected.
-src/paypal-enhanced.ts(196,3): error TS1128: Declaration or statement expected.
-src/paypal-enhanced.ts(201,27): error TS1005: ',' expected.
-src/paypal-enhanced.ts(201,58): error TS1005: ',' expected.
-src/paypal-enhanced.ts(201,67): error TS1005: ';' expected.
-src/paypal-enhanced.ts(201,69): error TS1434: Unexpected keyword or identifier.
-src/paypal-enhanced.ts(229,26): error TS1005: ',' expected.
-src/paypal-enhanced.ts(229,57): error TS1005: ',' expected.
-src/paypal-enhanced.ts(229,66): error TS1005: ';' expected.
-src/paypal-enhanced.ts(229,68): error TS1434: Unexpected keyword or identifier.
-src/paypal-enhanced.ts(255,29): error TS1005: ',' expected.
-src/paypal-enhanced.ts(255,60): error TS1005: ',' expected.
-src/paypal-enhanced.ts(255,74): error TS1005: ',' expected.
-src/paypal-enhanced.ts(255,94): error TS1005: ';' expected.
-src/paypal-enhanced.ts(255,96): error TS1434: Unexpected keyword or identifier.
-src/paypal-enhanced.ts(278,33): error TS1005: ',' expected.
-src/paypal-enhanced.ts(278,53): error TS1005: ',' expected.
-src/paypal-enhanced.ts(278,62): error TS1005: ';' expected.
-src/paypal-enhanced.ts(279,9): error TS1003: Identifier expected.
-src/paypal-enhanced.ts(279,14): error TS1005: ',' expected.
-src/paypal-enhanced.ts(279,53): error TS1005: ',' expected.
-src/paypal-enhanced.ts(279,55): error TS1136: Property assignment expected.
-src/paypal-enhanced.ts(282,3): error TS1128: Declaration or statement expected.
-src/paypal-enhanced.ts(287,5): error TS1128: Declaration or statement expected.
-src/paypal-enhanced.ts(287,39): error TS1005: ',' expected.
-src/paypal-enhanced.ts(287,45): error TS1005: ';' expected.
-src/paypal-enhanced.ts(287,47): error TS1434: Unexpected keyword or identifier.
-src/paypal-enhanced.ts(297,5): error TS1128: Declaration or statement expected.
-src/paypal-enhanced.ts(297,41): error TS1005: ',' expected.
-src/paypal-enhanced.ts(297,47): error TS1005: ';' expected.
-src/paypal-enhanced.ts(297,49): error TS1434: Unexpected keyword or identifier.
-src/paypal-enhanced.ts(307,5): error TS1128: Declaration or statement expected.
-src/paypal-enhanced.ts(307,39): error TS1005: ',' expected.
-src/paypal-enhanced.ts(307,45): error TS1005: ';' expected.
-src/paypal-enhanced.ts(307,47): error TS1434: Unexpected keyword or identifier.
-src/paypal-enhanced.ts(316,5): error TS1128: Declaration or statement expected.
-src/paypal-enhanced.ts(316,39): error TS1005: ',' expected.
-src/paypal-enhanced.ts(316,45): error TS1005: ';' expected.
-src/paypal-enhanced.ts(316,47): error TS1434: Unexpected keyword or identifier.
-src/paypal-enhanced.ts(326,5): error TS1128: Declaration or statement expected.
-src/paypal-enhanced.ts(326,25): error TS1005: ';' expected.
-src/paypal-enhanced.ts(326,27): error TS1434: Unexpected keyword or identifier.
-src/paypal-enhanced.ts(329,3): error TS1128: Declaration or statement expected.
+src/paypal-enhanced.ts(8,70): error TS6133: 'WebhookVerificationResult' is declared but its value is never read.
+src/paypal-enhanced.ts(10,1): error TS6133: 'crypto' is declared but its value is never read.
+src/paypal-enhanced.ts(20,43): error TS6133: 'signature' is declared but its value is never read.
+src/paypal-enhanced.ts(20,62): error TS6133: 'secret' is declared but its value is never read.
+src/paypal-enhanced.ts(102,49): error TS6133: 'dateRange' is declared but its value is never read.
+src/paypal-enhanced.ts(127,48): error TS6133: 'dateRange' is declared but its value is never read.
+src/paypal-enhanced.ts(204,5): error TS2375: Type '{ id: string; tenantId: string; paymentId: any; provider: string; providerTransactionId: any; type: TransactionType; amount: { value: number; currency: any; }; netAmount: { value: number; currency: any; } | undefined; status: TransactionStatus; rawPayload: any; created_at: Date; updatedAt: Date; }' is not assignable to type 'Transaction' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'netAmount' are incompatible.
+    Type '{ value: number; currency: any; } | undefined' is not assignable to type 'Money'.
+      Type 'undefined' is not assignable to type 'Money'.
+src/paypal-enhanced.ts(278,23): error TS6133: 'oldVersion' is declared but its value is never read.
+src/paypal.ts(8,13): error TS6133: 'dateRange' is declared but its value is never read.
+src/paypal.ts(39,5): error TS2375: Type '{ id: string; amount: number; currency: string; date: Date; metadata: { custom: string | undefined; }; sourceId: string; referenceId: string | undefined; }' is not assignable to type 'NormalizedData' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'referenceId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/paypal.ts(62,5): error TS2375: Type '{ valid: boolean; errors: string[] | undefined; }' is not assignable to type 'ValidationResult' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'errors' are incompatible.
+    Type 'string[] | undefined' is not assignable to type 'string[]'.
+      Type 'undefined' is not assignable to type 'string[]'.
+src/quickbooks.ts(8,13): error TS6133: 'dateRange' is declared but its value is never read.
+src/quickbooks.ts(40,5): error TS2375: Type '{ id: string; amount: number; currency: string; date: Date; metadata: { doc_number: string | undefined; }; sourceId: string; referenceId: string | undefined; }' is not assignable to type 'NormalizedData' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'referenceId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/quickbooks.ts(63,5): error TS2375: Type '{ valid: boolean; errors: string[] | undefined; }' is not assignable to type 'ValidationResult' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'errors' are incompatible.
+    Type 'string[] | undefined' is not assignable to type 'string[]'.
+      Type 'undefined' is not assignable to type 'string[]'.
+src/shopify.ts(8,13): error TS6133: 'dateRange' is declared but its value is never read.
+src/shopify.ts(45,5): error TS2375: Type '{ id: string; amount: number; currency: string; date: Date; metadata: { order_name: string | undefined; customer_email: string | undefined; }; sourceId: string; referenceId: string | undefined; }' is not assignable to type 'NormalizedData' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'referenceId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/shopify.ts(72,5): error TS2375: Type '{ valid: boolean; errors: string[] | undefined; }' is not assignable to type 'ValidationResult' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'errors' are incompatible.
+    Type 'string[] | undefined' is not assignable to type 'string[]'.
+      Type 'undefined' is not assignable to type 'string[]'.
+src/square-enhanced.ts(8,70): error TS6133: 'WebhookVerificationResult' is declared but its value is never read.
+src/square-enhanced.ts(114,49): error TS6133: 'dateRange' is declared but its value is never read.
+src/square-enhanced.ts(141,48): error TS6133: 'dateRange' is declared but its value is never read.
+src/square-enhanced.ts(201,5): error TS2375: Type '{ id: string; tenantId: string; paymentId: any; provider: string; providerTransactionId: any; type: TransactionType; amount: { value: number; currency: any; }; netAmount: { value: number; currency: any; } | undefined; status: TransactionStatus; rawPayload: any; created_at: Date; updatedAt: Date; }' is not assignable to type 'Transaction' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'netAmount' are incompatible.
+    Type '{ value: number; currency: any; } | undefined' is not assignable to type 'Money'.
+      Type 'undefined' is not assignable to type 'Money'.
+src/square-enhanced.ts(275,23): error TS6133: 'oldVersion' is declared but its value is never read.
+src/stripe-enhanced.ts(8,70): error TS6133: 'WebhookVerificationResult' is declared but its value is never read.
+src/stripe-enhanced.ts(107,49): error TS6133: 'dateRange' is declared but its value is never read.
+src/stripe-enhanced.ts(130,48): error TS6133: 'dateRange' is declared but its value is never read.
+src/stripe-enhanced.ts(187,5): error TS2375: Type '{ id: string; tenantId: string; paymentId: any; provider: string; providerTransactionId: any; type: TransactionType; amount: { value: number; currency: any; }; netAmount: { value: number; currency: any; } | undefined; status: TransactionStatus; rawPayload: any; created_at: Date; updatedAt: Date; }' is not assignable to type 'Transaction' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'netAmount' are incompatible.
+    Type '{ value: number; currency: any; } | undefined' is not assignable to type 'Money'.
+      Type 'undefined' is not assignable to type 'Money'.
+src/stripe-enhanced.ts(261,23): error TS6133: 'oldVersion' is declared but its value is never read.
+src/stripe.ts(8,13): error TS6133: 'dateRange' is declared but its value is never read.
+src/stripe.ts(45,5): error TS2375: Type '{ id: string; amount: number; currency: string; date: Date; metadata: Record<string, unknown>; sourceId: string; referenceId: string | undefined; }' is not assignable to type 'NormalizedData' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'referenceId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/stripe.ts(72,5): error TS2375: Type '{ valid: boolean; errors: string[] | undefined; }' is not assignable to type 'ValidationResult' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'errors' are incompatible.
+    Type 'string[] | undefined' is not assignable to type 'string[]'.
+      Type 'undefined' is not assignable to type 'string[]'.
 npm error Lifecycle script `build` failed with error:
 npm error code 2
 npm error path /workspace/packages/adapters

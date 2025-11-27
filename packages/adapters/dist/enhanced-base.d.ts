@@ -4,7 +4,7 @@
  * Supports webhook ingestion, API polling, and comprehensive normalization
  * as specified in the Product & Technical Specification.
  */
-import { Transaction, Settlement, Fee, RefundDispute, FXConversion } from '@settler/api/domain/canonical/types';
+import { Transaction, Settlement, Fee, RefundDispute, FXConversion } from '@settler/types';
 export interface AdapterConfig {
     apiKey?: string;
     secret?: string;

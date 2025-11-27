@@ -15,8 +15,12 @@ export class SettlerError extends Error {
     super(message);
     this.name = this.constructor.name;
     this.code = code;
-    this.statusCode = statusCode;
-    this.details = details;
+    if (statusCode !== undefined) {
+      this.statusCode = statusCode;
+    }
+    if (details !== undefined) {
+      this.details = details;
+    }
     Error.captureStackTrace?.(this, this.constructor);
   }
 }
@@ -55,7 +59,9 @@ export class ValidationError extends SettlerError {
   ) {
     super(message, "VALIDATION_ERROR", statusCode || 400, details);
     this.name = "ValidationError";
-    this.field = field;
+    if (field !== undefined) {
+      this.field = field;
+    }
   }
 }
 
@@ -77,10 +83,18 @@ export class RateLimitError extends SettlerError {
   ) {
     super(message, "RATE_LIMIT_ERROR", 429);
     this.name = "RateLimitError";
-    this.retryAfter = retryAfter;
-    this.limit = limit;
-    this.remaining = remaining;
-    this.reset = reset;
+    if (retryAfter !== undefined) {
+      this.retryAfter = retryAfter;
+    }
+    if (limit !== undefined) {
+      this.limit = limit;
+    }
+    if (remaining !== undefined) {
+      this.remaining = remaining;
+    }
+    if (reset !== undefined) {
+      this.reset = reset;
+    }
   }
 }
 

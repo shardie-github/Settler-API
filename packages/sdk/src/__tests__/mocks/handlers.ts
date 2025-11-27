@@ -44,14 +44,16 @@ export const handlers = [
     const bodyObj: Record<string, unknown> = body && typeof body === 'object' && !Array.isArray(body) && body !== null ? body : {};
     return HttpResponse.json(
       {
-        data: {
-          id: 'job_new',
-          userId: 'user_123',
-          ...bodyObj,
-          status: 'active',
-          createdAt: '2026-01-15T10:00:00Z',
-          updatedAt: '2026-01-15T10:00:00Z',
-        },
+        data: Object.assign(
+          {
+            id: 'job_new',
+            userId: 'user_123',
+            status: 'active',
+            createdAt: '2026-01-15T10:00:00Z',
+            updatedAt: '2026-01-15T10:00:00Z',
+          },
+          bodyObj
+        ),
         message: 'Reconciliation job created successfully',
       },
       { status: 201 }
@@ -144,14 +146,16 @@ export const handlers = [
     const bodyObj: Record<string, unknown> = body && typeof body === 'object' && !Array.isArray(body) && body !== null ? body : {};
     return HttpResponse.json(
       {
-        data: {
-          id: 'wh_new',
-          userId: 'user_123',
-          ...bodyObj,
-          secret: 'whsec_abc123',
-          status: 'active',
-          createdAt: '2026-01-15T10:00:00Z',
-        },
+        data: Object.assign(
+          {
+            id: 'wh_new',
+            userId: 'user_123',
+            secret: 'whsec_abc123',
+            status: 'active',
+            createdAt: '2026-01-15T10:00:00Z',
+          },
+          bodyObj
+        ),
         message: 'Webhook created successfully',
       },
       { status: 201 }
