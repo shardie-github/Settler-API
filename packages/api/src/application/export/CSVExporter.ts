@@ -4,7 +4,6 @@
  * Exports reconciled data to generic CSV format with customizable columns
  */
 
-import { Transaction, Settlement, Fee } from '@settler/types';
 import { query } from '../../db';
 
 export interface CSVExportOptions {
@@ -77,19 +76,22 @@ export class CSVExporter {
     // Add fees if included
     if (includeFees) {
       for (const match of matches) {
-        const fees = await query(
-          `SELECT type, amount_value, amount_currency, description 
-           FROM fees WHERE transaction_id = $1 AND tenant_id = $2`,
-          [match.transaction_id, tenantId]
-        );
+        const transactionId = (match as Record<string, unknown>).transaction_id;
+        if (typeof transactionId === 'string') {
+          const fees = await query(
+            `SELECT type, amount_value, amount_currency, description 
+             FROM fees WHERE transaction_id = $1 AND tenant_id = $2`,
+            [transactionId, tenantId]
+          );
 
-        for (const fee of fees) {
-          const row: string[] = [];
-          for (const col of columns) {
-            const value = this.getFeeColumnValue(fee, col, match);
-            row.push(this.escapeCSV(value));
+          for (const fee of fees) {
+            const row: string[] = [];
+            for (const col of columns) {
+              const value = this.getFeeColumnValue(fee, col, match);
+              row.push(this.escapeCSV(value));
+            }
+            csvRows.push(row.join(','));
           }
-          csvRows.push(row.join(','));
         }
       }
     }
@@ -133,7 +135,13 @@ export class CSVExporter {
    */
   private getColumnValue(match: Record<string, unknown>, column: string): string {
     const value = match[column];
-    return value !== null && value !== undefined ? String(value) : '';
+    if (value === null || value === undefined) {
+      return '';
+    }
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || value instanceof Date) {
+      return String(value);
+    }
+    return '';
   }
 
   /**
@@ -142,9 +150,23 @@ export class CSVExporter {
   private getFeeColumnValue(fee: Record<string, unknown>, column: string, match: Record<string, unknown>): string {
     if (column.startsWith('fee_')) {
       const feeField = column.replace('fee_', '');
-      return fee[feeField] || '';
+      const value = fee[feeField];
+      if (value === null || value === undefined) {
+        return '';
+      }
+      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || value instanceof Date) {
+        return String(value);
+      }
+      return '';
     }
-    return match[column] || '';
+    const value = match[column];
+    if (value === null || value === undefined) {
+      return '';
+    }
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || value instanceof Date) {
+      return String(value);
+    }
+    return '';
   }
 
   /**

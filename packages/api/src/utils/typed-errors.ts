@@ -21,12 +21,20 @@ export abstract class ApiError extends Error {
     message: string;
     details?: unknown;
   } {
-    return {
+    const result: {
+      error: string;
+      errorCode: string;
+      message: string;
+      details?: unknown;
+    } = {
       error: this.name,
       errorCode: this.errorCode,
       message: this.message,
-      ...(this.details && { details: this.details }),
     };
+    if (this.details !== undefined) {
+      result.details = this.details;
+    }
+    return result;
   }
 }
 
@@ -34,7 +42,7 @@ export class ValidationError extends ApiError {
   readonly statusCode = 400;
   readonly errorCode = 'VALIDATION_ERROR';
   readonly field?: string;
-  readonly details?: Array<{
+  declare readonly details?: Array<{
     field: string;
     message: string;
     code: string;
@@ -46,7 +54,9 @@ export class ValidationError extends ApiError {
     details?: unknown
   ) {
     super(message, details);
-    this.field = field;
+    if (field !== undefined) {
+      this.field = field;
+    }
     // If details is an array of field errors, use it
     if (Array.isArray(details)) {
       this.details = details;
@@ -72,8 +82,12 @@ export class NotFoundError extends ApiError {
 
   constructor(message: string, resourceType?: string, resourceId?: string, details?: unknown) {
     super(message, details);
-    this.resourceType = resourceType;
-    this.resourceId = resourceId;
+    if (resourceType !== undefined) {
+      this.resourceType = resourceType;
+    }
+    if (resourceId !== undefined) {
+      this.resourceId = resourceId;
+    }
   }
 }
 
@@ -97,9 +111,15 @@ export class RateLimitError extends ApiError {
     details?: unknown
   ) {
     super(message, details);
-    this.retryAfter = retryAfter;
-    this.limit = limit;
-    this.remaining = remaining;
+    if (retryAfter !== undefined) {
+      this.retryAfter = retryAfter;
+    }
+    if (limit !== undefined) {
+      this.limit = limit;
+    }
+    if (remaining !== undefined) {
+      this.remaining = remaining;
+    }
   }
 }
 
@@ -115,7 +135,9 @@ export class ServiceUnavailableError extends ApiError {
 
   constructor(message: string, retryAfter?: number, details?: unknown) {
     super(message, details);
-    this.retryAfter = retryAfter;
+    if (retryAfter !== undefined) {
+      this.retryAfter = retryAfter;
+    }
   }
 }
 

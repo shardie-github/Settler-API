@@ -93,22 +93,37 @@ export class DeadLetterQueue {
 
     const result = await this.db.query(query, [limit]);
 
-    return result.rows.map((row) => ({
-      id: row.id,
-      saga_id: row.saga_id,
-      event_id: row.event_id,
-      error_type: row.error_type,
-      error_message: row.error_message,
-      error_stack: row.error_stack,
-      payload: JSON.parse(row.payload),
-      retry_count: row.retry_count,
-      max_retries: row.max_retries,
-      tenant_id: row.tenant_id,
-      correlation_id: row.correlation_id,
-      created_at: new Date(row.created_at),
-      resolved_at: row.resolved_at ? new Date(row.resolved_at) : undefined,
-      resolution_notes: row.resolution_notes,
-    }));
+    return result.rows.map((row): DeadLetterEntry => {
+      const entry: DeadLetterEntry = {
+        id: row.id,
+        error_type: row.error_type,
+        error_message: row.error_message,
+        payload: JSON.parse(row.payload) as Record<string, unknown>,
+        retry_count: row.retry_count,
+        max_retries: row.max_retries,
+        tenant_id: row.tenant_id,
+        created_at: new Date(row.created_at),
+      };
+      if (row.saga_id) {
+        entry.saga_id = row.saga_id;
+      }
+      if (row.event_id) {
+        entry.event_id = row.event_id;
+      }
+      if (row.error_stack) {
+        entry.error_stack = row.error_stack;
+      }
+      if (row.correlation_id) {
+        entry.correlation_id = row.correlation_id;
+      }
+      if (row.resolved_at) {
+        entry.resolved_at = new Date(row.resolved_at);
+      }
+      if (row.resolution_notes) {
+        entry.resolution_notes = row.resolution_notes;
+      }
+      return entry;
+    });
   }
 
   /**
@@ -160,21 +175,36 @@ export class DeadLetterQueue {
 
     const result = await this.db.query(query, [tenantId, limit]);
 
-    return result.rows.map((row) => ({
-      id: row.id,
-      saga_id: row.saga_id,
-      event_id: row.event_id,
-      error_type: row.error_type,
-      error_message: row.error_message,
-      error_stack: row.error_stack,
-      payload: JSON.parse(row.payload),
-      retry_count: row.retry_count,
-      max_retries: row.max_retries,
-      tenant_id: row.tenant_id,
-      correlation_id: row.correlation_id,
-      created_at: new Date(row.created_at),
-      resolved_at: row.resolved_at ? new Date(row.resolved_at) : undefined,
-      resolution_notes: row.resolution_notes,
-    }));
+    return result.rows.map((row): DeadLetterEntry => {
+      const entry: DeadLetterEntry = {
+        id: row.id,
+        error_type: row.error_type,
+        error_message: row.error_message,
+        payload: JSON.parse(row.payload) as Record<string, unknown>,
+        retry_count: row.retry_count,
+        max_retries: row.max_retries,
+        tenant_id: row.tenant_id,
+        created_at: new Date(row.created_at),
+      };
+      if (row.saga_id) {
+        entry.saga_id = row.saga_id;
+      }
+      if (row.event_id) {
+        entry.event_id = row.event_id;
+      }
+      if (row.error_stack) {
+        entry.error_stack = row.error_stack;
+      }
+      if (row.correlation_id) {
+        entry.correlation_id = row.correlation_id;
+      }
+      if (row.resolved_at) {
+        entry.resolved_at = new Date(row.resolved_at);
+      }
+      if (row.resolution_notes) {
+        entry.resolution_notes = row.resolution_notes;
+      }
+      return entry;
+    });
   }
 }

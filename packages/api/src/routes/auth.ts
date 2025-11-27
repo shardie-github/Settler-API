@@ -4,11 +4,12 @@ import jwt from "jsonwebtoken";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { query } from "../db";
-import { hashPassword, verifyPassword, generateApiKey, hashApiKey } from "../utils/hash";
-import { logInfo, logError } from "../utils/logger";
+import { verifyPassword, generateApiKey, hashApiKey } from "../utils/hash";
+import { logInfo } from "../utils/logger";
 import { handleRouteError } from "../utils/error-handler";
 import { config } from "../config";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { rotateRefreshToken, storeRefreshToken } from "../infrastructure/security/token-rotation";
 import { v4 as uuidv4 } from "uuid";
 import { sendSuccess, sendError } from "../utils/api-response";
@@ -54,38 +55,53 @@ router.post(
         [email]
       );
 
-      if (users.length === 0) {
-        return res.status(401).json({ error: "Invalid credentials" });
+      if (users.length === 0 || !users[0]) {
+        res.status(401).json({ error: "Invalid credentials" });
+        return;
       }
 
       const user = users[0];
       const isValid = await verifyPassword(password, user.password_hash);
 
       if (!isValid) {
-        return res.status(401).json({ error: "Invalid credentials" });
+        res.status(401).json({ error: "Invalid credentials" });
+        return;
       }
+
+      if (!config.jwt.secret) {
+        throw new Error('JWT secret not configured');
+      }
+
+      const jwtSecret = config.jwt.secret as string;
+      const accessTokenExpiry: string | number = typeof config.jwt.accessTokenExpiry === 'string' 
+        ? config.jwt.accessTokenExpiry 
+        : (typeof config.jwt.accessTokenExpiry === 'number' ? config.jwt.accessTokenExpiry : '15m');
+      const refreshSecret = (config.jwt.refreshSecret || jwtSecret) as string;
+      const refreshTokenExpiry: string | number = typeof config.jwt.refreshTokenExpiry === 'string'
+        ? config.jwt.refreshTokenExpiry
+        : (typeof config.jwt.refreshTokenExpiry === 'number' ? config.jwt.refreshTokenExpiry : '7d');
 
       // Generate access token (15 minutes)
       const accessToken = jwt.sign(
         { userId: user.id, type: 'access' },
-        config.jwt.secret!,
+        jwtSecret,
         {
-          expiresIn: config.jwt.accessTokenExpiry,
+          expiresIn: accessTokenExpiry,
           issuer: 'settler-api',
           audience: 'settler-client',
-        }
+        } as jwt.SignOptions
       );
 
       // Generate refresh token with rotation support
       const refreshTokenId = uuidv4();
       const refreshToken = jwt.sign(
         { userId: user.id, tokenId: refreshTokenId, type: 'refresh' },
-        config.jwt.refreshSecret || config.jwt.secret!,
+        refreshSecret,
         {
-          expiresIn: config.jwt.refreshTokenExpiry,
+          expiresIn: refreshTokenExpiry,
           issuer: 'settler-api',
           audience: 'settler-client',
-        }
+        } as jwt.SignOptions
       );
 
       // Store refresh token in database for rotation
@@ -149,7 +165,7 @@ router.post(
 // Create API key
 router.post(
   "/api-keys",
-  requirePermission("api_keys", "create"),
+  requirePermission(Permission.USERS_WRITE),
   validateRequest(createApiKeySchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -174,6 +190,12 @@ router.post(
         ]
       );
 
+      if (!result[0]) {
+        throw new Error('Failed to create API key');
+      }
+
+      const apiKeyId = result[0].id;
+
       // Log audit event
       await query(
         `INSERT INTO audit_logs (event, user_id, metadata)
@@ -181,16 +203,16 @@ router.post(
         [
           'api_key_created',
           userId,
-          JSON.stringify({ apiKeyId: result[0].id, name }),
+          JSON.stringify({ apiKeyId, name }),
         ]
       );
 
-      logInfo('API key created', { userId, apiKeyId: result[0].id });
+      logInfo('API key created', { userId, apiKeyId });
 
       // Return key only once (never again)
       res.status(201).json({
         data: {
-          id: result[0].id,
+          id: apiKeyId,
           key, // Only returned on creation
           name,
           scopes: scopes || ['jobs:read', 'jobs:write', 'reports:read'],

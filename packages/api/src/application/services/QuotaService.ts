@@ -4,7 +4,6 @@
  */
 
 import { ITenantRepository } from '../../domain/repositories/ITenantRepository';
-import { Tenant } from '../../domain/entities/Tenant';
 import { query } from '../../db';
 import { logWarn } from '../../utils/logger';
 

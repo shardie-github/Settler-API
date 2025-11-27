@@ -8,6 +8,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 import { trackEventAsync } from "../utils/event-tracker";
@@ -61,7 +62,7 @@ const listFeedbackSchema = z.object({
 // Create feedback
 router.post(
   "/feedback",
-  requirePermission("feedback", "create"),
+  requirePermission(Permission.USERS_WRITE),
   validateRequest(createFeedbackSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -90,6 +91,10 @@ router.post(
         ]
       );
 
+      if (!result[0]) {
+        throw new Error('Failed to create feedback');
+      }
+
       // Track event
       trackEventAsync(userId, 'FeedbackCreated', {
         feedbackId: result[0].id,
@@ -112,22 +117,16 @@ router.post(
 // List feedback
 router.get(
   "/feedback",
-  requirePermission("feedback", "read"),
+  requirePermission(Permission.USERS_READ),
   validateRequest(listFeedbackSchema),
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.userId!;
-      const { persona, source, startDate, endDate, limit, offset } = req.query as {
-        persona?: string;
-        source?: string;
-        startDate?: string;
-        endDate?: string;
-        limit: number;
-        offset: number;
-      };
+      const queryParams = listFeedbackSchema.parse({ query: req.query });
+      const { persona, source, startDate, endDate, limit, offset } = queryParams.query;
 
       const conditions: string[] = [];
-      const values: unknown[] = [];
+      const values: (string | number | boolean | Date | null)[] = [];
       let paramCount = 1;
 
       // Only show feedback for user's organization (or all if admin)
@@ -185,23 +184,29 @@ router.get(
         values
       );
 
+      if (!countResult[0]) {
+        throw new Error('Failed to get feedback count');
+      }
       const total = parseInt(countResult[0].count);
 
       res.json({
-        data: feedback.map(f => ({
-          id: f.id,
-          source: f.source,
-          persona: f.persona,
-          company: f.company,
-          context: f.context,
-          pain: f.pain,
-          desiredOutcome: f.desired_outcome,
-          workaround: f.workaround,
-          quotes: f.quotes,
-          featureRequests: f.feature_requests,
-          tags: f.tags,
-          createdAt: f.created_at.toISOString(),
-        })),
+        data: feedback.map((f) => {
+          if (!f) return null;
+          return {
+            id: f.id,
+            source: f.source,
+            persona: f.persona,
+            company: f.company,
+            context: f.context,
+            pain: f.pain,
+            desiredOutcome: f.desired_outcome,
+            workaround: f.workaround,
+            quotes: f.quotes,
+            featureRequests: f.feature_requests,
+            tags: f.tags,
+            createdAt: f.created_at.toISOString(),
+          };
+        }).filter((f) => f !== null),
         pagination: {
           limit,
           offset,
@@ -218,7 +223,7 @@ router.get(
 // Get feedback insights
 router.get(
   "/feedback/insights",
-  requirePermission("feedback", "read"),
+  requirePermission(Permission.USERS_READ),
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.userId!;

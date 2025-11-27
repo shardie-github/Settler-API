@@ -8,8 +8,7 @@
  * - Fuzzy matching (reference ID variations, amount tolerance)
  */
 
-import { Transaction, Settlement, ReconciliationMatch, MatchingRulesConfig, MatchType, Exception, ExceptionCategory } from '@settler/types';
-import { query } from '../../db';
+import { Transaction, Settlement, ReconciliationMatch, MatchingRulesConfig, Exception } from '@settler/types';
 
 export interface MatchResult {
   match: ReconciliationMatch;
@@ -89,11 +88,9 @@ export class MatchingEngine {
     const unmatchedSettlements = settlements.filter(s => !matchedSettlementIds.has(s.id));
 
     for (const transaction of unmatchedTransactions) {
-      exceptions.push({
+      const exception: Exception = {
         id: this.generateId(),
         tenantId,
-        executionId,
-        jobId,
         transactionId: transaction.id,
         category: 'missing_settlement',
         severity: 'medium',
@@ -101,15 +98,20 @@ export class MatchingEngine {
         resolutionStatus: 'open',
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      };
+      if (executionId) {
+        exception.executionId = executionId;
+      }
+      if (jobId) {
+        exception.jobId = jobId;
+      }
+      exceptions.push(exception);
     }
 
     for (const settlement of unmatchedSettlements) {
-      exceptions.push({
+      const exception: Exception = {
         id: this.generateId(),
         tenantId,
-        executionId,
-        jobId,
         settlementId: settlement.id,
         category: 'missing_transaction',
         severity: 'medium',
@@ -117,7 +119,14 @@ export class MatchingEngine {
         resolutionStatus: 'open',
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      };
+      if (executionId) {
+        exception.executionId = executionId;
+      }
+      if (jobId) {
+        exception.jobId = jobId;
+      }
+      exceptions.push(exception);
     }
 
     return { matches, exceptions };
@@ -134,9 +143,6 @@ export class MatchingEngine {
     executionId?: string,
     jobId?: string
   ): Promise<{ matches: ReconciliationMatch[]; exceptions: Exception[] }> {
-    const matches: ReconciliationMatch[] = [];
-    const exceptions: Exception[] = [];
-
     switch (rule.field) {
       case 'transactionId':
       case 'providerTransactionId':
@@ -164,7 +170,7 @@ export class MatchingEngine {
   private async matchByTransactionId(
     transactions: Transaction[],
     settlements: Settlement[],
-    rule: MatchingRulesConfig['strategies'][0],
+    _rule: MatchingRulesConfig['strategies'][0],
     tenantId: string,
     executionId?: string,
     jobId?: string
@@ -187,11 +193,9 @@ export class MatchingEngine {
     for (const transaction of transactions) {
       const settlement = settlementMap.get(transaction.providerTransactionId);
       if (settlement) {
-        matches.push({
+        const match: ReconciliationMatch = {
           id: this.generateId(),
           tenantId,
-          executionId,
-          jobId,
           transactionId: transaction.id,
           settlementId: settlement.id,
           matchType: '1-to-1',
@@ -199,7 +203,14 @@ export class MatchingEngine {
           matchingRules: { rule: 'transactionId', type: 'exact' },
           matchedAt: new Date(),
           createdAt: new Date(),
-        });
+        };
+        if (executionId) {
+          match.executionId = executionId;
+        }
+        if (jobId) {
+          match.jobId = jobId;
+        }
+        matches.push(match);
       }
     }
 
@@ -247,11 +258,9 @@ export class MatchingEngine {
           const confidence = 1.0 - (amountDiff / Math.max(transactionAmount, settlementAmount));
           
           if (confidence >= threshold) {
-            matches.push({
+            const match: ReconciliationMatch = {
               id: this.generateId(),
               tenantId,
-              executionId,
-              jobId,
               transactionId: transaction.id,
               settlementId: settlement.id,
               matchType: '1-to-1',
@@ -259,7 +268,14 @@ export class MatchingEngine {
               matchingRules: { rule: 'amount', type: rule.type, tolerance },
               matchedAt: new Date(),
               createdAt: new Date(),
-            });
+            };
+            if (executionId) {
+              match.executionId = executionId;
+            }
+            if (jobId) {
+              match.jobId = jobId;
+            }
+            matches.push(match);
             break; // Match found, move to next transaction
           }
         }
@@ -299,11 +315,9 @@ export class MatchingEngine {
           const confidence = 1.0 - (daysDiff / toleranceDays);
           
           if (confidence >= threshold) {
-            matches.push({
+            const match: ReconciliationMatch = {
               id: this.generateId(),
               tenantId,
-              executionId,
-              jobId,
               transactionId: transaction.id,
               settlementId: settlement.id,
               matchType: '1-to-1',
@@ -311,7 +325,14 @@ export class MatchingEngine {
               matchingRules: { rule: 'date', type: rule.type, toleranceDays },
               matchedAt: new Date(),
               createdAt: new Date(),
-            });
+            };
+            if (executionId) {
+              match.executionId = executionId;
+            }
+            if (jobId) {
+              match.jobId = jobId;
+            }
+            matches.push(match);
             break;
           }
         }
@@ -350,11 +371,9 @@ export class MatchingEngine {
         const similarity = this.calculateStringSimilarity(transactionRefId, settlementRefId);
 
         if (similarity >= threshold) {
-          matches.push({
+          const match: ReconciliationMatch = {
             id: this.generateId(),
             tenantId,
-            executionId,
-            jobId,
             transactionId: transaction.id,
             settlementId: settlement.id,
             matchType: '1-to-1',
@@ -362,7 +381,14 @@ export class MatchingEngine {
             matchingRules: { rule: 'referenceId', type: 'fuzzy', threshold },
             matchedAt: new Date(),
             createdAt: new Date(),
-          });
+          };
+          if (executionId) {
+            match.executionId = executionId;
+          }
+          if (jobId) {
+            match.jobId = jobId;
+          }
+          matches.push(match);
           break;
         }
       }
@@ -375,12 +401,12 @@ export class MatchingEngine {
    * Match by multiple fields (composite matching)
    */
   private async matchByMultipleFields(
-    transactions: Transaction[],
-    settlements: Settlement[],
-    rule: MatchingRulesConfig['strategies'][0],
-    tenantId: string,
-    executionId?: string,
-    jobId?: string
+    _transactions: Transaction[],
+    _settlements: Settlement[],
+    _rule: MatchingRulesConfig['strategies'][0],
+    _tenantId: string,
+    _executionId?: string,
+    _jobId?: string
   ): Promise<{ matches: ReconciliationMatch[]; exceptions: Exception[] }> {
     const matches: ReconciliationMatch[] = [];
     const exceptions: Exception[] = [];
@@ -411,11 +437,17 @@ export class MatchingEngine {
    * Extract reference ID from transaction or settlement
    */
   private extractReferenceId(item: Transaction | Settlement): string | null {
-    if ('rawPayload' in item) {
-      return item.rawPayload.reference_id || 
-             item.rawPayload.order_id || 
-             item.rawPayload.external_id ||
-             null;
+    if ('rawPayload' in item && item.rawPayload) {
+      const payload = item.rawPayload as Record<string, unknown>;
+      if (typeof payload.reference_id === 'string') {
+        return payload.reference_id;
+      }
+      if (typeof payload.order_id === 'string') {
+        return payload.order_id;
+      }
+      if (typeof payload.external_id === 'string') {
+        return payload.external_id;
+      }
     }
     return null;
   }
@@ -446,24 +478,32 @@ export class MatchingEngine {
     }
 
     for (let j = 0; j <= str1.length; j++) {
-      matrix[0][j] = j;
+      if (matrix[0]) {
+        matrix[0][j] = j;
+      }
     }
 
     for (let i = 1; i <= str2.length; i++) {
       for (let j = 1; j <= str1.length; j++) {
+        const prevRow = matrix[i - 1];
+        const currRow = matrix[i];
+        if (!prevRow || !currRow) {
+          continue;
+        }
         if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
-          matrix[i][j] = matrix[i - 1][j - 1];
+          currRow[j] = prevRow[j - 1] ?? 0;
         } else {
-          matrix[i][j] = Math.min(
-            matrix[i - 1][j - 1] + 1,
-            matrix[i][j - 1] + 1,
-            matrix[i - 1][j] + 1
+          currRow[j] = Math.min(
+            (prevRow[j - 1] ?? 0) + 1,
+            (currRow[j - 1] ?? 0) + 1,
+            (prevRow[j] ?? 0) + 1
           );
         }
       }
     }
 
-    return matrix[str2.length][str1.length];
+    const lastRow = matrix[str2.length];
+    return lastRow?.[str1.length] ?? 0;
   }
 
   /**

@@ -6,10 +6,9 @@
 import jwt from 'jsonwebtoken';
 import { config } from '../../config';
 import { User, UserRole } from '../../domain/entities/User';
-import { ApiKey } from '../../domain/entities/ApiKey';
 import { verifyApiKey } from '../../utils/hash';
 import { query } from '../../db';
-import { logWarn, logError } from '../../utils/logger';
+// Logger imports removed - not used in this file
 
 export interface TokenPayload {
   userId: string;
@@ -207,6 +206,9 @@ export class ZeroTrustAuth {
       throw new Error('Invalid API key');
     }
 
+    if (!keys[0]) {
+      throw new Error('API key not found');
+    }
     const keyRecord = keys[0];
 
     // Verify key hash
@@ -283,6 +285,6 @@ export class ZeroTrustAuth {
        WHERE jti = $1 AND expires_at > NOW()`,
       [jti]
     );
-    return result[0]?.count > 0;
+    return (result[0]?.count ?? 0) > 0;
   }
 }

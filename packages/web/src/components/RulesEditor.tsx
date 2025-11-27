@@ -94,7 +94,24 @@ export function RulesEditor({ jobId }: { jobId?: string }) {
 
   const updateRule = (index: number, updates: Partial<MatchingRule>) => {
     const updated = [...rules];
-    updated[index] = { ...updated[index], ...updates };
+    const currentRule = updated[index];
+    if (!currentRule) return;
+    
+    const mergedRule: MatchingRule = {
+      field: updates.field !== undefined ? updates.field : currentRule.field,
+      type: updates.type !== undefined ? updates.type : currentRule.type,
+    };
+    if (updates.tolerance !== undefined) {
+      mergedRule.tolerance = updates.tolerance;
+    } else if (currentRule.tolerance !== undefined) {
+      mergedRule.tolerance = currentRule.tolerance;
+    }
+    if (updates.threshold !== undefined) {
+      mergedRule.threshold = updates.threshold;
+    } else if (currentRule.threshold !== undefined) {
+      mergedRule.threshold = currentRule.threshold;
+    }
+    updated[index] = mergedRule;
     setRules(updated);
   };
 
@@ -187,7 +204,7 @@ export function RulesEditor({ jobId }: { jobId?: string }) {
                         <Label>Field</Label>
                         <Input
                           value={rule.field}
-                          onChange={(e) => updateRule(index, { field: e.target.value })}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateRule(index, { field: e.target.value })}
                           placeholder="transaction_id"
                         />
                       </div>
@@ -214,11 +231,13 @@ export function RulesEditor({ jobId }: { jobId?: string }) {
                             type="number"
                             step="0.01"
                             value={rule.tolerance?.amount || ''}
-                            onChange={(e) => {
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                               const value = parseFloat(e.target.value);
-                              updateRule(index, { 
-                                tolerance: isNaN(value) ? undefined : { amount: value }
-                              });
+                              const updates: Partial<MatchingRule> = {};
+                              if (!isNaN(value)) {
+                                updates.tolerance = { amount: value };
+                              }
+                              updateRule(index, updates);
                             }}
                             placeholder="0.01"
                           />
@@ -233,11 +252,13 @@ export function RulesEditor({ jobId }: { jobId?: string }) {
                             min="0"
                             max="1"
                             value={rule.threshold || ''}
-                            onChange={(e) => {
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                               const value = parseFloat(e.target.value);
-                              updateRule(index, { 
-                                threshold: isNaN(value) ? undefined : value
-                              });
+                              const updates: Partial<MatchingRule> = {};
+                              if (!isNaN(value)) {
+                                updates.threshold = value;
+                              }
+                              updateRule(index, updates);
                             }}
                             placeholder="0.85"
                           />
@@ -249,11 +270,13 @@ export function RulesEditor({ jobId }: { jobId?: string }) {
                           <Input
                             type="number"
                             value={rule.tolerance?.days || ''}
-                            onChange={(e) => {
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                               const value = parseInt(e.target.value);
-                              updateRule(index, { 
-                                tolerance: isNaN(value) ? undefined : { days: value }
-                              });
+                              const updates: Partial<MatchingRule> = {};
+                              if (!isNaN(value)) {
+                                updates.tolerance = { days: value };
+                              }
+                              updateRule(index, updates);
                             }}
                             placeholder="1"
                           />
@@ -344,7 +367,7 @@ export function RulesEditor({ jobId }: { jobId?: string }) {
                     <Badge>{impactAnalysis.performanceImpact?.complexity}</Badge>
                   </div>
                 </div>
-                {impactAnalysis.recommendations?.length > 0 && (
+                {impactAnalysis.recommendations && impactAnalysis.recommendations.length > 0 && (
                   <div className="mt-4">
                     <h4 className="font-semibold mb-2">Recommendations</h4>
                     <ul className="list-disc list-inside space-y-1">

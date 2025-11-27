@@ -56,7 +56,11 @@ export async function traceFunction<T>(
   attributes?: Record<string, string | number | boolean>
 ): Promise<T> {
   const tracer = trace.getTracer('settler-api');
-  const span = tracer.startSpan(name, { attributes });
+  const spanOptions: { attributes?: Record<string, string | number | boolean> } = {};
+  if (attributes) {
+    spanOptions.attributes = attributes;
+  }
+  const span = tracer.startSpan(name, spanOptions);
 
   try {
     const result = await fn(span);

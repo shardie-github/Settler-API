@@ -8,6 +8,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query, transaction } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 import { NotFoundError, ValidationError } from "../utils/typed-errors";
@@ -48,11 +49,12 @@ const bulkResolveSchema = z.object({
 // List exceptions (unmatched transactions)
 router.get(
   "/exceptions",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(listExceptionsSchema),
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.userId!;
+      const queryParams = listExceptionsSchema.parse({ query: req.query });
       const {
         jobId,
         resolution_status = 'open',
@@ -61,19 +63,11 @@ router.get(
         endDate,
         limit,
         offset,
-      } = req.query as {
-        jobId?: string;
-        resolution_status?: 'open' | 'in_progress' | 'resolved' | 'dismissed';
-        category?: string;
-        startDate?: string;
-        endDate?: string;
-        limit: number;
-        offset: number;
-      };
+      } = queryParams.query;
 
       // Build query
       const conditions: string[] = [];
-      const values: unknown[] = [];
+      const values: (string | number | boolean | Date | null)[] = [];
       let paramCount = 1;
 
       // Join with jobs to ensure user ownership
@@ -142,22 +136,28 @@ router.get(
         values
       );
 
+      if (!countResult[0]) {
+        throw new Error('Failed to get exception count');
+      }
       const total = parseInt(countResult[0].count);
 
       res.json({
-        data: exceptions.map(e => ({
-          id: e.id,
-          jobId: e.job_id,
-          executionId: e.execution_id,
-          category: e.category,
-          severity: e.severity,
-          description: e.description,
-          status: e.resolution_status,
-          resolvedAt: e.resolved_at?.toISOString() || null,
-          resolvedBy: e.resolved_by || null,
-          notes: e.resolution_notes || null,
-          createdAt: e.created_at.toISOString(),
-        })),
+        data: exceptions.map((e) => {
+          if (!e) return null;
+          return {
+            id: e.id,
+            jobId: e.job_id,
+            executionId: e.execution_id,
+            category: e.category,
+            severity: e.severity,
+            description: e.description,
+            status: e.resolution_status,
+            resolvedAt: e.resolved_at?.toISOString() || null,
+            resolvedBy: e.resolved_by || null,
+            notes: e.resolution_notes || null,
+            createdAt: e.created_at.toISOString(),
+          };
+        }).filter((e) => e !== null),
         pagination: {
           limit,
           offset,
@@ -174,11 +174,15 @@ router.get(
 // Get exception details
 router.get(
   "/exceptions/:id",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   async (req: AuthRequest, res: Response) => {
     try {
       const { id } = req.params;
       const userId = req.userId!;
+
+      if (!id || !userId) {
+        throw new NotFoundError("Exception ID and User ID are required", "exception", id || "unknown");
+      }
 
       const exceptions = await query<{
         id: string;
@@ -203,7 +207,7 @@ router.get(
         [id, userId]
       );
 
-      if (exceptions.length === 0) {
+      if (exceptions.length === 0 || !exceptions[0]) {
         throw new NotFoundError("Exception not found", "exception", id);
       }
 
@@ -233,13 +237,17 @@ router.get(
 // Resolve exception
 router.post(
   "/exceptions/:id/resolve",
-  requirePermission("reports", "update"),
+  requirePermission(Permission.REPORTS_EXPORT),
   validateRequest(resolveExceptionSchema),
   async (req: AuthRequest, res: Response) => {
     try {
       const { id } = req.params;
       const { resolution, notes } = req.body;
       const userId = req.userId!;
+
+      if (!id || !userId) {
+        throw new NotFoundError("Exception ID and User ID are required", "exception", id || "unknown");
+      }
 
       // Verify ownership
       const existing = await query<{ id: string; status: string }>(
@@ -250,17 +258,18 @@ router.post(
         [id, userId]
       );
 
-      if (existing.length === 0) {
+      if (existing.length === 0 || !existing[0]) {
         throw new NotFoundError("Exception not found", "exception", id);
       }
 
-      if (existing[0].status !== 'pending') {
+      const existingException = existing[0];
+      if (existingException.status !== 'pending') {
         throw new ValidationError(
           "Exception is already resolved",
           'status',
           [{
             field: 'status',
-            message: `Exception is already ${existing[0].status}`,
+            message: `Exception is already ${existingException.status}`,
             code: 'ALREADY_RESOLVED',
           }]
         );
@@ -310,7 +319,7 @@ router.post(
 // Bulk resolve exceptions
 router.post(
   "/exceptions/bulk-resolve",
-  requirePermission("reports", "update"),
+  requirePermission(Permission.REPORTS_EXPORT),
   validateRequest(bulkResolveSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -319,7 +328,7 @@ router.post(
 
       await transaction(async (client) => {
         // Verify all exceptions belong to user
-        const owned = await client.query<{ id: string }>(
+        const ownedResult = await client.query<{ id: string }>(
           `SELECT e.id
            FROM exceptions e
            JOIN jobs j ON e.job_id = j.id
@@ -327,6 +336,7 @@ router.post(
           [exceptionIds, userId]
         );
 
+        const owned = ownedResult.rows || [];
         if (owned.length !== exceptionIds.length) {
           throw new ValidationError(
             "Some exceptions not found or already resolved",
@@ -385,14 +395,14 @@ router.post(
 // Get exception statistics
 router.get(
   "/exceptions/stats",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.userId!;
       const { jobId } = req.query as { jobId?: string };
 
       const conditions: string[] = [];
-      const values: unknown[] = [];
+      const values: (string | number | boolean | Date | null)[] = [];
       let paramCount = 1;
 
       conditions.push(`j.user_id = $${paramCount++}`);

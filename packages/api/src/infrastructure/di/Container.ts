@@ -5,8 +5,6 @@
 
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
 import { IJobRepository } from '../../domain/repositories/IJobRepository';
-import { IExecutionRepository } from '../../domain/repositories/IExecutionRepository';
-import { IApiKeyRepository } from '../../domain/repositories/IApiKeyRepository';
 import { IEventBus } from '../events/IEventBus';
 
 import { UserRepository } from '../repositories/UserRepository';

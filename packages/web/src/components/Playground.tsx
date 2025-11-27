@@ -9,7 +9,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Play, BarChart3, CheckCircle2, XCircle, AlertTriangle } from '@/lib/lucide-react';
+import { Play, BarChart3, CheckCircle2, AlertTriangle } from '@/lib/lucide-react';
 import { CodeBlock } from '@/components/ui/code-block';
 
 interface PlaygroundExample {

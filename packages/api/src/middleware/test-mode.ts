@@ -23,7 +23,7 @@ export async function checkTestMode(req: AuthRequest): Promise<boolean> {
       [req.userId]
     );
 
-    return users.length > 0 && users[0].test_mode_enabled === true;
+    return users.length > 0 && users[0] ? (users[0].test_mode_enabled === true) : false;
   } catch {
     return false;
   }
@@ -34,7 +34,7 @@ export async function checkTestMode(req: AuthRequest): Promise<boolean> {
  */
 export async function testModeMiddleware(
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> {
   const authReq = req as AuthRequest;
@@ -80,7 +80,7 @@ export async function testModeMiddleware(
 /**
  * Validate test mode restrictions
  */
-export function validateTestMode(req: Request, res: Response, next: NextFunction): void {
+export function validateTestMode(req: Request, _res: Response, next: NextFunction): void {
   const isTestMode = req.headers["x-settler-test-mode"] === "true";
 
   if (isTestMode) {
@@ -90,7 +90,7 @@ export function validateTestMode(req: Request, res: Response, next: NextFunction
     // - Rate limits reduced
 
     if (req.body?.source?.config?.apiKey && !req.body.source.config.apiKey.includes("test")) {
-      res.status(400).json({
+      _res.status(400).json({
         error: {
           code: "TEST_MODE_RESTRICTION",
           message: "Test mode requires test API keys",

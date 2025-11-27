@@ -35,7 +35,7 @@ export async function checkRateLimit(req: AuthRequest): Promise<{
       'SELECT rate_limit FROM api_keys WHERE id = $1',
       [req.apiKeyId]
     );
-    if (keys.length > 0) {
+    if (keys.length > 0 && keys[0]) {
       limit = keys[0].rate_limit;
     }
   }

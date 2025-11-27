@@ -91,7 +91,10 @@ export function sendError(
 
   // Extract traceId from request if available
   const requestTraceId = (res.req as AuthRequest).traceId;
-  response.traceId = traceId || requestTraceId;
+  const finalTraceId = traceId || requestTraceId;
+  if (finalTraceId) {
+    response.traceId = finalTraceId;
+  }
 
   res.status(statusCode).json(response);
 }

@@ -9,6 +9,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 import { calculateConfidenceScore } from "../services/confidence-scoring";
@@ -63,7 +64,7 @@ const analyzeImpactSchema = z.object({
 // List rules templates (AI-suggested configurations)
 router.get(
   "/rules/templates",
-  requirePermission("jobs", "read"),
+  requirePermission(Permission.JOBS_READ),
   async (req: AuthRequest, res: Response) => {
     try {
       const { adapter } = req.query as { adapter?: string };
@@ -129,7 +130,7 @@ router.get(
 // Preview rules with sample data
 router.post(
   "/rules/preview",
-  requirePermission("jobs", "read"),
+  requirePermission(Permission.JOBS_READ),
   validateRequest(previewRuleSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -178,8 +179,10 @@ router.post(
           insights,
         },
       });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, "Failed to preview rules", 500, { userId: req.userId });
+      return;
     }
   }
 );
@@ -187,7 +190,7 @@ router.post(
 // Analyze impact of rules on historical data
 router.post(
   "/rules/analyze-impact",
-  requirePermission("jobs", "read"),
+  requirePermission(Permission.JOBS_READ),
   validateRequest(analyzeImpactSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -222,7 +225,7 @@ router.post(
 // AI-powered rule suggestions
 router.post(
   "/rules/suggest",
-  requirePermission("jobs", "read"),
+  requirePermission(Permission.JOBS_READ),
   async (req: AuthRequest, res: Response) => {
     try {
       const { sourceAdapter, targetAdapter, useCase } = req.body as {

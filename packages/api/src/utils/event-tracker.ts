@@ -32,7 +32,7 @@ export async function trackEvent(
         `SELECT tenant_id FROM users WHERE id = $1 LIMIT 1`,
         [userId]
       );
-      if (users.length > 0) {
+      if (users.length > 0 && users[0]) {
         finalTenantId = users[0].tenant_id || undefined;
       }
     }
@@ -42,7 +42,7 @@ export async function trackEvent(
        VALUES ($1, $2, $3, $4, NOW())`,
       [
         userId,
-        finalTenantId,
+        finalTenantId || null,
         eventName,
         JSON.stringify(properties),
       ]
@@ -87,7 +87,7 @@ export async function trackEvents(
   if (events.length === 0) return;
 
   try {
-    const values: unknown[] = [];
+    const values: (string | number | boolean | Date | null)[] = [];
     const placeholders: string[] = [];
     let paramCount = 1;
 

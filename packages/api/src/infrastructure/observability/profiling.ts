@@ -5,7 +5,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { performance } from 'perf_hooks';
-import { logInfo, logWarn } from '../../utils/logger';
+import { logWarn } from '../../utils/logger';
 import { AuthRequest } from '../../middleware/auth';
 
 export interface ProfileMetrics {
@@ -32,21 +32,15 @@ export function profilingMiddleware(req: Request, res: Response, next: NextFunct
 
   // Override res.end to capture metrics
   const originalEnd = res.end.bind(res);
-  res.end = function(chunk?: unknown, encoding?: unknown) {
+  (res as { end: typeof originalEnd }).end = function(chunk?: unknown, encoding?: unknown, cb?: () => void) {
     const duration = performance.now() - startTime;
     const endMemory = process.memoryUsage();
-    const memoryDelta = {
-      heapUsed: endMemory.heapUsed - startMemory.heapUsed,
+    const memoryDelta: NodeJS.MemoryUsage = {
+      rss: endMemory.rss - startMemory.rss,
       heapTotal: endMemory.heapTotal - startMemory.heapTotal,
+      heapUsed: endMemory.heapUsed - startMemory.heapUsed,
       external: endMemory.external - startMemory.external,
-    };
-
-    const metrics: ProfileMetrics = {
-      requestDuration: duration,
-      databaseQueries: queryCount,
-      databaseDuration: dbDuration,
-      memoryUsage: memoryDelta,
-      timestamp: new Date().toISOString(),
+      arrayBuffers: endMemory.arrayBuffers - startMemory.arrayBuffers,
     };
 
     // Log slow requests
@@ -69,8 +63,24 @@ export function profilingMiddleware(req: Request, res: Response, next: NextFunct
       res.setHeader('X-DB-Duration', `${dbDuration.toFixed(2)}ms`);
     }
 
-    originalEnd(chunk, encoding);
-  };
+    // Call original end with proper typing
+    if (typeof encoding === 'function') {
+      // encoding is actually a callback function
+      originalEnd(chunk as unknown, encoding as unknown as () => void);
+    } else if (typeof chunk === 'function') {
+      // chunk is actually a callback function
+      originalEnd(chunk as unknown as () => void);
+    } else if (encoding !== undefined && typeof encoding === 'string') {
+      // encoding is a BufferEncoding string
+      originalEnd(chunk as unknown, encoding as BufferEncoding, cb);
+    } else if (cb !== undefined) {
+      // cb is provided but encoding is not - call with chunk and cb only
+      originalEnd(chunk as unknown, cb);
+    } else {
+      // Only chunk provided
+      originalEnd(chunk as unknown);
+    }
+  } as typeof originalEnd;
 
   next();
 }

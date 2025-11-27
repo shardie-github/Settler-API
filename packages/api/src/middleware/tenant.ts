@@ -3,10 +3,11 @@
  * Extracts tenant context from request and sets it for RLS
  */
 
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { AuthRequest } from './auth';
 import { ITenantRepository } from '../domain/repositories/ITenantRepository';
 import { Container } from '../infrastructure/di/Container';
+import { query } from '../db';
 
 export interface TenantRequest extends AuthRequest {
   tenantId?: string;
@@ -29,7 +30,8 @@ export async function tenantMiddleware(
   next: NextFunction
 ): Promise<void> {
   try {
-    const tenantRepo = Container.get<ITenantRepository>('ITenantRepository');
+    const container = Container.getInstance();
+    const tenantRepo = container.get<ITenantRepository>('ITenantRepository');
     let tenant = null;
 
     // 1. Check custom domain
@@ -54,12 +56,15 @@ export async function tenantMiddleware(
       }
     }
 
-    // 4. Fall back to user's tenant
-    if (!tenant && req.user) {
-      // User's tenant is already set via auth middleware
-      const userTenantId = req.user.tenantId;
-      if (userTenantId) {
-        tenant = await tenantRepo.findById(userTenantId);
+    // 4. Fall back to user's tenantId from auth middleware
+    if (!tenant && req.userId) {
+      // Try to get tenant from user
+      const userResult = await query<{ tenant_id: string }>(
+        `SELECT tenant_id FROM users WHERE id = $1`,
+        [req.userId]
+      );
+      if (userResult.length > 0 && userResult[0]) {
+        tenant = await tenantRepo.findById(userResult[0].tenant_id);
       }
     }
 

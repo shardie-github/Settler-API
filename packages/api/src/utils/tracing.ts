@@ -3,7 +3,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { AuthRequest } from '../middleware/auth';
-import { config } from '../config';
+// Config import removed - not used in this file
 
 export interface TraceContext {
   traceId: string;

@@ -3,8 +3,8 @@
  * Uses materialized views and optimized queries for performant data access
  */
 
-import { query } from '../../db';
-import { logInfo, logDebug } from '../../utils/logger';
+import { query } from '../db';
+import { logInfo, logDebug } from '../utils/logger';
 
 export interface QueryOptions {
   /** Use materialized view if available */
@@ -135,7 +135,7 @@ export async function getJobPerformance(
     GROUP BY job_id
     `,
     [jobId]
-  ).then((results) => results[0] || null);
+  ).then((results: unknown[]) => results[0] || null);
 }
 
 /**
@@ -277,7 +277,7 @@ export async function getMatchAccuracy(
     `;
 
   const params = jobId ? [jobId] : [];
-  return query(fallbackQuery, params).then((results) =>
+  return query(fallbackQuery, params).then((results: unknown[]) =>
     jobId ? results[0] || null : results
   );
 }

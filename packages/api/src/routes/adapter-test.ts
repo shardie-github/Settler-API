@@ -8,6 +8,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { handleRouteError } from "../utils/error-handler";
 import { testAdapterConnection } from "../services/adapter-connection-tester";
 
@@ -23,11 +24,15 @@ const testConnectionSchema = z.object({
 // Test adapter connection
 router.post(
   "/adapters/:adapter/test",
-  requirePermission("adapters", "read"),
+  requirePermission(Permission.WEBHOOKS_READ),
   validateRequest(testConnectionSchema),
   async (req: AuthRequest, res: Response) => {
     try {
       const { adapter } = req.params;
+      if (!adapter) {
+        res.status(400).json({ error: "Adapter parameter required" });
+        return;
+      }
       const { config } = req.body;
 
       const result = await testAdapterConnection(adapter, config);

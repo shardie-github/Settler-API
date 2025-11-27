@@ -41,7 +41,7 @@ export class JobRepository implements IJobRepository {
       [id, userId]
     );
 
-    if (results.length === 0) {
+    if (results.length === 0 || !results[0]) {
       return null;
     }
 
@@ -138,6 +138,9 @@ export class JobRepository implements IJobRepository {
       ]
     );
 
+    if (!result[0]) {
+      throw new Error('Failed to create job');
+    }
     const row = result[0];
     return {
       id: row.id,
@@ -175,7 +178,7 @@ export class JobRepository implements IJobRepository {
       [status, id, userId, expectedVersion]
     );
 
-    if (result.length === 0) {
+    if (result.length === 0 || !result[0]) {
       return null;
     }
 

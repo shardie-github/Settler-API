@@ -25,7 +25,7 @@ router.post(
       const tenantId = req.headers['x-tenant-id'] as string || req.body.tenant_id;
       
       if (!tenantId) {
-        return sendError(res, 'Bad Request', 'Tenant ID required', 400);
+        return sendError(res, 400, 'BAD_REQUEST', 'Tenant ID required');
       }
 
       // Get signature from headers (provider-specific)
@@ -36,11 +36,15 @@ router.post(
                        req.headers['x-square-hmacsha256-signature'] ||
                        '';
 
+      if (!adapter || !tenantId) {
+        return sendError(res, 400, 'BAD_REQUEST', 'Adapter and Tenant ID are required');
+      }
+
       // Get webhook secret from config or database
       const secret = await getWebhookSecret(adapter, tenantId);
       
       if (!secret) {
-        return sendError(res, 'Unauthorized', 'Webhook secret not configured', 401);
+        return sendError(res, 401, 'UNAUTHORIZED', 'Webhook secret not configured');
       }
 
       // Process webhook
@@ -53,15 +57,17 @@ router.post(
       );
 
       if (!result.success) {
-        return sendError(res, 'Processing Failed', result.errors?.join(', ') || 'Failed to process webhook', 400);
+        return sendError(res, 400, 'PROCESSING_FAILED', result.errors?.join(', ') || 'Failed to process webhook');
       }
 
       sendSuccess(res, { 
         processed: true, 
         events: result.events.length 
       });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, 'Failed to process webhook', 500);
+      return;
     }
   }
 );
@@ -70,12 +76,12 @@ router.post(
  * Get webhook secret from database
  */
 async function getWebhookSecret(adapter: string, tenantId: string): Promise<string | null> {
-  const { query } = require('../../../db');
-  const result = await query(
+  const { query } = await import('../../../db');
+  const result = await query<{ secret: string }>(
     `SELECT secret FROM webhook_configs WHERE adapter = $1 LIMIT 1`,
     [adapter]
   );
-  return result.length > 0 ? result[0].secret : null;
+  return result.length > 0 && result[0] ? result[0].secret : null;
 }
 
 export default router;

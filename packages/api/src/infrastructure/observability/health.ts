@@ -4,9 +4,7 @@
  */
 
 import { query } from '../../db';
-import { logError } from '../../utils/logger';
 import { getRedisClient } from '../../utils/cache';
-import { config } from '../../config';
 
 export interface HealthCheck {
   status: 'healthy' | 'unhealthy' | 'degraded';

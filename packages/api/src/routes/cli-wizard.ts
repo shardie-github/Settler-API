@@ -9,6 +9,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { handleRouteError } from "../utils/error-handler";
 import { listAdapters, getAdapterConfigSchema } from "../utils/adapter-config-validator";
 
@@ -24,7 +25,7 @@ const wizardStepSchema = z.object({
 // Get wizard steps
 router.get(
   "/cli/wizard/steps",
-  requirePermission("jobs", "read"),
+  requirePermission(Permission.JOBS_READ),
   async (req: AuthRequest, res: Response) => {
     try {
       const steps = [
@@ -155,7 +156,7 @@ router.get(
 // Process wizard step
 router.post(
   "/cli/wizard/step",
-  requirePermission("jobs", "create"),
+  requirePermission(Permission.JOBS_WRITE),
   validateRequest(wizardStepSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -189,8 +190,10 @@ router.post(
           }),
         },
       });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, "Failed to process wizard step", 500, { userId: req.userId });
+      return;
     }
   }
 );
@@ -198,7 +201,7 @@ router.post(
 // Generate CLI command from wizard answers
 router.post(
   "/cli/wizard/generate-command",
-  requirePermission("jobs", "create"),
+  requirePermission(Permission.JOBS_WRITE),
   async (req: AuthRequest, res: Response) => {
     try {
       const answers = req.body as Record<string, unknown>;
@@ -330,7 +333,7 @@ function generateGuidance(step: number, answers: Record<string, unknown>): strin
 }
 
 function generateJobConfig(answers: Record<string, unknown>): Record<string, unknown> {
-  return {
+  const config: Record<string, unknown> = {
     name: `${answers.sourceAdapter} → ${answers.targetAdapter} Reconciliation`,
     source: {
       adapter: answers.sourceAdapter,
@@ -343,17 +346,29 @@ function generateJobConfig(answers: Record<string, unknown>): Record<string, unk
     rules: {
       matching: answers.rules || [],
     },
-    ...(answers.schedule && { schedule: answers.schedule }),
   };
+  
+  if (answers.schedule && typeof answers.schedule === 'object' && answers.schedule !== null) {
+    config.schedule = answers.schedule;
+  }
+  
+  return config;
 }
 
 function generateCLICommand(jobConfig: Record<string, unknown>): string {
+  const source = jobConfig.source as Record<string, unknown> | undefined;
+  const target = jobConfig.target as Record<string, unknown> | undefined;
+  const sourceAdapter = source?.adapter ?? 'unknown';
+  const sourceConfig = source?.config ?? {};
+  const targetAdapter = target?.adapter ?? 'unknown';
+  const targetConfig = target?.config ?? {};
+  
   return `settler jobs create \\
   --name "${jobConfig.name}" \\
-  --source-adapter ${jobConfig.source?.adapter} \\
-  --source-config '${JSON.stringify(jobConfig.source?.config)}' \\
-  --target-adapter ${jobConfig.target?.adapter} \\
-  --target-config '${JSON.stringify(jobConfig.target?.config)}' \\
+  --source-adapter ${sourceAdapter} \\
+  --source-config '${JSON.stringify(sourceConfig)}' \\
+  --target-adapter ${targetAdapter} \\
+  --target-config '${JSON.stringify(targetConfig)}' \\
   --rules '${JSON.stringify(jobConfig.rules)}'`;
 }
 

@@ -5,7 +5,7 @@
  * as specified in the Product & Technical Specification.
  */
 
-import { Transaction, Fee, FeeType, Money } from '@settler/types';
+import { Transaction, Fee, Money } from '@settler/types';
 
 export interface FeeExtractionResult {
   fees: Fee[];
@@ -18,7 +18,6 @@ export class FeeExtractionService {
    * Extract fees from a transaction's raw payload
    */
   async extractFees(transaction: Transaction, tenantId: string): Promise<FeeExtractionResult> {
-    const fees: Fee[] = [];
     const provider = transaction.provider;
 
     switch (provider) {

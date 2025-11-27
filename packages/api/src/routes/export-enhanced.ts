@@ -9,6 +9,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 import { NotFoundError } from "../utils/typed-errors";
@@ -23,9 +24,9 @@ const exportReportSchema = z.object({
     format: z.enum(["csv", "json", "xlsx", "quickbooks", "xero", "netsuite"]).optional().default("csv"),
     startDate: z.string().datetime().optional(),
     endDate: z.string().datetime().optional(),
-    includeMatched: z.string().transform(v => v === "true").optional().default(true),
-    includeUnmatched: z.string().transform(v => v === "true").optional().default(true),
-    includeExceptions: z.string().transform(v => v === "true").optional().default(true),
+    includeMatched: z.string().transform(v => v === "true").default("true"),
+    includeUnmatched: z.string().transform(v => v === "true").default("true"),
+    includeExceptions: z.string().transform(v => v === "true").default("true"),
   }),
 });
 
@@ -44,20 +45,18 @@ const scheduleExportSchema = z.object({
 // Export report in various formats
 router.get(
   "/jobs/:jobId/export",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(exportReportSchema),
   async (req: AuthRequest, res: Response) => {
     try {
       const { jobId } = req.params;
-      const { format, startDate, endDate, includeMatched, includeUnmatched, includeExceptions } = req.query as {
-        format: "csv" | "json" | "xlsx" | "quickbooks" | "xero" | "netsuite";
-        startDate?: string;
-        endDate?: string;
-        includeMatched: boolean;
-        includeUnmatched: boolean;
-        includeExceptions: boolean;
-      };
+      const queryParams = exportReportSchema.parse({ params: req.params, query: req.query });
+      const { format, startDate, endDate, includeMatched, includeUnmatched: _includeUnmatched, includeExceptions } = queryParams.query;
       const userId = req.userId!;
+
+      if (!jobId || !userId) {
+        throw new NotFoundError("Job ID and User ID are required", "job", jobId || "unknown");
+      }
 
       // Verify job ownership
       const jobs = await query<{ id: string; name: string }>(
@@ -65,7 +64,7 @@ router.get(
         [jobId, userId]
       );
 
-      if (jobs.length === 0) {
+      if (jobs.length === 0 || !jobs[0]) {
         throw new NotFoundError("Job not found", "job", jobId);
       }
 
@@ -77,10 +76,10 @@ router.get(
         `SELECT id FROM executions
          WHERE job_id = $1 AND started_at >= $2 AND started_at <= $3
          ORDER BY started_at DESC LIMIT 1`,
-        [jobId, start, end]
+        [jobId!, start.toISOString(), end.toISOString()]
       );
 
-      if (executions.length === 0) {
+      if (executions.length === 0 || !executions[0]) {
         throw new NotFoundError("No execution found for date range", "execution", jobId);
       }
 
@@ -193,7 +192,7 @@ router.get(
       res.json({
         data: {
           jobId,
-          jobName: jobs[0].name,
+          jobName: jobs[0]?.name || "Unknown",
           dateRange: {
             start: start.toISOString(),
             end: end.toISOString(),
@@ -212,7 +211,7 @@ router.get(
 // Schedule recurring exports
 router.post(
   "/jobs/:jobId/exports/schedule",
-  requirePermission("reports", "create"),
+  requirePermission(Permission.REPORTS_EXPORT),
   validateRequest(scheduleExportSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -220,13 +219,17 @@ router.post(
       const { format, schedule, destination } = req.body;
       const userId = req.userId!;
 
+      if (!jobId || !userId) {
+        throw new NotFoundError("Job ID and User ID are required", "job", jobId || "unknown");
+      }
+
       // Verify job ownership
       const jobs = await query<{ id: string }>(
         `SELECT id FROM jobs WHERE id = $1 AND user_id = $2`,
         [jobId, userId]
       );
 
-      if (jobs.length === 0) {
+      if (jobs.length === 0 || !jobs[0]) {
         throw new NotFoundError("Job not found", "job", jobId);
       }
 

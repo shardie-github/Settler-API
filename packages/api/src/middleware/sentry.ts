@@ -32,9 +32,9 @@ export function initializeSentry(): void {
     integrations: [
       new ProfilingIntegration(),
       new Sentry.Integrations.Http({ tracing: true }),
-      new Sentry.Integrations.Express({ app: undefined }),
+      new Sentry.Integrations.Express(),
     ],
-    beforeSend(event, hint) {
+    beforeSend(event, _hint) {
       // Don't send events in development unless explicitly enabled
       if (validatedConfig.nodeEnv === 'development' && !process.env.SENTRY_ENABLE_DEV) {
         return null;
@@ -53,7 +53,7 @@ export function initializeSentry(): void {
  */
 export function sentryRequestHandler() {
   if (!sentryInitialized) {
-    return (req: Request, res: Response, next: NextFunction) => next();
+    return (_req: Request, _res: Response, next: NextFunction) => next();
   }
   
   return Sentry.Handlers.requestHandler({
@@ -68,7 +68,7 @@ export function sentryRequestHandler() {
  */
 export function sentryTracingHandler() {
   if (!sentryInitialized) {
-    return (req: Request, res: Response, next: NextFunction) => next();
+    return (_req: Request, _res: Response, next: NextFunction) => next();
   }
   
   return Sentry.Handlers.tracingHandler();
@@ -80,7 +80,7 @@ export function sentryTracingHandler() {
  */
 export function sentryErrorHandler(): (err: Error, req: Request, res: Response, next: NextFunction) => void {
   if (!sentryInitialized) {
-    return (err: Error, req: Request, res: Response, next: NextFunction) => next(err);
+    return (err: Error, _req: Request, _res: Response, next: NextFunction) => next(err);
   }
   
   return Sentry.Handlers.errorHandler({
@@ -103,11 +103,13 @@ export function setSentryUser(req: AuthRequest): void {
     return;
   }
 
-  Sentry.setUser({
+  const user: { id: string; ip_address?: string } = {
     id: req.userId,
-    email: req.email,
-    ip_address: req.ip,
-  });
+  };
+  if (req.ip !== undefined) {
+    user.ip_address = req.ip;
+  }
+  Sentry.setUser(user);
 }
 
 /**
@@ -121,7 +123,9 @@ export function captureException(error: Error, context?: Record<string, unknown>
   Sentry.withScope((scope) => {
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
-        scope.setContext(key, value);
+        if (value !== null && value !== undefined) {
+          scope.setContext(key, value as Record<string, unknown>);
+        }
       });
     }
     Sentry.captureException(error);
@@ -139,7 +143,9 @@ export function captureMessage(message: string, level: Sentry.SeverityLevel = 'i
   Sentry.withScope((scope) => {
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
-        scope.setContext(key, value);
+        if (value !== null && value !== undefined) {
+          scope.setContext(key, value as Record<string, unknown>);
+        }
       });
     }
     Sentry.captureMessage(message, level);

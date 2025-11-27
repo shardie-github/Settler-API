@@ -8,6 +8,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 import { NotFoundError } from "../utils/typed-errors";
@@ -23,12 +24,16 @@ const getStatusSchema = z.object({
 // Get reconciliation execution status with progress
 router.get(
   "/executions/:executionId/status",
-  requirePermission("jobs", "read"),
+  requirePermission(Permission.JOBS_READ),
   validateRequest(getStatusSchema),
   async (req: AuthRequest, res: Response) => {
     try {
       const { executionId } = req.params;
       const userId = req.userId!;
+
+      if (!executionId || !userId) {
+        throw new NotFoundError("Execution ID and User ID are required", "execution", executionId || "unknown");
+      }
 
       // Get execution details
       const executions = await query<{
@@ -47,7 +52,7 @@ router.get(
         [executionId, userId]
       );
 
-      if (executions.length === 0) {
+      if (executions.length === 0 || !executions[0]) {
         throw new NotFoundError("Execution not found", "execution", executionId);
       }
 
@@ -83,6 +88,8 @@ router.get(
         total?: number;
       } | null;
 
+      const matchCountValue = matchCount[0]?.count || "0";
+
       res.json({
         data: {
           executionId: execution.id,
@@ -91,7 +98,7 @@ router.get(
           progress: {
             percentage: progress,
             message: progressMessage,
-            matched: summary?.matched || parseInt(matchCount[0]?.count || "0"),
+            matched: summary?.matched || parseInt(matchCountValue),
             unmatched: summary?.unmatched || 0,
             total: summary?.total || 0,
           },

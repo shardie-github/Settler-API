@@ -3,9 +3,10 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query, transaction } from "../db";
 import { generateApiKey, hashApiKey } from "../utils/hash";
-import { logInfo, logError } from "../utils/logger";
+import { logInfo } from "../utils/logger";
 import { handleRouteError } from "../utils/error-handler";
 import { NotFoundError } from "../utils/typed-errors";
 
@@ -41,7 +42,7 @@ const regenerateApiKeySchema = z.object({
 // List API keys (masked)
 router.get(
   "/api-keys",
-  requirePermission("api_keys", "read"),
+  requirePermission(Permission.USERS_WRITE),
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.userId!;
@@ -89,10 +90,14 @@ router.get(
 // Get API key details (masked)
 router.get(
   "/api-keys/:id",
-  requirePermission("api_keys", "read"),
+  requirePermission(Permission.USERS_WRITE),
   async (req: AuthRequest, res: Response) => {
     try {
       const { id } = req.params;
+      if (!id) {
+        res.status(400).json({ error: "API key ID required" });
+        return;
+      }
       const userId = req.userId!;
 
       const keys = await query<{
@@ -112,7 +117,7 @@ router.get(
         [id, userId]
       );
 
-      if (keys.length === 0) {
+      if (keys.length === 0 || !keys[0]) {
         throw new NotFoundError("API key not found", "api_key", id);
       }
 
@@ -140,7 +145,7 @@ router.get(
 // Create API key
 router.post(
   "/api-keys",
-  requirePermission("api_keys", "create"),
+  requirePermission(Permission.USERS_WRITE),
   validateRequest(createApiKeySchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -172,7 +177,7 @@ router.post(
         [
           'api_key_created',
           userId,
-          JSON.stringify({ apiKeyId: result[0].id, name }),
+          JSON.stringify({ apiKeyId: result[0]?.id || '', name }),
         ]
       );
 
@@ -184,7 +189,7 @@ router.post(
           userId,
           'APIKeyCreated',
           JSON.stringify({
-            apiKeyId: result[0].id,
+            apiKeyId: result[0]?.id || '',
             keyType: 'live',
             name,
           }),
@@ -193,12 +198,15 @@ router.post(
         // Events table might not exist yet, ignore
       });
 
+      if (!result[0]) {
+        throw new Error('Failed to create API key');
+      }
       logInfo('API key created', { userId, apiKeyId: result[0].id });
 
       // Return key only once (never again)
       res.status(201).json({
         data: {
-          id: result[0].id,
+          id: result[0]?.id || '',
           key, // Only returned on creation
           name,
           scopes: scopes || ['jobs:read', 'jobs:write', 'reports:read'],
@@ -216,11 +224,15 @@ router.post(
 // Update API key
 router.patch(
   "/api-keys/:id",
-  requirePermission("api_keys", "update"),
+  requirePermission(Permission.USERS_WRITE),
   validateRequest(updateApiKeySchema),
   async (req: AuthRequest, res: Response) => {
     try {
       const { id } = req.params;
+      if (!id) {
+        res.status(400).json({ error: "API key ID required" });
+        return;
+      }
       const { name, scopes, rateLimit, revoked } = req.body;
       const userId = req.userId!;
 
@@ -236,7 +248,7 @@ router.patch(
 
       // Build update query
       const updates: string[] = [];
-      const values: unknown[] = [];
+      const values: (string | number | boolean | Date | null)[] = [];
       let paramCount = 1;
 
       if (name !== undefined) {
@@ -260,7 +272,8 @@ router.patch(
       }
 
       if (updates.length === 0) {
-        return res.status(400).json({ error: "No fields to update" });
+        res.status(400).json({ error: "No fields to update" });
+        return;
       }
 
       updates.push(`updated_at = NOW()`);
@@ -296,11 +309,15 @@ router.patch(
 // Regenerate API key (creates new key, revokes old one)
 router.post(
   "/api-keys/:id/regenerate",
-  requirePermission("api_keys", "update"),
+  requirePermission(Permission.USERS_WRITE),
   validateRequest(regenerateApiKeySchema),
   async (req: AuthRequest, res: Response) => {
     try {
       const { id } = req.params;
+      if (!id) {
+        res.status(400).json({ error: "API key ID required" });
+        return;
+      }
       const userId = req.userId!;
 
       // Verify ownership
@@ -317,7 +334,7 @@ router.post(
         [id, userId]
       );
 
-      if (existing.length === 0) {
+      if (existing.length === 0 || !existing[0]) {
         throw new NotFoundError("API key not found", "api_key", id);
       }
 
@@ -356,7 +373,7 @@ router.post(
           [
             'api_key_regenerated',
             userId,
-            JSON.stringify({ oldApiKeyId: id, newApiKeyId: result.rows[0].id }),
+            JSON.stringify({ oldApiKeyId: id, newApiKeyId: result.rows[0]?.id || '' }),
           ]
         );
 
@@ -369,15 +386,17 @@ router.post(
             'APIKeyRegenerated',
             JSON.stringify({
               oldApiKeyId: id,
-              newApiKeyId: result.rows[0].id,
+              newApiKeyId: result.rows[0]?.id || '',
             }),
           ]
         ).catch(() => {
           // Events table might not exist yet, ignore
         });
 
+        if (!result.rows[0]) {
+          throw new Error('Failed to regenerate API key');
+        }
         logInfo('API key regenerated', { userId, oldApiKeyId: id, newApiKeyId: result.rows[0].id });
-
         res.status(201).json({
           data: {
             id: result.rows[0].id,
@@ -399,10 +418,14 @@ router.post(
 // Delete API key
 router.delete(
   "/api-keys/:id",
-  requirePermission("api_keys", "delete"),
+  requirePermission(Permission.USERS_DELETE),
   async (req: AuthRequest, res: Response) => {
     try {
       const { id } = req.params;
+      if (!id) {
+        res.status(400).json({ error: "API key ID required" });
+        return;
+      }
       const userId = req.userId!;
 
       // Verify ownership
@@ -418,7 +441,7 @@ router.delete(
       // Revoke instead of delete (soft delete)
       await query(
         `UPDATE api_keys SET revoked_at = NOW(), updated_at = NOW() WHERE id = $1`,
-        [id]
+        [id || null]
       );
 
       // Log audit event

@@ -20,18 +20,24 @@ const sseConnections = new Map<string, Response>();
  */
 router.get(
   '/reconciliations/:jobId',
-  async (req: AuthRequest, res: Response) => {
+  async (req: AuthRequest, res: Response): Promise<void> => {
     const { jobId } = req.params;
     const tenantId = req.tenantId || req.userId;
 
+    if (!jobId || !tenantId) {
+      res.status(400).json({ error: 'Job ID and Tenant ID are required' });
+      return;
+    }
+
     // Verify job ownership
-    const jobs = await query(
+    const jobs = await query<{ id: string }>(
       `SELECT id FROM jobs WHERE id = $1 AND tenant_id = $2`,
       [jobId, tenantId]
     );
 
     if (jobs.length === 0) {
-      return res.status(404).json({ error: 'Job not found' });
+      res.status(404).json({ error: 'Job not found' });
+      return;
     }
 
     // Set SSE headers
@@ -60,7 +66,14 @@ router.get(
         }
 
         // Fetch latest execution status
-        const executions = await query(
+        const executions = await query<{
+          id: string;
+          status: string;
+          started_at: Date;
+          completed_at: Date | null;
+          error: string | null;
+          summary: unknown;
+        }>(
           `
             SELECT 
               id,
@@ -74,10 +87,10 @@ router.get(
             ORDER BY started_at DESC
             LIMIT 1
           `,
-          [jobId, tenantId]
+          [jobId!, tenantId!]
         );
 
-        if (executions.length > 0) {
+        if (executions.length > 0 && executions[0]) {
           const execution = executions[0];
           const update = {
             type: 'execution_update',

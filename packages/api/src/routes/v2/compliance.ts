@@ -38,8 +38,10 @@ router.post('/exports', async (req: Request, res: Response) => {
       data: export_,
       message: 'Export created successfully',
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to create export', 400);
+    return;
   }
 });
 
@@ -63,8 +65,10 @@ router.get('/exports', async (req: Request, res: Response) => {
       data: exports,
       count: exports.length,
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to list exports', 500);
+    return;
   }
 });
 
@@ -75,6 +79,9 @@ router.get('/exports', async (req: Request, res: Response) => {
 router.get('/exports/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ error: 'Export ID is required' });
+    }
     const export_ = complianceExportSystem.getExport(id);
 
     if (!export_) {
@@ -87,8 +94,10 @@ router.get('/exports/:id', async (req: Request, res: Response) => {
     res.json({
       data: export_,
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to get export', 500);
+    return;
   }
 });
 
@@ -104,8 +113,10 @@ router.get('/templates', async (req: Request, res: Response) => {
       data: templates,
       count: templates.length,
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to get templates', 500);
+    return;
   }
 });
 
@@ -142,8 +153,10 @@ router.post('/edge/initialize', async (req: Request, res: Response) => {
       },
       message: 'Edge agent initialized successfully',
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to initialize edge agent', 400);
+    return;
   }
 });
 

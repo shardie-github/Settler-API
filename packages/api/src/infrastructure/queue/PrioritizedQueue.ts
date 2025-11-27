@@ -33,11 +33,18 @@ export class PrioritizedQueue {
     private queueName: string,
     private processor: (job: Job<QueueJobData>) => Promise<any>
   ) {
-    this.redis = new Redis({
+    const redisOptions: {
+      host: string;
+      port: number;
+      url?: string;
+    } = {
       host: config.redis.host,
       port: config.redis.port,
-      url: config.redis.url,
-    });
+    };
+    if (config.redis.url) {
+      redisOptions.url = config.redis.url;
+    }
+    this.redis = new Redis(redisOptions);
 
     this.queue = new Queue(queueName, {
       connection: this.redis,
@@ -93,11 +100,18 @@ export class PrioritizedQueue {
         return await this.queue.add(
           'job',
           data,
-          {
-            priority: priorityScore,
-            delay: options.delay,
-            jobId: data.jobId,
-          }
+          (() => {
+            const jobOptions: { priority: number; delay?: number; jobId?: string } = {
+              priority: priorityScore,
+            };
+            if (options.delay !== undefined) {
+              jobOptions.delay = options.delay;
+            }
+            if (data.jobId !== undefined) {
+              jobOptions.jobId = data.jobId;
+            }
+            return jobOptions;
+          })()
         );
       },
       data.tenantId,

@@ -4,16 +4,10 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { authMiddleware, AuthRequest } from "./middleware/auth";
 import { errorHandler } from "./middleware/error";
-import { validateRequest } from "./middleware/validation";
 import { idempotencyMiddleware } from "./middleware/idempotency";
-import { jobsRouter } from "./routes/jobs";
-import { reportsRouter } from "./routes/reports";
-import { webhooksRouter } from "./routes/webhooks";
-import { adaptersRouter } from "./routes/adapters";
 import { healthRouter } from "./routes/health";
 import { metricsRouter } from "./routes/metrics";
 import { openApiRouter } from "./routes/openapi";
-import { usersRouter } from "./routes/users";
 import { authRouter } from "./routes/auth";
 import { apiKeysRouter } from "./routes/api-keys";
 import { exceptionsRouter } from "./routes/exceptions";
@@ -35,7 +29,7 @@ import { testModeMiddleware, validateTestMode } from "./middleware/test-mode";
 import { rateLimitMiddleware } from "./utils/rate-limiter";
 import { initDatabase } from "./db";
 import { config } from "./config";
-import { logInfo, logError } from "./utils/logger";
+import { logInfo, logError, logWarn } from "./utils/logger";
 import { v4 as uuidv4 } from "uuid";
 import { startDataRetentionJob } from "./jobs/data-retention";
 import { startMaterializedViewRefreshJob } from "./jobs/materialized-view-refresh";
@@ -47,7 +41,6 @@ import { reconciliationSummaryRouter } from "./routes/reconciliation-summary";
 import { SecretsManager, REQUIRED_SECRETS } from "./infrastructure/security/SecretsManager";
 import { initializeTracing } from "./infrastructure/observability/tracing";
 import { compressionMiddleware, brotliCompressionMiddleware } from "./middleware/compression";
-import { etagMiddleware } from "./middleware/etag";
 import { observabilityMiddleware } from "./middleware/observability";
 import { eventTrackingMiddleware } from "./middleware/event-tracking";
 import { setupSignalHandlers, registerShutdownHandler } from "./utils/graceful-shutdown";
@@ -146,7 +139,7 @@ function countDepth(obj: unknown, current = 0): number {
 
 app.use(express.json({
   limit: "1mb", // Reduced from 10mb
-  verify: (req, res, buf) => {
+  verify: (_req, _res, buf) => {
     try {
       const parsed = JSON.parse(buf.toString());
       const depth = countDepth(parsed);
@@ -293,10 +286,10 @@ app.use(sentryErrorHandler());
 app.use(errorHandler);
 
 // 404 handler
-app.use((req: Request, res: Response) => {
+app.use((_req: Request, res: Response) => {
   res.status(404).json({
     error: "Not Found",
-    message: `Cannot ${req.method} ${req.path}`,
+    message: `Cannot ${_req.method} ${_req.path}`,
   });
 });
 

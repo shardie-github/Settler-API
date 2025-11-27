@@ -4,7 +4,7 @@
  * Extracted from route handlers for better testability and maintainability
  */
 
-import { query, transaction } from '../../db';
+import { query } from '../../db';
 import { encrypt, decrypt } from '../../infrastructure/security/encryption';
 import { logInfo, logError } from '../../utils/logger';
 
@@ -35,8 +35,8 @@ export interface JobResponse {
   id: string;
   userId: string;
   name: string;
-  source: { adapter: string };
-  target: { adapter: string };
+  source: { adapter: string; config?: Record<string, unknown> };
+  target: { adapter: string; config?: Record<string, unknown> };
   rules: CreateJobRequest['rules'];
   schedule?: string;
   status: string;
@@ -67,10 +67,13 @@ export class JobRouteService {
           target.adapter,
           encryptedTargetConfig,
           JSON.stringify(rules),
-          schedule,
+          schedule || null,
         ]
       );
 
+      if (!result[0]) {
+        throw new Error('Failed to create job');
+      }
       const jobId = result[0].id;
 
       // Log audit event
@@ -86,17 +89,20 @@ export class JobRouteService {
 
       logInfo('Job created', { jobId, userId, name });
 
-      return {
+      const response: JobResponse = {
         id: jobId,
         userId,
         name,
         source: { adapter: source.adapter },
         target: { adapter: target.adapter },
         rules,
-        schedule,
         status: 'active',
         createdAt: new Date().toISOString(),
       };
+      if (schedule !== undefined) {
+        response.schedule = schedule;
+      }
+      return response;
     } catch (error: unknown) {
       logError('Failed to create job', error, { userId });
       const message = error instanceof Error ? error.message : 'Failed to create reconciliation job';
@@ -132,6 +138,9 @@ export class JobRouteService {
     }
 
     const job = jobs[0];
+    if (!job) {
+      return null;
+    }
 
     // Decrypt configs (but don't expose full API keys in response)
     const sourceConfig = JSON.parse(decrypt(job.source_config_encrypted));
@@ -156,7 +165,7 @@ export class JobRouteService {
       ])
     );
 
-    return {
+    const response: JobResponse = {
       id: job.id,
       userId: job.user_id,
       name: job.name,
@@ -169,10 +178,13 @@ export class JobRouteService {
         config: redactedTargetConfig,
       },
       rules: JSON.parse(job.rules),
-      schedule: job.schedule || undefined,
       status: job.status,
       createdAt: job.created_at.toISOString(),
     };
+    if (job.schedule) {
+      response.schedule = job.schedule;
+    }
+    return response;
   }
 
   /**
@@ -208,19 +220,29 @@ export class JobRouteService {
       ),
     ]);
 
+    if (!totalResult[0]) {
+      return { jobs: [], total: 0 };
+    }
     const total = parseInt(totalResult[0].count, 10);
 
+    const defaultRules: CreateJobRequest['rules'] = {
+      matching: [],
+    };
+
     return {
-      jobs: jobs.map((job) => ({
-        id: job.id,
-        userId: job.user_id,
-        name: job.name,
-        source: { adapter: job.source_adapter },
-        target: { adapter: job.target_adapter },
-        rules: {},
-        status: job.status,
-        createdAt: job.created_at.toISOString(),
-      })),
+      jobs: jobs.map((job) => {
+        const response: JobResponse = {
+          id: job.id,
+          userId: job.user_id,
+          name: job.name,
+          source: { adapter: job.source_adapter },
+          target: { adapter: job.target_adapter },
+          rules: defaultRules,
+          status: job.status,
+          createdAt: job.created_at.toISOString(),
+        };
+        return response;
+      }),
       total,
     };
   }

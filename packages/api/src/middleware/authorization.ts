@@ -3,8 +3,7 @@
  * Enforces least privilege access control
  */
 
-import { Request, Response, NextFunction } from 'express';
-import { AuthRequest } from './auth';
+import { Response, NextFunction } from 'express';
 import { TenantRequest } from './tenant';
 import { Permission, PermissionChecker } from '../infrastructure/security/Permissions';
 import { UserRole } from '../domain/entities/User';
@@ -44,7 +43,7 @@ export function requirePermission(...permissions: Permission[]) {
         [req.userId, req.apiKeyId || null, req.tenantId]
       );
 
-      if (user.length === 0) {
+      if (user.length === 0 || !user[0]) {
         res.status(403).json({
           error: 'Forbidden',
           message: 'User not found',
@@ -52,7 +51,8 @@ export function requirePermission(...permissions: Permission[]) {
         return;
       }
 
-      const { role, scopes } = user[0];
+      const userRecord = user[0];
+      const { role, scopes } = userRecord;
 
       // Check permissions
       const hasPermission = PermissionChecker.hasAllPermissions(
@@ -70,8 +70,8 @@ export function requirePermission(...permissions: Permission[]) {
             'unauthorized_access',
             req.userId,
             req.tenantId,
-            req.ip,
-            req.headers['user-agent'],
+            req.ip || null,
+            req.headers['user-agent'] || null,
             req.path,
             JSON.stringify({ requiredPermissions: permissions }),
           ]
@@ -120,7 +120,7 @@ export function requireAnyPermission(...permissions: Permission[]) {
         [req.userId, req.apiKeyId || null, req.tenantId]
       );
 
-      if (user.length === 0) {
+      if (user.length === 0 || !user[0]) {
         res.status(403).json({
           error: 'Forbidden',
           message: 'User not found',
@@ -128,7 +128,8 @@ export function requireAnyPermission(...permissions: Permission[]) {
         return;
       }
 
-      const { role, scopes } = user[0];
+      const userRecord = user[0];
+      const { role, scopes } = userRecord;
 
       const hasPermission = PermissionChecker.hasAnyPermission(
         role,
@@ -144,8 +145,8 @@ export function requireAnyPermission(...permissions: Permission[]) {
             'unauthorized_access',
             req.userId,
             req.tenantId,
-            req.ip,
-            req.headers['user-agent'],
+            req.ip || null,
+            req.headers['user-agent'] || null,
             req.path,
             JSON.stringify({ requiredPermissions: permissions }),
           ]
@@ -220,7 +221,7 @@ export function requireResourceOwnership(
             `SELECT role FROM users WHERE id = $1 AND tenant_id = $2`,
             [req.userId, req.tenantId]
           );
-          if (user.length > 0) {
+          if (user.length > 0 && user[0]) {
             owned = user[0].role === UserRole.OWNER || user[0].role === UserRole.ADMIN;
           }
       }

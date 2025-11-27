@@ -1,12 +1,11 @@
-import { Router, Request, Response } from "express";
+import { Router, Response } from "express";
 import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
-import { requirePermission, requireResourceOwnership } from "../middleware/authorization";
+import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
-import { logInfo, logError } from "../utils/logger";
 import { handleRouteError } from "../utils/error-handler";
-import { handleEnhancedError } from "../utils/enhanced-error-handler";
 
 const router = Router();
 
@@ -33,13 +32,18 @@ const paginationSchema = z.object({
 // Get reconciliation report with pagination
 router.get(
   "/:jobId",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(getReportSchema),
   async (req: AuthRequest, res: Response) => {
     try {
       const { jobId } = req.params;
       const userId = req.userId!;
-      const { startDate, endDate, format = "json", page, limit } = req.query;
+      const queryParams = getReportSchema.parse({ params: req.params, query: req.query });
+      const { startDate, endDate, format = "json", page, limit } = queryParams.query;
+
+      if (!jobId || !userId) {
+        return res.status(400).json({ error: "Job ID and User ID are required" });
+      }
 
       // Check job ownership
       const jobs = await query<{ user_id: string }>(
@@ -47,7 +51,7 @@ router.get(
         [jobId]
       );
 
-      if (jobs.length === 0) {
+      if (jobs.length === 0 || !jobs[0]) {
         return res.status(404).json({ error: "Job not found" });
       }
 
@@ -75,7 +79,7 @@ router.get(
         [jobId, dateStart, dateEnd]
       );
 
-      if (executions.length === 0) {
+      if (executions.length === 0 || !executions[0]) {
         return res.status(404).json({ error: "No reports found for this job" });
       }
 
@@ -126,6 +130,9 @@ router.get(
         ),
       ]);
 
+      if (!totalMatches[0]) {
+        throw new Error('Failed to get match count');
+      }
       const total = parseInt(totalMatches[0].count);
       const summary = execution.summary || {
         matched: matches.length,
@@ -148,6 +155,7 @@ router.get(
         });
         
         res.send(csv);
+        return;
       } else {
         res.json({
           data: {
@@ -188,9 +196,11 @@ router.get(
             generatedAt: new Date().toISOString(),
           },
         });
+        return;
       }
     } catch (error: unknown) {
       handleRouteError(res, error, "Failed to generate report", 500, { userId: req.userId, jobId: req.params.jobId });
+      return;
     }
   }
 );
@@ -198,13 +208,14 @@ router.get(
 // Get report history with pagination
 router.get(
   "/",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(paginationSchema),
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.userId!;
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = Math.min(parseInt(req.query.limit as string) || 100, 1000);
+      const queryParams = paginationSchema.parse({ query: req.query });
+      const page = queryParams.query.page;
+      const limit = Math.min(queryParams.query.limit, 1000);
       const offset = (page - 1) * limit;
 
       const [reports, totalResult] = await Promise.all([
@@ -231,6 +242,9 @@ router.get(
         ),
       ]);
 
+      if (!totalResult[0]) {
+        throw new Error('Failed to get report count');
+      }
       const total = parseInt(totalResult[0].count);
 
       res.json({

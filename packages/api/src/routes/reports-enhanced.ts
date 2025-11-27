@@ -8,6 +8,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 import { NotFoundError } from "../utils/typed-errors";
@@ -28,7 +29,7 @@ const getEnhancedReportSchema = z.object({
 // Get enhanced report with visual summaries
 router.get(
   "/reports/:jobId/enhanced",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(getEnhancedReportSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -40,13 +41,17 @@ router.get(
       };
       const userId = req.userId!;
 
+      if (!jobId || !userId) {
+        throw new NotFoundError("Job ID and User ID are required", "job", jobId || "unknown");
+      }
+
       // Verify job ownership
       const jobs = await query<{ user_id: string; name: string }>(
         `SELECT user_id, name FROM jobs WHERE id = $1`,
         [jobId]
       );
 
-      if (jobs.length === 0 || jobs[0].user_id !== userId) {
+      if (jobs.length === 0 || !jobs[0] || jobs[0].user_id !== userId) {
         throw new NotFoundError("Job not found", "job", jobId);
       }
 
@@ -75,7 +80,7 @@ router.get(
            SUM((summary->>'unmatchedAmount')::decimal) as unmatched_amount
          FROM executions
          WHERE job_id = $1 AND started_at >= $2 AND started_at <= $3`,
-        [jobId, start, end]
+        [jobId!, start.toISOString(), end.toISOString()]
       );
 
       const stats = summary[0] || {
@@ -102,7 +107,7 @@ router.get(
          WHERE job_id = $1 AND started_at >= $2 AND started_at <= $3
          ORDER BY started_at DESC
          LIMIT 10`,
-        [jobId, start, end]
+        [jobId!, start.toISOString(), end.toISOString()]
       );
 
       // Get exception count
@@ -111,7 +116,7 @@ router.get(
          FROM exceptions e
          JOIN jobs j ON e.job_id = j.id
          WHERE j.id = $1 AND e.created_at >= $2 AND e.created_at <= $3 AND e.resolution_status = 'open'`,
-        [jobId, start, end]
+        [jobId!, start.toISOString(), end.toISOString()]
       );
 
       // Format response based on format type
@@ -120,16 +125,16 @@ router.get(
         res.json({
           data: {
             jobId,
-            jobName: jobs[0].name,
+            jobName: jobs[0]?.name || "Unknown",
             dateRange: {
               start: start.toISOString(),
               end: end.toISOString(),
             },
             summary: {
-              totalReconciliations: parseInt(stats.total),
-              matched: parseInt(stats.matched),
-              unmatched: parseInt(stats.unmatched),
-              errors: parseInt(stats.errors),
+              totalReconciliations: parseInt(String(stats.total || "0")),
+              matched: parseInt(String(stats.matched || "0")),
+              unmatched: parseInt(String(stats.unmatched || "0")),
+              errors: parseInt(String(stats.errors || "0")),
               accuracy: stats.avg_accuracy || 0,
               totalAmount: parseFloat(stats.total_amount?.toString() || "0"),
               matchedAmount: parseFloat(stats.matched_amount?.toString() || "0"),
@@ -147,7 +152,7 @@ router.get(
             cards: [
               {
                 title: "Total Reconciliations",
-                value: parseInt(stats.total),
+                value: parseInt(String(stats.total || "0")),
                 trend: "up", // Would calculate from previous period
               },
               {
@@ -191,8 +196,8 @@ router.get(
         res.json({
           data: {
             jobId,
-            summary: report[0].summary,
-            generatedAt: report[0].generated_at.toISOString(),
+            summary: report[0]?.summary || {},
+            generatedAt: report[0]?.generated_at?.toISOString() || new Date().toISOString(),
           },
         });
       }

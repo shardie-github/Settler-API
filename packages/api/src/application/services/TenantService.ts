@@ -3,12 +3,12 @@
  * Business logic for tenant management and onboarding
  */
 
-import { Tenant, TenantTier, TenantStatus, TenantQuotas } from '../../domain/entities/Tenant';
+import { Tenant, TenantTier, TenantStatus, TenantQuotas, TenantProps } from '../../domain/entities/Tenant';
 import { ITenantRepository } from '../../domain/repositories/ITenantRepository';
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
-import { User, UserRole } from '../../domain/entities/User';
+import { User, UserRole, UserProps } from '../../domain/entities/User';
 import { query } from '../../db';
-import { logInfo, logError } from '../../utils/logger';
+import { logInfo } from '../../utils/logger';
 
 export class TenantService {
   constructor(
@@ -31,10 +31,9 @@ export class TenantService {
     const tier = data.tier || TenantTier.FREE;
     const quotas = this.getDefaultQuotas(tier);
 
-    const tenant = Tenant.create({
+    const tenantProps: Omit<TenantProps, 'id' | 'createdAt' | 'updatedAt'> = {
       name: data.name,
       slug: data.slug,
-      parentTenantId: data.parentTenantId,
       tier,
       status: TenantStatus.TRIAL,
       quotas,
@@ -47,7 +46,11 @@ export class TenantService {
         maxRetries: 3,
       },
       metadata: {},
-    });
+    };
+    if (data.parentTenantId !== undefined) {
+      tenantProps.parentTenantId = data.parentTenantId;
+    }
+    const tenant = Tenant.create(tenantProps);
 
     await this.tenantRepo.save(tenant);
 
@@ -58,15 +61,18 @@ export class TenantService {
     }
 
     // Create owner user
-    const owner = User.create({
+    const userProps: Omit<UserProps, 'id' | 'createdAt' | 'updatedAt'> = {
       tenantId: tenant.id,
       email: data.ownerEmail,
       passwordHash: data.ownerPasswordHash,
-      name: data.ownerName,
       role: UserRole.OWNER,
       dataResidencyRegion: 'us',
       dataRetentionDays: 365,
-    });
+    };
+    if (data.ownerName !== undefined) {
+      userProps.name = data.ownerName;
+    }
+    const owner = User.create(userProps);
 
     await this.userRepo.save(owner);
 

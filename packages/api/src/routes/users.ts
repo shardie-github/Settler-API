@@ -1,8 +1,9 @@
-import { Router, Request, Response } from "express";
+import { Router, Response } from "express";
 import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query, transaction } from "../db";
 import { hashPassword, verifyPassword } from "../utils/hash";
 import { logInfo, logError } from "../utils/logger";
@@ -26,7 +27,7 @@ const exportUserDataSchema = z.object({
 // GDPR: Delete user data
 router.delete(
   "/:id/data",
-  requirePermission("users", "delete"),
+  requirePermission(Permission.USERS_DELETE),
   validateRequest(deleteUserDataSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -37,13 +38,17 @@ router.delete(
       // Users can only delete their own data (or admins)
       if (id !== userId) {
         // Check if user is admin
-        const users = await query<{ role: Role }>(
+        const users = await query<{ role: UserRole }>(
           'SELECT role FROM users WHERE id = $1',
           [userId]
         );
-        if (users.length === 0 || users[0].role !== Role.ADMIN && users[0].role !== Role.OWNER) {
+        if (users.length === 0 || !users[0] || (users[0].role !== UserRole.ADMIN && users[0].role !== UserRole.OWNER)) {
           return res.status(403).json({ error: 'Forbidden' });
         }
+      }
+
+      if (!id || !userId) {
+        return res.status(400).json({ error: 'User ID is required' });
       }
 
       // Verify password
@@ -52,7 +57,7 @@ router.delete(
         [id]
       );
 
-      if (targetUsers.length === 0) {
+      if (targetUsers.length === 0 || !targetUsers[0]) {
         return res.status(404).json({ error: 'User not found' });
       }
 
@@ -103,8 +108,10 @@ router.delete(
         message: 'Deletion scheduled. Data will be permanently deleted in 30 days.',
         deletionDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, "Failed to delete user data", 500, { userId: req.userId });
+      return;
     }
   }
 );
@@ -112,7 +119,7 @@ router.delete(
 // GDPR: Export user data
 router.get(
   "/:id/data-export",
-  requirePermission("users", "read"),
+  requirePermission(Permission.USERS_READ),
   validateRequest(exportUserDataSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -194,8 +201,10 @@ router.get(
       logInfo('User data exported', { userId });
 
       res.json({ data: exportData });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, "Failed to export user data", 500, { userId: req.userId });
+      return;
     }
   }
 );

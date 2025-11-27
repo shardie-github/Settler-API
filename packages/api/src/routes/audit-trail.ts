@@ -9,6 +9,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 
@@ -29,11 +30,12 @@ const getAuditTrailSchema = z.object({
 // Get audit trail
 router.get(
   "/audit-trail",
-  requirePermission("audit", "read"),
+  requirePermission(Permission.ADMIN_AUDIT),
   validateRequest(getAuditTrailSchema),
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.userId!;
+      const queryParams = getAuditTrailSchema.parse({ query: req.query });
       const {
         resourceType,
         resourceId,
@@ -42,18 +44,10 @@ router.get(
         eventType,
         limit,
         offset,
-      } = req.query as {
-        resourceType?: string;
-        resourceId?: string;
-        startDate?: string;
-        endDate?: string;
-        eventType?: string;
-        limit: number;
-        offset: number;
-      };
+      } = queryParams.query;
 
       const conditions: string[] = [];
-      const values: unknown[] = [];
+      const values: (string | number | boolean | Date | null)[] = [];
       let paramCount = 1;
 
       // Filter by user's tenant
@@ -106,6 +100,9 @@ router.get(
         values
       );
 
+      if (!countResult[0]) {
+        throw new Error('Failed to get audit log count');
+      }
       const total = parseInt(countResult[0].count);
 
       res.json({
@@ -137,11 +134,16 @@ router.get(
 // Get audit trail for specific resource
 router.get(
   "/audit-trail/:resourceType/:resourceId",
-  requirePermission("audit", "read"),
+  requirePermission(Permission.ADMIN_AUDIT),
   async (req: AuthRequest, res: Response) => {
     try {
       const { resourceType, resourceId } = req.params;
       const userId = req.userId!;
+
+      if (!resourceType || !resourceId) {
+        res.status(400).json({ error: 'resourceType and resourceId are required' });
+        return;
+      }
 
       const auditLogs = await query<{
         id: string;
@@ -183,7 +185,7 @@ router.get(
 // Export audit trail (compliance)
 router.get(
   "/audit-trail/export",
-  requirePermission("audit", "read"),
+  requirePermission(Permission.ADMIN_AUDIT),
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.userId!;

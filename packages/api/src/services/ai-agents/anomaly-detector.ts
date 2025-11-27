@@ -55,7 +55,7 @@ export class AnomalyDetectorAgent extends BaseAgent {
         });
       
       case 'get_stats':
-        return await this.getStats();
+        return await this.getStatus();
       
       default:
         throw new Error(`Unknown action: ${action}`);
@@ -67,15 +67,22 @@ export class AnomalyDetectorAgent extends BaseAgent {
     lastExecution?: Date;
     metrics?: Record<string, unknown>;
   }> {
-    return {
-      enabled: this.enabled,
-      lastExecution: this.lastDetection,
-      metrics: {
-        totalAnomalies: this.detectedAnomalies.length,
-        criticalAnomalies: this.detectedAnomalies.filter(a => a.severity === 'critical').length,
-        falsePositiveRate: 0.05, // TODO: Calculate actual rate
-      },
+    const status: {
+      enabled: boolean;
+      lastExecution?: Date;
+      metrics?: Record<string, unknown>;
+    } = {
+      enabled: (this as any).enabled,
     };
+    if (this.lastDetection) {
+      status.lastExecution = this.lastDetection;
+    }
+    status.metrics = {
+      totalAnomalies: this.detectedAnomalies.length,
+      criticalAnomalies: this.detectedAnomalies.filter(a => a.severity === 'critical').length,
+      falsePositiveRate: 0.05, // TODO: Calculate actual rate
+    };
+    return status;
   }
 
   /**

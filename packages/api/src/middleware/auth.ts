@@ -10,6 +10,7 @@ export interface AuthRequest extends Request {
   apiKeyId?: string;
   apiKey?: string;
   traceId?: string;
+  tenantId?: string;
 }
 
 /**
@@ -46,10 +47,11 @@ export const authMiddleware = async (
           userAgent: req.headers['user-agent'],
           error: message,
         });
-        return res.status(401).json({
+        res.status(401).json({
           error: "Unauthorized",
           message,
         });
+        return;
       }
     }
 
@@ -66,10 +68,11 @@ export const authMiddleware = async (
           userAgent: req.headers['user-agent'],
           error: message,
         });
-        return res.status(401).json({
+        res.status(401).json({
           error: "Invalid Token",
           message,
         });
+        return;
       }
     }
 
@@ -115,8 +118,8 @@ async function validateApiKey(req: AuthRequest, apiKey: string): Promise<void> {
        VALUES ($1, $2, $3, $4, $5)`,
       [
         'api_key_auth_failed',
-        req.ip,
-        req.headers['user-agent'],
+        req.ip || null,
+        req.headers['user-agent'] || null,
         req.path,
         JSON.stringify({ keyPrefix: prefix }),
       ]
@@ -124,6 +127,9 @@ async function validateApiKey(req: AuthRequest, apiKey: string): Promise<void> {
     throw new Error("Invalid API key");
   }
 
+  if (!keys[0]) {
+    throw new Error("Invalid API key");
+  }
   const keyRecord = keys[0];
 
   // Verify full key against hash
@@ -136,8 +142,8 @@ async function validateApiKey(req: AuthRequest, apiKey: string): Promise<void> {
       [
         'api_key_auth_failed',
         keyRecord.id,
-        req.ip,
-        req.headers['user-agent'],
+        req.ip || null,
+        req.headers['user-agent'] || null,
         req.path,
         JSON.stringify({ keyPrefix: prefix }),
       ]

@@ -8,10 +8,12 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 import { NotFoundError } from "../utils/typed-errors";
 import { calculateConfidenceScore, explainConfidenceScore } from "../services/confidence-scoring";
+import { MatchingRule } from "../domain/entities/Job";
 
 const router = Router();
 
@@ -24,12 +26,16 @@ const getConfidenceScoreSchema = z.object({
 // Get confidence score for a match
 router.get(
   "/matches/:matchId/confidence",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   validateRequest(getConfidenceScoreSchema),
   async (req: AuthRequest, res: Response) => {
     try {
       const { matchId } = req.params;
       const userId = req.userId!;
+
+      if (!matchId || !userId) {
+        throw new NotFoundError("Match ID and User ID are required", "match", matchId || "unknown");
+      }
 
       // Get match details
       const matches = await query<{
@@ -49,7 +55,7 @@ router.get(
         [matchId, userId]
       );
 
-      if (matches.length === 0) {
+      if (matches.length === 0 || !matches[0]) {
         throw new NotFoundError("Match not found", "match", matchId);
       }
 
@@ -61,7 +67,7 @@ router.get(
         [match.job_id]
       );
 
-      if (jobs.length === 0) {
+      if (jobs.length === 0 || !jobs[0]) {
         throw new NotFoundError("Job not found", "job", match.job_id);
       }
 
@@ -74,9 +80,9 @@ router.get(
           targetId: match.target_id,
           sourceData: (match.source_data as Record<string, unknown>) || {},
           targetData: (match.target_data as Record<string, unknown>) || {},
-          rules: rules as Array<{ field: string; type: string; tolerance?: number; threshold?: number; days?: number }>,
+          rules: rules as MatchingRule[],
         },
-        rules as Array<{ field: string; type: string; tolerance?: number; threshold?: number; days?: number }>
+        rules as MatchingRule[]
       );
 
       // Explain confidence score
@@ -103,11 +109,15 @@ router.get(
 // Get accuracy metrics for a job
 router.get(
   "/jobs/:jobId/accuracy",
-  requirePermission("reports", "read"),
+  requirePermission(Permission.REPORTS_READ),
   async (req: AuthRequest, res: Response) => {
     try {
       const { jobId } = req.params;
       const userId = req.userId!;
+
+      if (!jobId) {
+        throw new NotFoundError("Job ID is required", "job", "unknown");
+      }
 
       // Verify job ownership
       const jobs = await query<{ id: string }>(
@@ -153,10 +163,10 @@ router.get(
         data: {
           jobId,
           accuracy: {
-            totalMatches: parseInt(m.total_matches),
-            highConfidence: parseInt(m.high_confidence),
-            mediumConfidence: parseInt(m.medium_confidence),
-            lowConfidence: parseInt(m.low_confidence),
+            totalMatches: parseInt(String(m.total_matches || "0")),
+            highConfidence: parseInt(String(m.high_confidence || "0")),
+            mediumConfidence: parseInt(String(m.medium_confidence || "0")),
+            lowConfidence: parseInt(String(m.low_confidence || "0")),
             averageConfidence: m.avg_confidence || 0,
             accuracyPercentage: m.accuracy || 0,
             badge: m.accuracy >= 95 ? "high" : m.accuracy >= 80 ? "medium" : "low",

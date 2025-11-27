@@ -4,7 +4,7 @@
  */
 
 import pRetry, { AbortError } from 'p-retry';
-import { logWarn, logError } from '../../utils/logger';
+import { logWarn } from '../../utils/logger';
 
 export interface RetryOptions {
   retries?: number;

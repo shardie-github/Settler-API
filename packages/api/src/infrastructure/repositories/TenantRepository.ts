@@ -1,6 +1,6 @@
 import { ITenantRepository } from '../../domain/repositories/ITenantRepository';
-import { Tenant, TenantProps, TenantTier, TenantStatus } from '../../domain/entities/Tenant';
-import { query, transaction } from '../../db';
+import { Tenant, TenantProps } from '../../domain/entities/Tenant';
+import { query } from '../../db';
 
 export class TenantRepository implements ITenantRepository {
   async findById(id: string): Promise<Tenant | null> {
@@ -8,7 +8,7 @@ export class TenantRepository implements ITenantRepository {
       `SELECT * FROM tenants WHERE id = $1 AND deleted_at IS NULL`,
       [id]
     );
-    return rows.length > 0 ? Tenant.fromPersistence(rows[0]) : null;
+    return rows.length > 0 && rows[0] ? Tenant.fromPersistence(rows[0]) : null;
   }
 
   async findBySlug(slug: string): Promise<Tenant | null> {
@@ -16,7 +16,7 @@ export class TenantRepository implements ITenantRepository {
       `SELECT * FROM tenants WHERE slug = $1 AND deleted_at IS NULL`,
       [slug]
     );
-    return rows.length > 0 ? Tenant.fromPersistence(rows[0]) : null;
+    return rows.length > 0 && rows[0] ? Tenant.fromPersistence(rows[0]) : null;
   }
 
   async findByCustomDomain(domain: string): Promise<Tenant | null> {
@@ -27,7 +27,7 @@ export class TenantRepository implements ITenantRepository {
        AND deleted_at IS NULL`,
       [domain]
     );
-    return rows.length > 0 ? Tenant.fromPersistence(rows[0]) : null;
+    return rows.length > 0 && rows[0] ? Tenant.fromPersistence(rows[0]) : null;
   }
 
   async findSubAccounts(parentTenantId: string): Promise<Tenant[]> {
@@ -44,7 +44,7 @@ export class TenantRepository implements ITenantRepository {
       `SELECT parent_tenant_id FROM tenants WHERE id = $1 AND deleted_at IS NULL`,
       [tenantId]
     );
-    if (rows.length === 0 || !rows[0].parent_tenant_id) {
+    if (rows.length === 0 || !rows[0] || !rows[0].parent_tenant_id) {
       return null;
     }
     return this.findById(rows[0].parent_tenant_id);

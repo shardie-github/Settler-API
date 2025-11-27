@@ -4,7 +4,6 @@
  */
 
 import { query } from '../../db';
-import { tenantResourceUsage, tenantConcurrentRequests } from '../../infrastructure/observability/metrics';
 import { logWarn } from '../../utils/logger';
 
 export interface NoisyNeighborAlert {

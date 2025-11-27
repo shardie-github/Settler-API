@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { config } from '../config';
+// Config import removed - not used
 import { logWarn } from '../utils/logger';
 
 const DEFAULT_TIMEOUT = 30000; // 30 seconds
@@ -50,13 +50,19 @@ export function requestTimeoutMiddleware(timeoutMs: number = DEFAULT_TIMEOUT) {
     }, timeout);
 
     // Clear timeout when response finishes
-    const originalEnd = res.end;
-    res.end = function(...args: unknown[]) {
+    const originalEnd = res.end.bind(res);
+    res.end = function(chunk?: unknown, encoding?: BufferEncoding, cb?: () => void) {
       if (req.timeout) {
         clearTimeout(req.timeout);
       }
-      originalEnd.apply(res, args);
-    };
+      if (encoding !== undefined && typeof encoding === 'string') {
+        originalEnd(chunk, encoding, cb);
+      } else if (cb !== undefined) {
+        originalEnd(chunk, cb);
+      } else {
+        originalEnd(chunk);
+      }
+    } as typeof originalEnd;
 
     next();
   };

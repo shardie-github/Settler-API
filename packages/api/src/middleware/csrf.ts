@@ -66,10 +66,11 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
       ip: req.ip,
     });
 
-    return res.status(403).json({
+    res.status(403).json({
       error: 'FORBIDDEN',
       message: 'CSRF token validation failed',
     });
+    return;
   }
 
   next();

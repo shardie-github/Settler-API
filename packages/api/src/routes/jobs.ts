@@ -1,13 +1,14 @@
-import { Router, Request, Response } from "express";
+import { Router, Response } from "express";
 import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission, requireResourceOwnership } from "../middleware/authorization";
-import { query, transaction } from "../db";
+import { Permission } from "../infrastructure/security/Permissions";
+import { query } from "../db";
 import { logInfo, logError } from "../utils/logger";
 import { Mutex } from "async-mutex";
 import { JobRouteService } from "../application/services/JobRouteService";
-import { sendSuccess, sendError, sendPaginated, sendCreated, sendNoContent } from "../utils/api-response";
+import { sendSuccess, sendError, sendCreated, sendNoContent } from "../utils/api-response";
 import { handleRouteError } from "../utils/error-handler";
 import { trackEventAsync } from "../utils/event-tracker";
 import { validateAdapterConfig } from "../utils/adapter-config-validator";
@@ -102,7 +103,7 @@ const paginationSchema = z.object({
 // Create reconciliation job
 router.post(
   "/",
-  requirePermission("jobs", "create"),
+  requirePermission(Permission.JOBS_WRITE),
   validateRequest(createJobSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -116,7 +117,7 @@ router.post(
       
       // Track event
       trackEventAsync(userId, 'JobCreated', {
-        jobId: job.data.id,
+        jobId: job.id,
         sourceAdapter: req.body.source.adapter,
         targetAdapter: req.body.target.adapter,
         hasSchedule: !!req.body.schedule,
@@ -134,7 +135,7 @@ router.post(
 // Get all jobs with pagination
 router.get(
   "/",
-  requirePermission("jobs", "read"),
+  requirePermission(Permission.JOBS_READ),
   validateRequest(paginationSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -163,6 +164,9 @@ router.get(
         ),
       ]);
 
+      if (!totalResult[0]) {
+        throw new Error('Failed to get job count');
+      }
       const total = parseInt(totalResult[0].count);
 
       res.json({
@@ -189,12 +193,16 @@ router.get(
 // Get job by ID
 router.get(
   "/:id",
-  requirePermission("jobs", "read"),
+  requirePermission(Permission.JOBS_READ),
   validateRequest(getJobSchema),
   async (req: AuthRequest, res: Response) => {
     try {
       const { id } = req.params;
       const userId = req.userId!;
+
+      if (!id || !userId) {
+        return sendError(res, 400, 'BAD_REQUEST', 'Job ID and User ID are required', undefined, req.traceId);
+      }
 
       // Check ownership
       await new Promise<void>((resolve, reject) => {
@@ -219,11 +227,16 @@ router.get(
 // Trigger job execution with race condition prevention
 router.post(
   "/:id/run",
-  requirePermission("jobs", "create"),
+  requirePermission(Permission.JOBS_WRITE),
   validateRequest(getJobSchema),
   async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
-      const userId = req.userId!;
+    const userId = req.userId!;
+    
+    if (!id || !userId) {
+      return sendError(res, 400, 'BAD_REQUEST', 'Job ID and User ID are required', undefined, req.traceId);
+    }
+    
     const mutex = getJobMutex(id);
 
     const release = await mutex.acquire();
@@ -242,7 +255,7 @@ router.post(
         [id, userId]
       );
 
-      if (jobs.length === 0) {
+      if (jobs.length === 0 || !jobs[0]) {
         return sendError(res, 404, 'NOT_FOUND', 'Job not found', undefined, req.traceId);
       }
 
@@ -253,7 +266,7 @@ router.post(
       }
 
       // Update job status atomically
-      const updated = await query(
+      const updated = await query<{ id: string }>(
         `UPDATE jobs
          SET status = 'running', version = version + 1, updated_at = NOW()
          WHERE id = $1 AND user_id = $2 AND version = $3
@@ -261,7 +274,7 @@ router.post(
         [id, userId, job.version]
       );
 
-      if (updated.length === 0) {
+      if (updated.length === 0 || !updated[0]) {
         return sendError(res, 409, 'CONFLICT', 'Job state changed, please retry', undefined, req.traceId);
       }
 
@@ -273,10 +286,14 @@ router.post(
         [id]
       );
 
+      if (executions.length === 0 || !executions[0]) {
+        return sendError(res, 500, 'INTERNAL_ERROR', 'Failed to create execution record', undefined, req.traceId);
+      }
+
       const executionId = executions[0].id;
 
       // Log audit event
-      await query(
+      await query<{ id: string }>(
         `INSERT INTO audit_logs (event, user_id, metadata)
          VALUES ($1, $2, $3)`,
         [
@@ -335,12 +352,16 @@ router.post(
 // Delete job
 router.delete(
   "/:id",
-  requirePermission("jobs", "delete"),
+  requirePermission(Permission.JOBS_DELETE),
   validateRequest(getJobSchema),
   async (req: AuthRequest, res: Response) => {
     try {
       const { id } = req.params;
       const userId = req.userId!;
+
+      if (!id || !userId) {
+        return sendError(res, 400, 'BAD_REQUEST', 'Job ID and User ID are required', undefined, req.traceId);
+      }
 
       // Check ownership
       await new Promise<void>((resolve, reject) => {

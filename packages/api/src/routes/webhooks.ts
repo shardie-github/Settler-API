@@ -3,6 +3,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission, requireResourceOwnership } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
 import { verifyWebhookSignature, generateWebhookSignature } from "../utils/webhook-signature";
 import { validateExternalUrl } from "../infrastructure/security/SSRFProtection";
@@ -40,7 +41,7 @@ const getWebhookSchema = z.object({
 // Create webhook endpoint with SSRF protection
 router.post(
   "/",
-  requirePermission("webhooks", "create"),
+  requirePermission(Permission.WEBHOOKS_WRITE),
   validateRequest(createWebhookSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -66,6 +67,9 @@ router.post(
         [userId, url, events, webhookSecret]
       );
 
+      if (!result[0]) {
+        throw new Error('Failed to create webhook');
+      }
       const webhookId = result[0].id;
 
       // Log audit event
@@ -92,8 +96,10 @@ router.post(
         },
         message: "Webhook created successfully",
       });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, "Failed to create webhook", 500, { userId: req.userId });
+      return;
     }
   }
 );
@@ -101,7 +107,7 @@ router.post(
 // List webhooks with pagination
 router.get(
   "/",
-  requirePermission("webhooks", "read"),
+  requirePermission(Permission.WEBHOOKS_READ),
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.userId!;
@@ -130,6 +136,9 @@ router.get(
         ),
       ]);
 
+      if (!totalResult[0]) {
+        throw new Error('Failed to get webhook count');
+      }
       const total = parseInt(totalResult[0].count);
 
       res.json({
@@ -148,8 +157,10 @@ router.get(
           totalPages: Math.ceil(total / limit),
         },
       });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, "Failed to fetch webhooks", 500, { userId: req.userId });
+      return;
     }
   }
 );
@@ -186,6 +197,9 @@ router.post(
       }
 
       try {
+        if (!adapter) {
+          return res.status(400).json({ error: 'Adapter is required' });
+        }
         const isValid = await verifyWebhookSignature(adapter, rawBody, signature);
         if (!isValid) {
           logWarn('Invalid webhook signature', { adapter, ip: req.ip });
@@ -201,7 +215,7 @@ router.post(
       await query(
         `INSERT INTO webhook_payloads (adapter, payload, signature, received_at)
          VALUES ($1, $2, $3, NOW())`,
-        [adapter, JSON.stringify(req.body), signature]
+        [adapter || '', JSON.stringify(req.body), signature || '']
       );
 
       // Queue for async processing (in production, use Bull/Redis queue)
@@ -212,8 +226,10 @@ router.post(
         received: true,
         message: "Webhook received and queued for processing",
       });
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, "Failed to process webhook", 500, { adapter: req.params.adapter });
+      return;
     }
   }
 );
@@ -221,7 +237,7 @@ router.post(
 // Delete webhook
 router.delete(
   "/:id",
-  requirePermission("webhooks", "delete"),
+  requirePermission(Permission.WEBHOOKS_DELETE),
   validateRequest(getWebhookSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -233,12 +249,12 @@ router.delete(
         requireResourceOwnership(req, res, (err?: unknown) => {
           if (err) reject(err);
           else resolve();
-        }, 'webhook', id);
+        }, 'webhook', id || '');
       });
 
       await query(
         `DELETE FROM webhooks WHERE id = $1 AND user_id = $2`,
-        [id, userId]
+        [id || '', userId]
       );
 
       // Log audit event
@@ -255,8 +271,10 @@ router.delete(
       logInfo('Webhook deleted', { webhookId: id, userId });
 
       res.status(204).send();
+      return;
     } catch (error: unknown) {
       handleRouteError(res, error, "Failed to delete webhook", 500, { userId: req.userId, webhookId: req.params.id });
+      return;
     }
   }
 );

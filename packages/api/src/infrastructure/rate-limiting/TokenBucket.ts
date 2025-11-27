@@ -16,14 +16,22 @@ export class TokenBucket {
   private redis: Redis;
 
   constructor() {
-    this.redis = new Redis({
+    const redisOptions: {
+      host: string;
+      port: number;
+      url?: string;
+      retryStrategy?: (times: number) => number;
+    } = {
       host: config.redis.host,
       port: config.redis.port,
-      url: config.redis.url,
-      retryStrategy: (times) => {
+      retryStrategy: (times: number) => {
         return Math.min(times * 50, 2000);
       },
-    });
+    };
+    if (config.redis.url) {
+      redisOptions.url = config.redis.url;
+    }
+    this.redis = new Redis(redisOptions);
   }
 
   /**
@@ -123,7 +131,7 @@ export class TokenBucket {
    * Adaptive rate limiting: adjust rate based on tenant behavior
    */
   async adjustRate(
-    key: string,
+    _key: string,
     currentConfig: TokenBucketConfig,
     successRate: number // 0-1, percentage of successful requests
   ): Promise<TokenBucketConfig> {

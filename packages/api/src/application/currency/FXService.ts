@@ -40,10 +40,12 @@ export class FXService {
       fromAmount,
       toAmount,
       fxRate,
-      provider,
       rateDate: rateDate || new Date(),
       createdAt: new Date(),
     };
+    if (provider) {
+      conversion.provider = provider;
+    }
 
     await query(
       `INSERT INTO fx_conversions (
@@ -60,7 +62,7 @@ export class FXService {
         fromAmount,
         toAmount,
         fxRate,
-        provider,
+        conversion.provider || null,
         conversion.rateDate,
         conversion.createdAt,
       ]
@@ -95,7 +97,7 @@ export class FXService {
       [tenantId, fromCurrency, toCurrency, targetDate]
     );
 
-    if (result.length === 0) {
+    if (result.length === 0 || !result[0]) {
       return null; // No FX rate available
     }
 
@@ -137,8 +139,11 @@ export class FXService {
       [tenantId]
     );
 
-    if (result.length > 0 && result[0].config?.baseCurrency) {
-      return result[0].config.baseCurrency;
+    if (result.length > 0 && result[0]?.config?.baseCurrency) {
+      const baseCurrency = result[0].config.baseCurrency;
+      if (typeof baseCurrency === 'string') {
+        return baseCurrency;
+      }
     }
 
     return 'USD'; // Default
@@ -170,7 +175,7 @@ export class FXService {
       toCurrency: row.to_currency,
       rate: row.fx_rate,
       rateDate: row.rate_date,
-      provider: row.provider || 'unknown',
+      provider: row.provider ?? 'unknown',
     }));
   }
 

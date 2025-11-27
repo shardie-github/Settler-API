@@ -4,7 +4,7 @@
  * Exports reconciled data to JSON format for programmatic access
  */
 
-import { Transaction, Settlement, Fee, ReconciliationMatch } from '@settler/types';
+import { Transaction, Settlement, Fee, ReconciliationMatch, MatchType } from '@settler/types';
 import { query } from '../../db';
 
 export interface JSONExportOptions {
@@ -94,43 +94,52 @@ export class JSONExporter {
         delete settlement.raw_payload;
       }
 
+      const matchObj: {
+        id: string;
+        tenantId: string;
+        executionId?: string;
+        jobId?: string;
+        transactionId?: string;
+        settlementId?: string;
+        matchType: MatchType;
+        confidenceScore: number;
+        matchingRules: unknown;
+        matchedAt: string;
+        createdAt: string;
+      } = {
+        id: match.id,
+        tenantId: match.tenantId,
+        matchType: match.matchType as MatchType,
+        confidenceScore: match.confidenceScore,
+        matchingRules: match.matchingRules,
+        matchedAt: match.matchedAt.toISOString(),
+        createdAt: match.createdAt.toISOString(),
+      };
+      if (match.executionId) {
+        matchObj.executionId = match.executionId;
+      }
+      if (match.jobId) {
+        matchObj.jobId = match.jobId;
+      }
+      if (match.transactionId) {
+        matchObj.transactionId = match.transactionId;
+      }
+      if (match.settlementId) {
+        matchObj.settlementId = match.settlementId;
+      }
       const matchEntry: {
-        match: {
-          id: string;
-          tenantId: string;
-          executionId: string;
-          jobId: string;
-          transactionId: string;
-          settlementId: string;
-          matchType: string;
-          confidenceScore: number;
-          matchingRules: unknown;
-          matchedAt: string;
-          createdAt: string;
-        };
+        match: typeof matchObj;
         transaction: Transaction;
         settlement: Settlement;
         fees?: Fee[];
       } = {
-        match: {
-          id: match.id,
-          tenantId: match.tenantId,
-          executionId: match.executionId,
-          jobId: match.jobId,
-          transactionId: match.transactionId,
-          settlementId: match.settlementId,
-          matchType: match.matchType,
-          confidenceScore: match.confidenceScore,
-          matchingRules: match.matchingRules,
-          matchedAt: match.matchedAt.toISOString(),
-          createdAt: match.createdAt.toISOString(),
-        },
+        match: matchObj,
         transaction,
         settlement,
       };
 
       // Add fees if included
-      if (includeFees) {
+      if (includeFees && match.transactionId) {
         const fees = await query<Fee>(
           `SELECT * FROM fees WHERE transaction_id = $1 AND tenant_id = $2`,
           [match.transactionId, tenantId]
@@ -146,7 +155,43 @@ export class JSONExporter {
         result.summary.totalFees += fees.length;
       }
 
-      result.matches.push(matchEntry);
+      // Build ReconciliationMatch with proper types
+      const reconciliationMatch: ReconciliationMatch = {
+        id: matchObj.id,
+        tenantId: matchObj.tenantId,
+        matchType: matchObj.matchType,
+        confidenceScore: matchObj.confidenceScore,
+        matchingRules: matchObj.matchingRules as Record<string, unknown>,
+        matchedAt: new Date(matchObj.matchedAt),
+        createdAt: new Date(matchObj.createdAt),
+      };
+      if (matchObj.executionId) {
+        reconciliationMatch.executionId = matchObj.executionId;
+      }
+      if (matchObj.jobId) {
+        reconciliationMatch.jobId = matchObj.jobId;
+      }
+      if (matchObj.transactionId) {
+        reconciliationMatch.transactionId = matchObj.transactionId;
+      }
+      if (matchObj.settlementId) {
+        reconciliationMatch.settlementId = matchObj.settlementId;
+      }
+      
+      const matchEntryResult: {
+        match: ReconciliationMatch;
+        transaction: Transaction;
+        settlement: Settlement;
+        fees?: Fee[];
+      } = {
+        match: reconciliationMatch,
+        transaction,
+        settlement,
+      };
+      if (matchEntry.fees) {
+        matchEntryResult.fees = matchEntry.fees;
+      }
+      result.matches.push(matchEntryResult);
     }
 
     // Add unmatched if included

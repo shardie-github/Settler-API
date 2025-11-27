@@ -216,6 +216,9 @@ export class ReconciliationGraphEngine extends EventEmitter {
     }
     
     for (let j = 0; j <= str1.length; j++) {
+      if (!matrix[0]) {
+        matrix[0] = [];
+      }
       matrix[0][j] = j;
     }
     

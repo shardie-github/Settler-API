@@ -8,6 +8,7 @@ import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
+import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 
@@ -27,7 +28,7 @@ const createAlertRuleSchema = z.object({
 // List alert rules
 router.get(
   "/alerts/rules",
-  requirePermission("alerts", "read"),
+  requirePermission(Permission.ADMIN_READ),
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.userId!;
@@ -70,7 +71,7 @@ router.get(
 // Create alert rule
 router.post(
   "/alerts/rules",
-  requirePermission("alerts", "create"),
+  requirePermission(Permission.ADMIN_WRITE),
   validateRequest(createAlertRuleSchema),
   async (req: AuthRequest, res: Response) => {
     try {
@@ -84,6 +85,9 @@ router.post(
         [userId, name, metric, threshold, operator, channels, enabled]
       );
 
+      if (!result[0]) {
+        throw new Error('Failed to create alert rule');
+      }
       res.status(201).json({
         data: {
           id: result[0].id,
@@ -99,7 +103,7 @@ router.post(
 // Get alert history
 router.get(
   "/alerts/history",
-  requirePermission("alerts", "read"),
+  requirePermission(Permission.ADMIN_READ),
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.userId!;

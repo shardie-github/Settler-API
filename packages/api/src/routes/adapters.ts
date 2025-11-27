@@ -1,7 +1,5 @@
 import { Router, Request, Response } from "express";
-import { AuthRequest } from "../middleware/auth";
 import { get, set } from "../utils/cache";
-import { logError } from "../utils/logger";
 import { handleRouteError } from "../utils/error-handler";
 import { listAdapters, getAdapterConfigSchema } from "../utils/adapter-config-validator";
 
@@ -30,16 +28,17 @@ const ADAPTERS = listAdapters().map(adapter => ({
 }));
 
 // List available adapters (cached)
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", async (_req: Request, res: Response) => {
   try {
     const cacheKey = 'adapters:list';
     const cached = await get<typeof ADAPTERS>(cacheKey);
 
     if (cached) {
-      return res.json({
+      res.json({
         data: cached,
         count: cached.length,
       });
+      return;
     }
 
     // Cache for 1 hour
@@ -59,12 +58,21 @@ router.get("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     
+    if (!id) {
+      res.status(400).json({
+        error: "Bad Request",
+        message: "Adapter ID required",
+      });
+      return;
+    }
+    
     const schema = getAdapterConfigSchema(id);
     if (!schema) {
-      return res.status(404).json({
+      res.status(404).json({
         error: "Not Found",
         message: `Adapter '${id}' not found`,
       });
+      return;
     }
 
     const adapter = {

@@ -34,23 +34,41 @@ router.post('/decisions', async (req: Request, res: Response) => {
  */
 router.get('/decisions', async (req: Request, res: Response) => {
   try {
-    const decisions = decisionLog.queryDecisions({
-      status: req.query.status as string | undefined,
-      decisionMaker: req.query.decisionMaker as string,
-      tag: req.query.tag as string,
-      dateRange: req.query.startDate && req.query.endDate ? {
+    const queryOptions: {
+      status?: "proposed" | "accepted" | "rejected" | "superseded";
+      decisionMaker?: string;
+      tag?: string;
+      dateRange?: { start: Date; end: Date };
+      search?: string;
+    } = {};
+    if (req.query.status) {
+      queryOptions.status = req.query.status as "proposed" | "accepted" | "rejected" | "superseded";
+    }
+    if (req.query.decisionMaker) {
+      queryOptions.decisionMaker = req.query.decisionMaker as string;
+    }
+    if (req.query.tag) {
+      queryOptions.tag = req.query.tag as string;
+    }
+    if (req.query.startDate && req.query.endDate) {
+      queryOptions.dateRange = {
         start: new Date(req.query.startDate as string),
         end: new Date(req.query.endDate as string),
-      } : undefined,
-      search: req.query.search as string,
-    });
+      };
+    }
+    if (req.query.search) {
+      queryOptions.search = req.query.search as string;
+    }
+    const decisions = decisionLog.queryDecisions(queryOptions);
 
     res.json({
       data: decisions,
       count: decisions.length,
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to query decisions', 400);
+    return;
   }
 });
 
@@ -61,6 +79,9 @@ router.get('/decisions', async (req: Request, res: Response) => {
 router.get('/decisions/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ error: 'Decision ID is required' });
+    }
     const decision = decisionLog.getDecision(id);
 
     if (!decision) {
@@ -78,8 +99,10 @@ router.get('/decisions/:id', async (req: Request, res: Response) => {
         relatedDecisions: related,
       },
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to get decision', 400);
+    return;
   }
 });
 
@@ -91,6 +114,10 @@ router.patch('/decisions/:id/outcomes', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { outcome } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ error: 'Decision ID is required' });
+    }
 
     if (!outcome) {
       return res.status(400).json({
@@ -104,8 +131,10 @@ router.patch('/decisions/:id/outcomes', async (req: Request, res: Response) => {
       data: decision,
       message: 'Outcome updated successfully',
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to update outcome', 400);
+    return;
   }
 });
 
@@ -117,7 +146,7 @@ router.post('/assistant/query', async (req: Request, res: Response) => {
   try {
     const { question, context } = req.body;
 
-    if (!question) {
+    if (!question || typeof question !== 'string') {
       return res.status(400).json({
         error: 'Missing question',
       });
@@ -131,8 +160,10 @@ router.post('/assistant/query', async (req: Request, res: Response) => {
     res.json({
       data: response,
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to query assistant', 400);
+    return;
   }
 });
 
@@ -160,8 +191,10 @@ router.get('/stats', async (req: Request, res: Response) => {
         },
       },
     });
+    return;
   } catch (error: unknown) {
     handleRouteError(res, error, 'Failed to get stats', 500);
+    return;
   }
 });
 
