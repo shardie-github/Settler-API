@@ -3,9 +3,20 @@
 
 # Run typecheck before lint-staged to catch TypeScript errors early
 echo "🔍 Running TypeScript typecheck..."
+echo "   This ensures no type errors make it into the repository."
+echo ""
+
+# Use turbo's typecheck which is faster and respects dependencies
 npm run typecheck || {
-  echo "❌ TypeScript errors found. Please fix them before committing."
+  echo ""
+  echo "❌ TypeScript errors found!"
+  echo "   Please fix the errors above before committing."
+  echo "   Run 'npm run typecheck' locally to see detailed errors."
   exit 1
 }
 
+echo "✅ Typecheck passed!"
+echo ""
+
+# Run lint-staged for formatting and linting
 npx lint-staged
