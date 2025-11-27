@@ -394,9 +394,9 @@ export function RulesEditor({ jobId }: { jobId?: string }) {
                       <div key={index} className="flex items-center gap-2 p-2 border rounded">
                         <Badge>{rule.type}</Badge>
                         <span className="font-mono text-sm">{rule.field}</span>
-                        {rule.tolerance && <span className="text-xs text-muted-foreground">±{rule.tolerance}</span>}
+                        {rule.tolerance?.amount && <span className="text-xs text-muted-foreground">±{rule.tolerance.amount}</span>}
+                        {rule.tolerance?.days && <span className="text-xs text-muted-foreground">±{rule.tolerance.days}d</span>}
                         {rule.threshold && <span className="text-xs text-muted-foreground">≥{rule.threshold}</span>}
-                        {rule.days && <span className="text-xs text-muted-foreground">±{rule.days}d</span>}
                         <Button
                           size="sm"
                           variant="outline"

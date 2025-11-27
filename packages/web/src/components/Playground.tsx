@@ -9,7 +9,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Play, BarChart3, CheckCircle2, XCircle } from '@/lib/lucide-react';
+import { Play, BarChart3, CheckCircle2, XCircle, AlertTriangle } from '@/lib/lucide-react';
 import { CodeBlock } from '@/components/ui/code-block';
 
 interface PlaygroundExample {
@@ -331,9 +331,9 @@ export function Playground() {
                     <p className="text-sm text-muted-foreground">
                       This was a simulation. Sign up to run real reconciliations with your data.
                     </p>
-                    <Button asChild>
-                      <a href="/signup">Get Started Free</a>
-                    </Button>
+                    <a href="/signup">
+                      <Button>Get Started Free</Button>
+                    </a>
                   </div>
                 </CardContent>
               </Card>
