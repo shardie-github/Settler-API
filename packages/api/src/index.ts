@@ -98,7 +98,7 @@ const ipLimiter = rateLimit({
 app.use("/api/", ipLimiter);
 
 // Body parsing with size and depth limits
-function countDepth(obj: any, current = 0): number {
+function countDepth(obj: unknown, current = 0): number {
   if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
     return current;
   }
@@ -115,8 +115,8 @@ app.use(express.json({
       if (depth > 20) {
         throw new Error('JSON depth exceeds maximum of 20 levels');
       }
-    } catch (error: any) {
-      if (error.message.includes('depth')) {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('depth')) {
         throw error;
       }
       // Ignore JSON parse errors, let express handle them
@@ -133,8 +133,9 @@ initializeTracing();
 if (config.nodeEnv === 'production' || config.nodeEnv === 'preview') {
   try {
     SecretsManager.validateSecrets(REQUIRED_SECRETS);
-  } catch (error: any) {
-    console.error('Secret validation failed:', error.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Secret validation failed:', message);
     process.exit(1);
   }
 }

@@ -45,12 +45,12 @@ export function encodeCursor(created_at: string | Date, id: string): string {
 export function buildCursorWhereClause(
   params: CursorPaginationParams,
   tableAlias: string = ''
-): { whereClause: string; params: any[]; paramIndex: number } {
+): { whereClause: string; params: (string | number)[]; paramIndex: number } {
   const prefix = tableAlias ? `${tableAlias}.` : '';
   const limit = Math.min(params.limit || 100, 1000);
   const direction = params.direction || 'next';
   let paramIndex = 1;
-  const queryParams: any[] = [];
+  const queryParams: (string | number)[] = [];
   let whereClause = '';
 
   if (params.cursor) {
@@ -138,10 +138,10 @@ export function createCursorPaginationResponse<T extends { created_at: Date | st
 /**
  * Parse pagination params from query string
  */
-export function parseCursorPaginationParams(req: any): CursorPaginationParams {
+export function parseCursorPaginationParams(req: { query: Record<string, string | undefined> }): CursorPaginationParams {
   return {
-    cursor: req.query.cursor as string | undefined,
-    limit: req.query.limit ? parseInt(req.query.limit as string, 10) : undefined,
+    cursor: req.query.cursor,
+    limit: req.query.limit ? parseInt(req.query.limit, 10) : undefined,
     direction: (req.query.direction as 'next' | 'prev') || 'next',
   };
 }

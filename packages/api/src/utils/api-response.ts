@@ -5,7 +5,7 @@
 
 import { Response } from 'express';
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   data?: T;
   error?: string;
   message?: string;
@@ -21,7 +21,7 @@ export interface ApiError {
   error: string;
   message: string;
   code?: string;
-  details?: any;
+  details?: unknown;
 }
 
 /**
@@ -53,7 +53,7 @@ export function sendError(
   message: string,
   statusCode: number = 400,
   code?: string,
-  details?: any
+  details?: unknown
 ): void {
   const response: ApiError = {
     error,

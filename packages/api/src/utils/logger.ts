@@ -70,30 +70,31 @@ function shouldLog(): boolean {
 }
 
 // Helper to log with automatic redaction and trace context
-export function logInfo(message: string, meta?: any) {
+export function logInfo(message: string, meta?: Record<string, unknown>) {
   if (!shouldLog()) {
     return;
   }
   logger.info(message, redact(meta));
 }
 
-export function logError(message: string, error?: any, meta?: any) {
+export function logError(message: string, error?: unknown, meta?: Record<string, unknown>) {
   // Always log errors (no sampling)
+  const errorObj = error instanceof Error ? error : { message: String(error) };
   logger.error(message, {
     ...redact(meta),
-    error: error?.message,
-    stack: error?.stack,
+    error: errorObj.message,
+    stack: error instanceof Error ? errorObj.stack : undefined,
   });
 }
 
-export function logWarn(message: string, meta?: any) {
+export function logWarn(message: string, meta?: Record<string, unknown>) {
   if (!shouldLog()) {
     return;
   }
   logger.warn(message, redact(meta));
 }
 
-export function logDebug(message: string, meta?: any) {
+export function logDebug(message: string, meta?: Record<string, unknown>) {
   if (!shouldLog()) {
     return;
   }
@@ -108,7 +109,7 @@ export function logBusinessEvent(
     user_id?: string;
     job_id?: string;
     execution_id?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   }
 ) {
   logger.info(`business_event:${event}`, {
@@ -123,7 +124,7 @@ export function logPerformance(
   durationMs: number,
   meta?: {
     tenant_id?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   }
 ) {
   logger.info(`performance:${operation}`, {

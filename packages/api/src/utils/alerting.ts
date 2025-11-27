@@ -18,7 +18,7 @@ interface Alert {
   severity: 'low' | 'medium' | 'high' | 'critical';
   title: string;
   message: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 // Simple alerting system (for MVP)

@@ -1,3 +1,4 @@
+import { Response, NextFunction } from 'express';
 import { AuthRequest } from "../middleware/auth";
 import { query } from "../db";
 import { config } from "../config";
@@ -81,7 +82,7 @@ export async function checkRateLimit(req: AuthRequest): Promise<{
 }
 
 export function rateLimitMiddleware() {
-  return async (req: AuthRequest, res: any, next: any) => {
+  return async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     const result = await checkRateLimit(req);
 
     res.setHeader('X-RateLimit-Limit', config.rateLimiting.defaultLimit);
@@ -89,11 +90,12 @@ export function rateLimitMiddleware() {
     res.setHeader('X-RateLimit-Reset', new Date(result.resetAt).toISOString());
 
     if (!result.allowed) {
-      return res.status(429).json({
+      res.status(429).json({
         error: 'Too Many Requests',
         message: 'Rate limit exceeded',
         retryAfter: Math.ceil((result.resetAt - Date.now()) / 1000),
       });
+      return;
     }
 
     next();

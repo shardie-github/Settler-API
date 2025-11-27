@@ -12,7 +12,7 @@ interface CacheEntry<T> {
 }
 
 // In-memory cache fallback
-const memoryCache = new Map<string, CacheEntry<any>>();
+const memoryCache = new Map<string, CacheEntry<unknown>>();
 
 // Redis client (lazy initialization)
 let redisClient: Redis | null = null;

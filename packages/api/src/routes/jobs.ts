@@ -86,12 +86,13 @@ router.post(
       const userId = req.userId!;
       const job = await jobService.createJob(userId, req.body);
       sendCreated(res, job, "Reconciliation job created successfully");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to create reconciliation job";
       logError('Failed to create job', error, { userId: req.userId });
       sendError(
         res,
         "Internal Server Error",
-        error.message || "Failed to create reconciliation job",
+        message,
         500
       );
     }
