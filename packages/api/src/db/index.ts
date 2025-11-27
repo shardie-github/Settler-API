@@ -25,9 +25,9 @@ pool.on('error', (err) => {
 });
 
 // Helper function to execute queries
-export async function query<T = any>(
+export async function query<T = Record<string, unknown>>(
   text: string,
-  params?: any[]
+  params?: (string | number | boolean | null | Date)[]
 ): Promise<T[]> {
   const client = await pool.connect();
   try {
@@ -63,9 +63,10 @@ export async function initDatabase(): Promise<void> {
   try {
     // Run all migrations in order
     await runMigrations();
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Fallback to basic schema if migration runner fails
-    console.warn('Migration runner failed, falling back to basic schema:', error.message);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.warn('Migration runner failed, falling back to basic schema:', message);
     
     const fs = require('fs');
     const path = require('path');
@@ -80,12 +81,13 @@ export async function initDatabase(): Promise<void> {
         if (statement.trim() && !statement.trim().startsWith('--')) {
           try {
             await query(statement);
-          } catch (error: any) {
+          } catch (error: unknown) {
             // Ignore "already exists" errors (idempotent migration)
-            if (!error.message.includes('already exists') && 
-                !error.message.includes('duplicate') &&
-                !error.message.includes('already enabled')) {
-              console.warn('Migration warning:', error.message);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            if (!errorMessage.includes('already exists') && 
+                !errorMessage.includes('duplicate') &&
+                !errorMessage.includes('already enabled')) {
+              console.warn('Migration warning:', errorMessage);
             }
           }
         }

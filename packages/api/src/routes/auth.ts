@@ -6,6 +6,7 @@ import { AuthRequest } from "../middleware/auth";
 import { query } from "../db";
 import { hashPassword, verifyPassword, generateApiKey, hashApiKey } from "../utils/hash";
 import { logInfo, logError } from "../utils/logger";
+import { handleRouteError } from "../utils/error-handler";
 import { config } from "../config";
 import { requirePermission } from "../middleware/authorization";
 
@@ -108,12 +109,8 @@ router.post(
           },
         },
       });
-    } catch (error: any) {
-      logError('Login failed', error);
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to login",
-      });
+    } catch (error: unknown) {
+      handleRouteError(res, error, "Failed to login", 500);
     }
   }
 );
@@ -153,18 +150,14 @@ router.post(
             expiresIn: 900,
           },
         });
-      } catch (error: any) {
-        if (error.name === 'TokenExpiredError') {
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === 'TokenExpiredError') {
           return res.status(401).json({ error: "Refresh token expired" });
         }
         throw error;
       }
-    } catch (error: any) {
-      logError('Token refresh failed', error);
-      res.status(401).json({
-        error: "Invalid Token",
-        message: "Failed to refresh token",
-      });
+    } catch (error: unknown) {
+      handleRouteError(res, error, "Failed to refresh token", 401);
     }
   }
 );
@@ -222,12 +215,8 @@ router.post(
         },
         message: "API key created. Store it securely - it will not be shown again.",
       });
-    } catch (error: any) {
-      logError('Failed to create API key', error, { userId: req.userId });
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to create API key",
-      });
+    } catch (error: unknown) {
+      handleRouteError(res, error, "Failed to create API key", 500, { userId: req.userId });
     }
   }
 );

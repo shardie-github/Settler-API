@@ -7,6 +7,7 @@ import { query } from "../db";
 import { verifyWebhookSignature, generateWebhookSignature } from "../utils/webhook-signature";
 import { validateExternalUrl } from "../infrastructure/security/SSRFProtection";
 import { logInfo, logError, logWarn } from "../utils/logger";
+import { handleRouteError } from "../utils/error-handler";
 import rateLimit from "express-rate-limit";
 
 const router = Router();
@@ -91,12 +92,8 @@ router.post(
         },
         message: "Webhook created successfully",
       });
-    } catch (error: any) {
-      logError('Failed to create webhook', error, { userId: req.userId });
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to create webhook",
-      });
+    } catch (error: unknown) {
+      handleRouteError(res, error, "Failed to create webhook", 500, { userId: req.userId });
     }
   }
 );
@@ -151,12 +148,8 @@ router.get(
           totalPages: Math.ceil(total / limit),
         },
       });
-    } catch (error: any) {
-      logError('Failed to fetch webhooks', error, { userId: req.userId });
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to fetch webhooks",
-      });
+    } catch (error: unknown) {
+      handleRouteError(res, error, "Failed to fetch webhooks", 500, { userId: req.userId });
     }
   }
 );
@@ -198,9 +191,10 @@ router.post(
           logWarn('Invalid webhook signature', { adapter, ip: req.ip });
           return res.status(401).json({ error: "Invalid webhook signature" });
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Webhook signature verification failed';
         logError('Webhook signature verification failed', error, { adapter });
-        return res.status(400).json({ error: error.message });
+        return res.status(400).json({ error: message });
       }
 
       // Store webhook payload for async processing
@@ -218,12 +212,8 @@ router.post(
         received: true,
         message: "Webhook received and queued for processing",
       });
-    } catch (error: any) {
-      logError('Failed to process webhook', error, { adapter: req.params.adapter });
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to process webhook",
-      });
+    } catch (error: unknown) {
+      handleRouteError(res, error, "Failed to process webhook", 500, { adapter: req.params.adapter });
     }
   }
 );
@@ -240,7 +230,7 @@ router.delete(
 
       // Check ownership
       await new Promise<void>((resolve, reject) => {
-        requireResourceOwnership(req, res, (err?: any) => {
+        requireResourceOwnership(req, res, (err?: unknown) => {
           if (err) reject(err);
           else resolve();
         }, 'webhook', id);
@@ -265,12 +255,8 @@ router.delete(
       logInfo('Webhook deleted', { webhookId: id, userId });
 
       res.status(204).send();
-    } catch (error: any) {
-      logError('Failed to delete webhook', error, { userId: req.userId, webhookId: req.params.id });
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to delete webhook",
-      });
+    } catch (error: unknown) {
+      handleRouteError(res, error, "Failed to delete webhook", 500, { userId: req.userId, webhookId: req.params.id });
     }
   }
 );

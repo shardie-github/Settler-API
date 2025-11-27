@@ -6,6 +6,7 @@
 import { Response } from 'express';
 import { sendError } from './api-response';
 import { logError } from './logger';
+import { ApiError, isApiError, toApiError } from './typed-errors';
 
 /**
  * Safely extracts error message from unknown error type
@@ -32,6 +33,7 @@ export function getErrorStack(error: unknown): string | undefined {
 
 /**
  * Checks if error is a known error type with status code
+ * @deprecated Use isApiError from typed-errors instead
  */
 export interface HttpError extends Error {
   statusCode?: number;
@@ -40,7 +42,7 @@ export interface HttpError extends Error {
 }
 
 export function isHttpError(error: unknown): error is HttpError {
-  return (
+  return isApiError(error) || (
     error instanceof Error &&
     'statusCode' in error &&
     typeof (error as HttpError).statusCode === 'number'
@@ -57,12 +59,13 @@ export function handleRouteError(
   defaultStatusCode: number = 500,
   context?: Record<string, unknown>
 ): void {
-  const message = getErrorMessage(error);
-  const statusCode = isHttpError(error) ? error.statusCode ?? defaultStatusCode : defaultStatusCode;
-  const code = isHttpError(error) ? error.code : undefined;
-  const details = isHttpError(error) ? error.details : undefined;
+  const apiError = toApiError(error);
+  const message = apiError.message || defaultMessage;
+  const statusCode = apiError.statusCode;
+  const errorCode = apiError.errorCode;
+  const details = apiError.details;
 
   logError(defaultMessage, error, context);
 
-  sendError(res, 'Internal Server Error', message, statusCode, code, details);
+  sendError(res, apiError.name, message, statusCode, errorCode, details);
 }

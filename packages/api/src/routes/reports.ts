@@ -5,6 +5,7 @@ import { AuthRequest } from "../middleware/auth";
 import { requirePermission, requireResourceOwnership } from "../middleware/authorization";
 import { query } from "../db";
 import { logInfo, logError } from "../utils/logger";
+import { handleRouteError } from "../utils/error-handler";
 
 const router = Router();
 
@@ -187,12 +188,8 @@ router.get(
           },
         });
       }
-    } catch (error: any) {
-      logError('Failed to generate report', error, { userId: req.userId, jobId: req.params.jobId });
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to generate report",
-      });
+    } catch (error: unknown) {
+      handleRouteError(res, error, "Failed to generate report", 500, { userId: req.userId, jobId: req.params.jobId });
     }
   }
 );
@@ -213,7 +210,7 @@ router.get(
         query<{
           id: string;
           job_id: string;
-          summary: any;
+          summary: Record<string, unknown>;
           generated_at: Date;
         }>(
           `SELECT r.id, r.job_id, r.summary, r.generated_at
@@ -249,12 +246,8 @@ router.get(
           totalPages: Math.ceil(total / limit),
         },
       });
-    } catch (error: any) {
-      logError('Failed to fetch reports', error, { userId: req.userId });
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to fetch reports",
-      });
+    } catch (error: unknown) {
+      handleRouteError(res, error, "Failed to fetch reports", 500, { userId: req.userId });
     }
   }
 );

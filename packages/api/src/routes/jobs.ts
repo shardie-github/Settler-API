@@ -8,6 +8,7 @@ import { logInfo, logError } from "../utils/logger";
 import { Mutex } from "async-mutex";
 import { JobRouteService } from "../application/services/JobRouteService";
 import { sendSuccess, sendError, sendPaginated, sendCreated, sendNoContent } from "../utils/api-response";
+import { handleRouteError } from "../utils/error-handler";
 
 const router = Router();
 const jobService = new JobRouteService();
@@ -148,12 +149,8 @@ router.get(
           totalPages: Math.ceil(total / limit),
         },
       });
-    } catch (error: any) {
-      logError('Failed to fetch jobs', error, { userId: req.userId });
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to fetch jobs",
-      });
+    } catch (error: unknown) {
+      handleRouteError(res, error, "Failed to fetch jobs", 500, { userId: req.userId });
     }
   }
 );
@@ -170,7 +167,7 @@ router.get(
 
       // Check ownership
       await new Promise<void>((resolve, reject) => {
-        requireResourceOwnership(req, res, (err?: any) => {
+        requireResourceOwnership(req, res, (err?: unknown) => {
           if (err) reject(err);
           else resolve();
         }, 'job', id);
@@ -182,9 +179,8 @@ router.get(
       }
 
       sendSuccess(res, job);
-    } catch (error: any) {
-      logError('Failed to fetch job', error, { userId: req.userId, jobId: req.params.id });
-      sendError(res, "Internal Server Error", "Failed to fetch job", 500);
+    } catch (error: unknown) {
+      handleRouteError(res, error, "Failed to fetch job", 500, { userId: req.userId, jobId: req.params.id });
     }
   }
 );
@@ -196,14 +192,14 @@ router.post(
   validateRequest(getJobSchema),
   async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
-    const userId = req.userId!;
+      const userId = req.userId!;
     const mutex = getJobMutex(id);
 
     const release = await mutex.acquire();
     try {
       // Check ownership
       await new Promise<void>((resolve, reject) => {
-        requireResourceOwnership(req, res, (err?: any) => {
+        requireResourceOwnership(req, res, (err?: unknown) => {
           if (err) reject(err);
           else resolve();
         }, 'job', id);
@@ -297,12 +293,8 @@ router.post(
         },
         message: "Job execution started",
       });
-    } catch (error: any) {
-      logError('Failed to start job execution', error, { userId, jobId: id });
-      res.status(500).json({
-        error: "Internal Server Error",
-        message: "Failed to start job execution",
-      });
+    } catch (error: unknown) {
+      handleRouteError(res, error, "Failed to start job execution", 500, { userId, jobId: id });
     } finally {
       release();
     }
@@ -321,7 +313,7 @@ router.delete(
 
       // Check ownership
       await new Promise<void>((resolve, reject) => {
-        requireResourceOwnership(req, res, (err?: any) => {
+        requireResourceOwnership(req, res, (err?: unknown) => {
           if (err) reject(err);
           else resolve();
         }, 'job', id);
@@ -333,9 +325,8 @@ router.delete(
       }
 
       sendNoContent(res);
-    } catch (error: any) {
-      logError('Failed to delete job', error, { userId: req.userId, jobId: req.params.id });
-      sendError(res, "Internal Server Error", "Failed to delete job", 500);
+    } catch (error: unknown) {
+      handleRouteError(res, error, "Failed to delete job", 500, { userId: req.userId, jobId: req.params.id });
     }
   }
 );
