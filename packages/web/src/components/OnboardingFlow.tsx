@@ -34,7 +34,7 @@ export default function OnboardingFlow({ apiKey, onComplete }: OnboardingFlowPro
       setLoading(true);
       setError(null);
 
-      const job = await client.jobs.create({
+      await client.jobs.create({
         name: formData.name,
         source: {
           adapter: formData.sourceAdapter,

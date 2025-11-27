@@ -25,26 +25,27 @@ interface ExecutionUpdate {
   };
 }
 
-interface RealtimeDashboardProps {
-  jobId: string;
-  apiKey: string;
+interface PageProps {
+  params?: Record<string, string | string[] | undefined>;
+  searchParams?: Record<string, string | string[] | undefined>;
 }
 
-export default function RealtimeDashboard({ jobId, apiKey }: RealtimeDashboardProps) {
+export default function RealtimeDashboard({ params, searchParams }: PageProps) {
+  const jobId = (params?.jobId as string | undefined) || (searchParams?.jobId as string | undefined) || '';
+  const apiKey = (searchParams?.apiKey as string | undefined) || '';
   const [connected, setConnected] = useState(false);
   const [execution, setExecution] = useState<ExecutionUpdate | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
 
   useEffect(() => {
-    const eventSource = new EventSource(
-      `/api/v1/realtime/reconciliations/${jobId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-        },
-      }
-    );
+    if (!jobId || !apiKey) {
+      return;
+    }
+
+    // EventSource doesn't support custom headers, so we use fetch with streaming
+    const url = `/api/v1/realtime/reconciliations/${jobId}?token=${encodeURIComponent(apiKey)}`;
+    const eventSource = new EventSource(url);
 
     eventSource.onopen = () => {
       setConnected(true);

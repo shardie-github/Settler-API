@@ -10,7 +10,7 @@ interface DashboardProps {
 interface Job {
   id: string;
   name: string;
-  status: "active" | "paused" | "completed" | "failed";
+  status: "active" | "paused" | "archived";
   lastRun?: string;
   nextRun?: string;
   summary?: {
@@ -33,7 +33,7 @@ export default function Dashboard({ apiKey }: DashboardProps) {
   async function loadJobs() {
     try {
       setLoading(true);
-      const response = await client.jobs.list({ page: 1, limit: 100 });
+      const response = await client.jobs.list({ limit: 100 });
       setJobs(response.data || []);
     } catch (error) {
       console.error("Failed to load jobs:", error);
@@ -82,9 +82,9 @@ export default function Dashboard({ apiKey }: DashboardProps) {
             icon="✅"
           />
           <StatCard
-            title="Failed Jobs"
-            value={jobs.filter((j) => j.status === "failed").length}
-            icon="❌"
+            title="Archived Jobs"
+            value={jobs.filter((j) => j.status === "archived").length}
+            icon="📦"
           />
           <StatCard
             title="Total Matched"
@@ -122,7 +122,6 @@ export default function Dashboard({ apiKey }: DashboardProps) {
             job={selectedJob}
             client={client}
             onClose={() => setSelectedJob(null)}
-            onUpdate={loadJobs}
           />
         )}
       </div>
@@ -164,8 +163,7 @@ function JobRow({
   const statusColors = {
     active: "bg-green-100 text-green-800",
     paused: "bg-yellow-100 text-yellow-800",
-    completed: "bg-blue-100 text-blue-800",
-    failed: "bg-red-100 text-red-800",
+    archived: "bg-gray-100 text-gray-800",
   };
 
   return (
@@ -221,12 +219,10 @@ function JobDetailModal({
   job,
   client,
   onClose,
-  onUpdate,
 }: {
   job: Job;
   client: SettlerClient;
   onClose: () => void;
-  onUpdate: () => void;
 }) {
   const [report, setReport] = useState<{
     summary?: {
@@ -249,8 +245,8 @@ function JobDetailModal({
   async function loadReport() {
     try {
       setLoading(true);
-      const data = await client.reports.get(job.id);
-      setReport(data);
+      const response = await client.reports.get(job.id);
+      setReport(response.data);
     } catch (error) {
       console.error("Failed to load report:", error);
     } finally {

@@ -5,6 +5,7 @@ import { SettlerClient } from "@settler/sdk";
 
 interface AuditTrailProps {
   client: SettlerClient;
+  apiKey: string;
   jobId?: string;
 }
 
@@ -16,7 +17,7 @@ interface AuditLog {
   metadata?: Record<string, unknown>;
 }
 
-export default function AuditTrail({ client, jobId }: AuditTrailProps) {
+export default function AuditTrail({ client, apiKey, jobId }: AuditTrailProps) {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
@@ -34,7 +35,7 @@ export default function AuditTrail({ client, jobId }: AuditTrailProps) {
         `/api/v1/audit-logs${jobId ? `?job_id=${jobId}` : ""}${filter !== "all" ? `&event=${filter}` : ""}`,
         {
           headers: {
-            Authorization: `Bearer ${(client as { apiKey?: string }).apiKey || ''}`,
+            Authorization: `Bearer ${apiKey}`,
           },
         }
       );
