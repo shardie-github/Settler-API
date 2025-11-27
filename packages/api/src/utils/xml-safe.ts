@@ -19,7 +19,7 @@ export function safeParseXML(xml: string): Promise<any> {
       // CRITICAL: Disable external entities to prevent XXE
       // This is the default, but explicitly set for security
       // noEnt: false, // Must be false (default)
-    }, (err, result) => {
+    }, (err: Error | null, result: any) => {
       if (err) {
         reject(err);
       } else {
