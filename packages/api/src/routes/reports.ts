@@ -6,6 +6,7 @@ import { requirePermission, requireResourceOwnership } from "../middleware/autho
 import { query } from "../db";
 import { logInfo, logError } from "../utils/logger";
 import { handleRouteError } from "../utils/error-handler";
+import { handleEnhancedError } from "../utils/enhanced-error-handler";
 
 const router = Router();
 

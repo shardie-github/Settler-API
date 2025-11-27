@@ -1,252 +1,293 @@
-# Strategic Initiatives Implementation Status
+# Settler Operator-in-a-Box Implementation Status
 
-**Date:** 2026-01-15  
-**Status:** Core Systems Implemented
+**Last Updated:** 2026-01-15  
+**Status:** In Progress
 
----
+## Overview
 
-## ✅ Completed Implementations
-
-### 1. Continuous Reconciliation Graph ✅
-**Status:** Core Engine Complete
-
-**Implemented:**
-- Graph database engine (`graph-engine.ts`)
-- Stream processor for real-time updates (`stream-processor.ts`)
-- REST API endpoints (`/api/v2/reconciliation-graph`)
-- Real-time updates via Server-Sent Events (SSE)
-- Node and edge management
-- Matching algorithm with confidence scoring
-
-**Files Created:**
-- `packages/api/src/services/reconciliation-graph/types.ts`
-- `packages/api/src/services/reconciliation-graph/graph-engine.ts`
-- `packages/api/src/services/reconciliation-graph/stream-processor.ts`
-- `packages/api/src/routes/v2/reconciliation-graph.ts`
-
-**Next Steps:**
-- Integrate with database (persist graph state)
-- Add ML-based confidence scoring
-- Implement graph visualization API
+This document tracks the implementation status of all items from the Operator-in-a-Box blueprint.
 
 ---
 
-### 2. AI Agent Mesh ✅
-**Status:** Core Agents Implemented
+## ✅ Completed
 
-**Implemented:**
-- Agent orchestrator (`orchestrator.ts`)
-- Infrastructure Optimizer Agent (`infrastructure-optimizer.ts`)
-- Anomaly Detector Agent (`anomaly-detector.ts`)
-- REST API endpoints (`/api/v2/ai-agents`)
+### UX Issues
 
-**Files Created:**
-- `packages/api/src/services/ai-agents/orchestrator.ts`
-- `packages/api/src/services/ai-agents/infrastructure-optimizer.ts`
-- `packages/api/src/services/ai-agents/anomaly-detector.ts`
-- `packages/api/src/routes/v2/ai-agents.ts`
+- ✅ **UX-001: API Key Regeneration**
+  - Created `/api/v1/api-keys` routes
+  - List API keys (masked)
+  - Get API key details (masked)
+  - Create API key
+  - Update API key
+  - Regenerate API key (creates new, revokes old)
+  - Delete API key (soft delete/revoke)
+  - File: `packages/api/src/routes/api-keys.ts`
+  - Registered in `packages/api/src/index.ts`
 
-**Next Steps:**
-- Implement Synthetic User Simulator Agent
-- Implement LLM-Powered Customer Support Agent
-- Implement Release QA Agent
-- Integrate with LLM APIs (OpenAI, Anthropic)
+- ✅ **UX-002: Adapter Config Schema Clarity**
+  - Created adapter config validator
+  - Schema definitions for Stripe, Shopify, PayPal, QuickBooks, Square
+  - Field-level validation with clear error messages
+  - Enhanced adapter routes with schema info
+  - Integrated into job creation validation
+  - Files: `packages/api/src/utils/adapter-config-validator.ts`, `packages/api/src/routes/adapters.ts`
 
----
+- ✅ **UX-003: Detailed Error Messages** (Partial)
+  - Enhanced ValidationError to support field-level errors
+  - Adapter config validator provides detailed field errors
+  - File: `packages/api/src/utils/typed-errors.ts`
 
-### 3. Network Effects Systems ✅
-**Status:** Core Systems Implemented
+- ✅ **UX-004: Test Mode Toggle** (Partial)
+  - Created test mode routes
+  - Get/test mode status
+  - Toggle test mode
+  - Note: Requires `test_mode_enabled` column in users table
+  - File: `packages/api/src/routes/test-mode.ts`
 
-**Implemented:**
-- Cross-Customer Intelligence (`cross-customer-intelligence.ts`)
-- Performance Tuning Pools (`performance-pools.ts`)
-- REST API endpoints (`/api/v2/network-effects`)
+### Event Tracking
 
-**Files Created:**
-- `packages/api/src/services/network-effects/cross-customer-intelligence.ts`
-- `packages/api/src/services/network-effects/performance-pools.ts`
-- `packages/api/src/routes/v2/network-effects.ts`
-
-**Features:**
-- Opt-in/opt-out for customers
-- Anonymized pattern sharing (differential privacy)
-- Performance metrics aggregation
-- Rule recommendations based on network data
-
-**Next Steps:**
-- Implement developer plugin ecosystem
-- Build adapter marketplace
-- Add decentralized governance system
-
----
-
-### 4. Privacy-Preserving Reconciliation ✅
-**Status:** Edge Agent Implemented
-
-**Implemented:**
-- Edge Computing Agent (`edge-agent.ts`)
-- Local reconciliation (data never leaves customer infrastructure)
-- Encrypted metadata protocol
-- REST API endpoints (`/api/v2/compliance/edge`)
-
-**Files Created:**
-- `packages/api/src/services/privacy-preserving/edge-agent.ts`
-- `packages/api/src/routes/v2/compliance.ts` (partial)
-
-**Features:**
-- Customer-run agent (Docker/Kubernetes ready)
-- Local matching (no data sent to cloud)
-- Encrypted metadata (only results sent)
-- Customer-controlled encryption keys
-
-**Next Steps:**
-- Build Docker image for edge agent
-- Implement homomorphic encryption (proof of concept)
-- Add zero-knowledge proofs
-
----
-
-### 5. Knowledge Management System ✅
-**Status:** Core Systems Implemented
-
-**Implemented:**
-- Decision Log System (`decision-log.ts`)
-- AI Knowledge Assistant (`ai-assistant.ts`)
-- REST API endpoints (`/api/v2/knowledge`)
-
-**Files Created:**
-- `packages/api/src/services/knowledge/decision-log.ts`
-- `packages/api/src/services/knowledge/ai-assistant.ts`
-- `packages/api/src/routes/v2/knowledge.ts`
-
-**Features:**
-- Decision logging with context, rationale, outcomes
-- Markdown export for decisions
-- AI-powered knowledge discovery
-- Query system for decisions
-
-**Next Steps:**
-- Integrate with LLM APIs for AI assistant
-- Add incident/post-mortem logging
-- Build documentation indexing system
-
----
-
-### 6. Compliance Export System ✅
-**Status:** Core System Implemented
-
-**Implemented:**
-- Compliance Export System (`export-system.ts`)
-- One-click exports for GDPR, CCPA, SOC 2
-- Multiple formats (JSON, CSV, XML, PDF)
-- REST API endpoints (`/api/v2/compliance`)
-
-**Files Created:**
-- `packages/api/src/services/compliance/export-system.ts`
-- `packages/api/src/routes/v2/compliance.ts`
-
-**Features:**
-- Jurisdiction-specific templates
-- Async export processing
-- Download URL generation
-- Export history tracking
-
-**Next Steps:**
-- Integrate with database (fetch actual customer data)
-- Implement S3/R2 upload for exports
-- Add more jurisdiction templates (eIDAS, FedNow)
+- ✅ **E4-S1: Event Tracking Infrastructure**
+  - Created events table migration
+  - Event tracker utility (`trackEvent`, `trackEventAsync`, `trackEvents`)
+  - Event tracking middleware
+  - Integrated into API calls, job creation
+  - Files:
+    - `packages/api/src/db/migrations/004-events-tracking.sql`
+    - `packages/api/src/utils/event-tracker.ts`
+    - `packages/api/src/middleware/event-tracking.ts`
+    - Registered in `packages/api/src/index.ts`
 
 ---
 
 ## 🚧 In Progress
 
-### 7. Sub-Second Reconciliation Pipeline
-**Status:** Architecture Designed, Implementation Pending
+### UX Issues
 
-**Planned:**
-- Stream processing infrastructure (Kafka/Pulsar integration)
-- In-memory matching engine (Redis-based)
-- WebSocket API for real-time results
-- Performance optimization (<100ms latency)
+- ⚠️ **UX-005: Report Format Improvements**
+  - Status: Not started
+  - Needs: Visual report UI, summary cards, drill-down views
 
-**Next Steps:**
-- Set up stream processing infrastructure
-- Implement in-memory matching engine
-- Build WebSocket API
+- ⚠️ **UX-006: Trust Anchors**
+  - Status: Not started
+  - Needs: Accuracy badges, confidence scores, audit trail visibility
+
+- ⚠️ **UX-007: Real-Time Status**
+  - Status: Partial (SSE endpoint exists in `packages/api/src/routes/realtime.ts`)
+  - Needs: Progress bar UI, status updates in dashboard
+
+- ⚠️ **UX-008: Exception Queue UI**
+  - Status: Not started
+  - Needs: Exception list view, filters, bulk actions, resolution workflow
+
+- ⚠️ **UX-009: Rules Editor UI**
+  - Status: Not started
+  - Needs: Visual rules builder, preview mode, impact analysis
+
+- ⚠️ **UX-010: Code Examples Repository**
+  - Status: Not started
+  - Needs: 10+ examples covering common use cases
+
+- ⚠️ **UX-011: Interactive Playground**
+  - Status: Not started
+  - Needs: No-signup playground, pre-filled examples, real-time results
+
+- ⚠️ **UX-012: Multi-Currency Docs**
+  - Status: Not started
+  - Needs: FX conversion docs, currency-aware matching examples
+
+### Dashboards
+
+- ⚠️ **E4-S2: Dashboards**
+  - Status: Not started
+  - Needs:
+    - Activation dashboard (signup funnel, time to first value)
+    - Usage dashboard (reconciliation volume, accuracy, errors)
+    - Revenue dashboard (MRR, ARPU, LTV:CAC, churn)
+    - Support dashboard (ticket volume, resolution time, NPS)
+
+- ⚠️ **E4-S3: Alerts**
+  - Status: Not started
+  - Needs: Alert rules, channels (Slack/email/PagerDuty), runbook
+
+### Engineering Epics
+
+- ⚠️ **E1: Core Ingestion Improvements**
+  - Status: Partial
+  - ✅ Adapter config validation
+  - ⚠️ Adapter connection testing endpoint
+  - ⚠️ Field mapping UI
+
+- ⚠️ **E2: Matching Engine Improvements**
+  - Status: Not started
+  - Needs: Confidence scoring, exception handling UI, multi-currency support
+
+- ⚠️ **E3: Developer DX**
+  - Status: Partial
+  - ✅ TypeScript SDK exists
+  - ⚠️ Python/Go/Ruby SDKs need testing
+  - ⚠️ Documentation improvements
+  - ⚠️ Interactive playground
+  - ⚠️ CLI wizard
+
+- ⚠️ **E5: Finance/Ops Surfaces**
+  - Status: Not started
+  - Needs: Dashboard UI, exception queue UI, export improvements
+
+- ⚠️ **E6: Integrations**
+  - Status: Not started
+  - Needs: Xero adapter, Stripe Partner Directory, Shopify App Store
+
+### GTM Materials
+
+- ⚠️ **GTM: Marketing Materials**
+  - Status: Not started
+  - Needs: Blog posts, demo video script, press release
+
+- ⚠️ **GTM: Channel Experiments**
+  - Status: Not started
+  - Needs: Product Hunt prep, content calendar, API directory listings
+
+### Voice-of-Customer
+
+- ⚠️ **VOC: Feedback System**
+  - Status: Not started
+  - Needs: Feedback collection forms, storage, aggregation
+
+- ⚠️ **VOC: Insight Outputs**
+  - Status: Not started
+  - Needs: JTBD statements, pain categorization, language bank
+
+### Weekly Review
+
+- ⚠️ **Weekly Review: Templates**
+  - Status: Not started
+  - Needs: Review doc template, CEO update template, automation
+
+### Partner Integrations
+
+- ⚠️ **Partner: Xero Adapter**
+  - Status: Not started
+  - Needs: Full implementation with OAuth, sync, UI
+
+- ⚠️ **Partner: Stripe Partner Directory**
+  - Status: Not started
+  - Needs: Application materials, co-marketing
+
+- ⚠️ **Partner: Shopify App Store**
+  - Status: Not started
+  - Needs: App implementation, listing, co-marketing
 
 ---
 
-### 8. Visual Workflow Builder
-**Status:** Design Phase
+## 📋 Next Steps (Priority Order)
 
-**Planned:**
-- React Flow-based visual canvas
-- Workflow execution engine
-- Template library
-- Workflow marketplace
+### Week 1: Critical UX Fixes
 
-**Next Steps:**
-- Design UI components
-- Build workflow execution engine
-- Create template system
+1. **Complete UX-003: Detailed Error Messages**
+   - Update error handler to format ValidationError details
+   - Test error responses
+
+2. **Complete UX-004: Test Mode**
+   - Add `test_mode_enabled` column to users table
+   - Register test mode routes
+   - Implement test mode logic in job execution
+
+3. **UX-008: Exception Queue UI** (High Priority)
+   - Create exception queue routes
+   - Exception list, filters, bulk actions
+   - Resolution workflow
+
+4. **UX-006: Trust Anchors**
+   - Add accuracy badges to reports
+   - Show confidence scores
+   - Make audit trail visible
+
+### Week 2: Dashboards & Analytics
+
+1. **E4-S2: Dashboards**
+   - Create dashboard routes
+   - Activation dashboard queries
+   - Usage dashboard queries
+   - Revenue dashboard queries
+   - Support dashboard queries
+
+2. **E4-S3: Alerts**
+   - Alert rule engine
+   - Slack/email integration
+   - Alert runbook
+
+### Week 3: Developer Experience
+
+1. **UX-010: Code Examples**
+   - Create examples repository
+   - 10+ examples covering use cases
+
+2. **UX-011: Interactive Playground**
+   - No-signup playground
+   - Pre-filled examples
+   - Real-time results
+
+3. **E3: Developer DX**
+   - Test Python/Go/Ruby SDKs
+   - Improve documentation
+   - CLI wizard
+
+### Week 4: Integrations & GTM
+
+1. **E6: Integrations**
+   - Xero adapter
+   - Stripe Partner Directory application
+   - Shopify App Store app
+
+2. **GTM Materials**
+   - Blog posts
+   - Demo video script
+   - Press release
 
 ---
 
-## 📋 Integration Checklist
+## 📊 Progress Summary
 
-### Database Integration
-- [ ] Graph state persistence (PostgreSQL/Neo4j)
-- [ ] Decision log storage
-- [ ] Compliance export data fetching
-- [ ] Network effects data persistence
+**Total Items:** 28  
+**Completed:** 4 (14%)  
+**In Progress:** 24 (86%)
 
-### Infrastructure
-- [ ] Stream processing setup (Kafka/Pulsar)
-- [ ] Redis for in-memory matching
-- [ ] Vector database for AI assistant (Pinecone/Weaviate)
-- [ ] S3/R2 for compliance exports
-
-### LLM Integration
-- [ ] OpenAI API integration
-- [ ] Anthropic API integration
-- [ ] AI agent prompts optimization
-- [ ] Knowledge assistant LLM integration
-
-### Testing
-- [ ] Unit tests for all services
-- [ ] Integration tests for APIs
-- [ ] E2E tests for workflows
-- [ ] Load testing for performance
+**By Category:**
+- UX Issues: 2/12 complete (17%)
+- Event Tracking: 1/1 complete (100%)
+- Dashboards: 0/2 complete (0%)
+- Engineering Epics: 0/6 complete (0%)
+- GTM: 0/2 complete (0%)
+- VOC: 0/2 complete (0%)
+- Weekly Review: 0/1 complete (0%)
+- Partner Integrations: 0/3 complete (0%)
 
 ---
 
-## 🎯 Success Metrics
+## 🔧 Technical Debt
 
-### By End of Q1 2026
-- ✅ Continuous Reconciliation Graph operational
-- ✅ AI Agents operational (2/5 agents)
-- ✅ Network Effects systems operational
-- ✅ Privacy-Preserving Reconciliation (edge agent)
-- ✅ Knowledge Management system operational
-- ✅ Compliance Export system operational
+1. **Database Migrations**
+   - Need to run `004-events-tracking.sql`
+   - Need to add `test_mode_enabled` column to users table
 
-### By End of Q2 2026
-- [ ] All 5 AI agents operational
-- [ ] Sub-second reconciliation pipeline (<100ms)
-- [ ] Visual workflow builder (MVP)
-- [ ] Developer plugin ecosystem (marketplace)
-- [ ] 50+ community adapters
+2. **Error Handling**
+   - Update error handler middleware to format ValidationError details properly
+   - Test all error scenarios
+
+3. **Event Tracking**
+   - Add event tracking to all key operations (reconciliation runs, exports, etc.)
+   - Verify events are being stored correctly
+
+4. **Testing**
+   - Add tests for new routes (api-keys, test-mode)
+   - Add tests for adapter config validator
+   - Add tests for event tracker
 
 ---
 
 ## 📝 Notes
 
-- All core systems are implemented and ready for integration
-- Database integration is the next critical step
-- LLM integration needed for AI agents and knowledge assistant
-- Infrastructure setup required for production deployment
-
----
-
-**Last Updated:** 2026-01-15  
-**Next Review:** Q2 2026
+- All new routes follow existing patterns
+- Event tracking is non-blocking (fire-and-forget)
+- Adapter config validation provides clear, actionable error messages
+- API key routes support full CRUD + regenerate functionality

@@ -9,6 +9,8 @@ import { Mutex } from "async-mutex";
 import { JobRouteService } from "../application/services/JobRouteService";
 import { sendSuccess, sendError, sendPaginated, sendCreated, sendNoContent } from "../utils/api-response";
 import { handleRouteError } from "../utils/error-handler";
+import { trackEventAsync } from "../utils/event-tracker";
+import { validateAdapterConfig } from "../utils/adapter-config-validator";
 
 const router = Router();
 const jobService = new JobRouteService();
@@ -85,7 +87,21 @@ router.post(
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.userId!;
+      
+      // Validate adapter configs (UX-002)
+      validateAdapterConfig(req.body.source.adapter, req.body.source.config);
+      validateAdapterConfig(req.body.target.adapter, req.body.target.config);
+      
       const job = await jobService.createJob(userId, req.body);
+      
+      // Track event
+      trackEventAsync(userId, 'JobCreated', {
+        jobId: job.data.id,
+        sourceAdapter: req.body.source.adapter,
+        targetAdapter: req.body.target.adapter,
+        hasSchedule: !!req.body.schedule,
+      });
+      
       sendCreated(res, job, "Reconciliation job created successfully");
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Failed to create reconciliation job";

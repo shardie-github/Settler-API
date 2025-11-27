@@ -34,10 +34,23 @@ export class ValidationError extends ApiError {
   readonly statusCode = 400;
   readonly errorCode = 'VALIDATION_ERROR';
   readonly field?: string;
+  readonly details?: Array<{
+    field: string;
+    message: string;
+    code: string;
+  }>;
 
-  constructor(message: string, field?: string, details?: unknown) {
+  constructor(
+    message: string,
+    field?: string,
+    details?: unknown
+  ) {
     super(message, details);
     this.field = field;
+    // If details is an array of field errors, use it
+    if (Array.isArray(details)) {
+      this.details = details;
+    }
   }
 }
 

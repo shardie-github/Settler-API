@@ -7,3 +7,4 @@ export * from "./paypal-enhanced";
 export * from "./square-enhanced";
 export * from "./shopify";
 export * from "./quickbooks";
+export * from "./xero";

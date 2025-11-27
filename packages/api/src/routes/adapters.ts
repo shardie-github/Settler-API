@@ -3,55 +3,31 @@ import { AuthRequest } from "../middleware/auth";
 import { get, set } from "../utils/cache";
 import { logError } from "../utils/logger";
 import { handleRouteError } from "../utils/error-handler";
+import { listAdapters, getAdapterConfigSchema } from "../utils/adapter-config-validator";
 
 const router = Router();
 
-const ADAPTERS = [
-  {
-    id: "stripe",
-    name: "Stripe",
-    description: "Reconcile Stripe payments and charges",
-    version: "1.0.0",
-    config: {
-      required: ["apiKey"],
-      optional: ["webhookSecret"],
-    },
-    supportedEvents: ["payment.succeeded", "charge.refunded"],
+// Get adapters from validator (UX-002)
+const ADAPTERS = listAdapters().map(adapter => ({
+  id: adapter.id,
+  name: adapter.name,
+  description: `Reconcile ${adapter.name} transactions`,
+  version: "1.0.0",
+  config: {
+    required: adapter.configSchema.required,
+    optional: adapter.configSchema.optional || [],
+    fields: adapter.configSchema.fields,
   },
-  {
-    id: "shopify",
-    name: "Shopify",
-    description: "Reconcile Shopify orders and transactions",
-    version: "1.0.0",
-    config: {
-      required: ["apiKey", "shopDomain"],
-      optional: ["webhookSecret"],
-    },
-    supportedEvents: ["order.created", "order.updated", "transaction.created"],
-  },
-  {
-    id: "quickbooks",
-    name: "QuickBooks",
-    description: "Reconcile QuickBooks transactions",
-    version: "1.0.0",
-    config: {
-      required: ["clientId", "clientSecret", "realmId"],
-      optional: ["sandbox"],
-    },
-    supportedEvents: ["transaction.created", "transaction.updated"],
-  },
-  {
-    id: "paypal",
-    name: "PayPal",
-    description: "Reconcile PayPal transactions",
-    version: "1.0.0",
-    config: {
-      required: ["clientId", "clientSecret"],
-      optional: ["sandbox"],
-    },
-    supportedEvents: ["payment.completed", "refund.completed"],
-  },
-];
+  supportedEvents: adapter.id === 'stripe' 
+    ? ["payment.succeeded", "charge.refunded"]
+    : adapter.id === 'shopify'
+    ? ["order.created", "order.updated", "transaction.created"]
+    : adapter.id === 'quickbooks'
+    ? ["transaction.created", "transaction.updated"]
+    : adapter.id === 'paypal'
+    ? ["payment.completed", "refund.completed"]
+    : [],
+}));
 
 // List available adapters (cached)
 router.get("/", async (req: Request, res: Response) => {
@@ -78,20 +54,28 @@ router.get("/", async (req: Request, res: Response) => {
   }
 });
 
-// Get adapter details
+// Get adapter details (UX-002: Enhanced with schema)
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     
-    // In production, fetch from adapter registry
+    const schema = getAdapterConfigSchema(id);
+    if (!schema) {
+      return res.status(404).json({
+        error: "Not Found",
+        message: `Adapter '${id}' not found`,
+      });
+    }
+
     const adapter = {
       id,
       name: id.charAt(0).toUpperCase() + id.slice(1),
       description: `Adapter for ${id}`,
       version: "1.0.0",
       config: {
-        required: ["apiKey"],
-        optional: [],
+        required: schema.required,
+        optional: schema.optional || [],
+        fields: schema.fields,
       },
       documentation: `https://docs.settler.io/adapters/${id}`,
     };
