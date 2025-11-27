@@ -143,7 +143,7 @@ export const REQUIRED_SECRETS: SecretConfig[] = [
   },
 ];
 
-// Validate secrets on module load (in production)
-if (config.nodeEnv === 'production') {
+// Validate secrets on module load (in production and preview)
+if (config.nodeEnv === 'production' || config.nodeEnv === 'preview') {
   SecretsManager.validateSecrets(REQUIRED_SECRETS);
 }

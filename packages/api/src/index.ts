@@ -129,8 +129,8 @@ app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 // Initialize tracing
 initializeTracing();
 
-// Validate secrets at startup
-if (config.nodeEnv === 'production') {
+// Validate secrets at startup (production and preview)
+if (config.nodeEnv === 'production' || config.nodeEnv === 'preview') {
   try {
     SecretsManager.validateSecrets(REQUIRED_SECRETS);
   } catch (error: any) {

@@ -82,7 +82,7 @@ async function executeMigration(
     const pool = new Pool({
       connectionString: connectionString,
       ssl: config.database.ssl || useSupabase ? {
-        rejectUnauthorized: config.nodeEnv === 'production',
+        rejectUnauthorized: config.nodeEnv === 'production' || config.nodeEnv === 'preview',
       } : false,
     });
 
@@ -157,7 +157,7 @@ async function initializeSupabaseExtensions(): Promise<void> {
     const pool = new Pool({
       connectionString: connectionString,
       ssl: config.database.ssl || useSupabase ? {
-        rejectUnauthorized: config.nodeEnv === 'production',
+        rejectUnauthorized: config.nodeEnv === 'production' || config.nodeEnv === 'preview',
       } : false,
     });
 

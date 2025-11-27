@@ -8,7 +8,7 @@ import { cleanEnv, str, num, url, bool, host, port, email, json } from 'envalid'
 export const env = cleanEnv(process.env, {
   // Node Environment
   NODE_ENV: str({ 
-    choices: ['development', 'test', 'production', 'staging'],
+    choices: ['development', 'test', 'production', 'staging', 'preview'],
     default: 'development',
   }),
 
@@ -108,18 +108,18 @@ export const env = cleanEnv(process.env, {
   HEALTH_CHECK_ENABLED: bool({ default: true }),
 });
 
-// Validate encryption key length in production
-if (env.NODE_ENV === 'production') {
+// Validate encryption key length in production and preview
+if (env.NODE_ENV === 'production' || env.NODE_ENV === 'preview') {
   if (!env.ENCRYPTION_KEY || env.ENCRYPTION_KEY.length !== 32) {
-    throw new Error('ENCRYPTION_KEY must be exactly 32 characters in production');
+    throw new Error(`ENCRYPTION_KEY must be exactly 32 characters in ${env.NODE_ENV}`);
   }
   
   if (!env.JWT_SECRET || env.JWT_SECRET === 'dev-secret-change-in-production') {
-    throw new Error('JWT_SECRET must be set to a secure random value in production');
+    throw new Error(`JWT_SECRET must be set to a secure random value in ${env.NODE_ENV}`);
   }
   
   if (env.ALLOWED_ORIGINS === '*') {
-    console.warn('WARNING: CORS allows all origins in production. Consider restricting ALLOWED_ORIGINS.');
+    console.warn(`WARNING: CORS allows all origins in ${env.NODE_ENV}. Consider restricting ALLOWED_ORIGINS.`);
   }
 }
 
