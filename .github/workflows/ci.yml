@@ -7,9 +7,40 @@ on:
     branches: [main, develop]
 
 jobs:
+  validate-env:
+    name: Validate Environment Schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Validate environment variable schema
+        run: |
+          # Check that env schema compiles and is valid
+          # tsx is available via npx or can be installed
+          npx --yes tsx --check config/env.schema.ts || npm install -g tsx && tsx --check config/env.schema.ts
+          echo "✅ Environment schema is valid"
+      - name: Check for missing required env vars (dry-run)
+        run: |
+          # Run validation in dry-run mode (will show what's missing but not fail)
+          # Use npx to run tsx (will install if needed)
+          npx --yes tsx scripts/check-env.ts --env=production --json > env-check.json || true
+          if [ -f env-check.json ]; then
+            echo "Environment validation check completed"
+            # Use node to parse JSON (more reliable than jq)
+            node -e "try { const fs=require('fs'); const d=JSON.parse(fs.readFileSync('env-check.json')); console.log('Summary:', JSON.stringify(d.summary, null, 2)); } catch(e) { console.log('Could not parse validation results'); }" || echo "No summary available"
+          else
+            echo "⚠️  Could not generate validation report (this is OK in CI without real env vars)"
+          fi
+        continue-on-error: true
+
   lint-and-typecheck:
     name: Lint and Type Check
     runs-on: ubuntu-latest
+    needs: [validate-env]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
