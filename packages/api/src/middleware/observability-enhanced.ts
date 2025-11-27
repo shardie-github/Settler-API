@@ -4,9 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { AuthRequest } from './auth';
 import { Counter, Histogram, register } from 'prom-client';
-import { logDebug } from '../utils/logger';
 
 // Prometheus metrics
 const cacheHitsCounter = new Counter({
@@ -76,7 +74,6 @@ export function observabilityEnhancedMiddleware(
   res: Response,
   next: NextFunction
 ): void {
-  const startTime = Date.now();
 
   // Track cache status from headers
   res.on('finish', () => {

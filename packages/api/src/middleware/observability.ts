@@ -4,9 +4,9 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { trace, Span, SpanStatusCode, context } from '@opentelemetry/api';
+import { trace, SpanStatusCode, context } from '@opentelemetry/api';
 import { httpRequestDuration, httpRequestTotal, httpRequestErrors } from '../infrastructure/observability/metrics';
-import { logInfo, logError, logPerformance } from '../utils/logger';
+import { logPerformance } from '../utils/logger';
 import { AuthRequest } from './auth';
 
 const tracer = trace.getTracer('settler-api');
@@ -19,7 +19,8 @@ export function observabilityMiddleware(
   const startTime = Date.now();
   const method = req.method;
   const route = req.route?.path || req.path;
-  const tenantId = (req as AuthRequest).tenantId || (req as AuthRequest).userId || 'unknown';
+  const authReq = req as AuthRequest;
+  const tenantId = (authReq as { tenantId?: string }).tenantId || authReq.userId || 'unknown';
 
   // Create span for this request
   const span = tracer.startSpan(`http.${method.toLowerCase()}`, {
@@ -49,10 +50,10 @@ export function observabilityMiddleware(
     return originalJson.call(this, body);
   };
 
-  res.end = function (chunk?: unknown, encoding?: BufferEncoding) {
+  res.end = function (chunk?: unknown, encoding?: BufferEncoding, cb?: () => void) {
     recordMetrics();
-    return originalEnd.call(this, chunk, encoding);
-  };
+    return originalEnd.call(this, chunk, encoding, cb);
+  } as typeof res.end;
 
   function recordMetrics() {
     const duration = (Date.now() - startTime) / 1000;

@@ -3,13 +3,13 @@ import { logError } from "../utils/logger";
 import { AuthRequest } from "./auth";
 import { config } from "../config";
 import { captureException, setSentryUser } from "./sentry";
-import { ApiError, isApiError, toApiError } from "../utils/typed-errors";
+import { toApiError } from "../utils/typed-errors";
 
 export const errorHandler = (
   err: unknown,
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void => {
   const authReq = req as AuthRequest;
   const apiError = toApiError(err);
@@ -42,7 +42,6 @@ export const errorHandler = (
       },
       user: {
         id: authReq.userId,
-        email: authReq.email,
       },
     });
   }
@@ -59,16 +58,20 @@ export const errorHandler = (
     error: apiError.name,
     errorCode: apiError.errorCode,
     message: apiError.message,
-    traceId: authReq.traceId,
   };
 
+  // Include traceId if present
+  if (authReq.traceId) {
+    response.traceId = authReq.traceId;
+  }
+
   // Include details if present
-  if (apiError.details) {
+  if (apiError.details !== undefined) {
     response.details = apiError.details;
   }
 
   // Only include stack in development
-  if (config.nodeEnv === "development" && err instanceof Error) {
+  if (config.nodeEnv === "development" && err instanceof Error && err.stack) {
     response.stack = err.stack;
   }
 
