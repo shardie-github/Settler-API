@@ -1,20 +1,16 @@
 {
   "version": 2,
-  "routes": [
+  "rewrites": [
     {
-      "src": "/health",
-      "dest": "/dist/index.js"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/dist/index.js"
+      "source": "/(.*)",
+      "destination": "/api/index"
     }
   ],
   "env": {
     "NODE_ENV": "production"
   },
   "functions": {
-    "dist/index.js": {
+    "api/index.ts": {
       "maxDuration": 30
     }
   }
