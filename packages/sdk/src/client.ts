@@ -227,8 +227,11 @@ export class SettlerClient {
     const fetchOptions: RequestInit = {
       method: context.method,
       headers,
-      ...(context.body ? { body: JSON.stringify(context.body) } : {}),
     };
+    
+    if (context.body !== undefined && context.body !== null) {
+      fetchOptions.body = JSON.stringify(context.body);
+    }
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
@@ -251,9 +254,11 @@ export class SettlerClient {
       let data: T;
       const contentType = response.headers.get("content-type");
       if (contentType?.includes("application/json")) {
-        data = (await response.json()) as T;
+        const jsonData = await response.json();
+        data = jsonData as T;
       } else {
-        data = (await response.text()) as unknown as T;
+        const textData = await response.text();
+        data = textData as unknown as T;
       }
 
       if (!response.ok) {

@@ -53,7 +53,7 @@ export async function withRetry<T>(
   config: RetryConfig = {}
 ): Promise<T> {
   const retryConfig = { ...DEFAULT_RETRY_CONFIG, ...config };
-  let lastError: SettlerError | Error;
+  let lastError: SettlerError;
 
   for (let attempt = 0; attempt <= retryConfig.maxRetries; attempt++) {
     try {
@@ -67,11 +67,12 @@ export async function withRetry<T>(
       }
 
       // Check if we should retry this error
-      const shouldRetry =
-        (lastError instanceof SettlerError && retryConfig.shouldRetry(lastError, attempt)) &&
-        (lastError instanceof NetworkError ||
-          (lastError instanceof RateLimitError && retryConfig.retryOnRateLimit) ||
-          (lastError instanceof SettlerError && lastError.statusCode && lastError.statusCode >= 500));
+      const isRetryableError =
+        lastError instanceof NetworkError ||
+        (lastError instanceof RateLimitError && retryConfig.retryOnRateLimit) ||
+        (lastError.statusCode !== undefined && lastError.statusCode >= 500);
+
+      const shouldRetry = retryConfig.shouldRetry(lastError, attempt) && isRetryableError;
 
       if (!shouldRetry) {
         break;
