@@ -1,0 +1,103 @@
+
+> @settler/adapters@1.0.0 build
+> tsc
+
+src/paypal-enhanced.ts(39,66): error TS1005: ',' expected.
+src/paypal-enhanced.ts(39,67): error TS1109: Expression expected.
+src/paypal-enhanced.ts(39,77): error TS1005: ';' expected.
+src/paypal-enhanced.ts(39,79): error TS1434: Unexpected keyword or identifier.
+src/paypal-enhanced.ts(39,85): error TS1128: Declaration or statement expected.
+src/paypal-enhanced.ts(39,86): error TS1128: Declaration or statement expected.
+src/paypal-enhanced.ts(39,104): error TS1011: An element access expression should take an argument.
+src/paypal-enhanced.ts(39,106): error TS1005: ';' expected.
+src/paypal-enhanced.ts(102,3): error TS1434: Unexpected keyword or identifier.
+src/paypal-enhanced.ts(102,32): error TS1005: ',' expected.
+src/paypal-enhanced.ts(102,58): error TS1005: ',' expected.
+src/paypal-enhanced.ts(102,70): error TS1005: ';' expected.
+src/paypal-enhanced.ts(102,92): error TS1011: An element access expression should take an argument.
+src/paypal-enhanced.ts(103,11): error TS1005: ':' expected.
+src/paypal-enhanced.ts(103,37): error TS1005: ',' expected.
+src/paypal-enhanced.ts(104,11): error TS1005: ':' expected.
+src/paypal-enhanced.ts(104,45): error TS1005: ',' expected.
+src/paypal-enhanced.ts(106,9): error TS1003: Identifier expected.
+src/paypal-enhanced.ts(106,19): error TS1005: ',' expected.
+src/paypal-enhanced.ts(106,35): error TS1005: ';' expected.
+src/paypal-enhanced.ts(122,3): error TS1128: Declaration or statement expected.
+src/paypal-enhanced.ts(127,3): error TS1434: Unexpected keyword or identifier.
+src/paypal-enhanced.ts(127,31): error TS1005: ',' expected.
+src/paypal-enhanced.ts(127,57): error TS1005: ',' expected.
+src/paypal-enhanced.ts(127,69): error TS1005: ';' expected.
+src/paypal-enhanced.ts(127,90): error TS1011: An element access expression should take an argument.
+src/paypal-enhanced.ts(128,11): error TS1005: ':' expected.
+src/paypal-enhanced.ts(128,37): error TS1005: ',' expected.
+src/paypal-enhanced.ts(129,11): error TS1005: ':' expected.
+src/paypal-enhanced.ts(129,45): error TS1005: ',' expected.
+src/paypal-enhanced.ts(131,9): error TS1003: Identifier expected.
+src/paypal-enhanced.ts(131,19): error TS1005: ',' expected.
+src/paypal-enhanced.ts(131,35): error TS1005: ';' expected.
+src/paypal-enhanced.ts(147,3): error TS1128: Declaration or statement expected.
+src/paypal-enhanced.ts(152,3): error TS1434: Unexpected keyword or identifier.
+src/paypal-enhanced.ts(152,32): error TS1005: ',' expected.
+src/paypal-enhanced.ts(152,55): error TS1005: ',' expected.
+src/paypal-enhanced.ts(152,64): error TS1005: ';' expected.
+src/paypal-enhanced.ts(152,78): error TS1011: An element access expression should take an argument.
+src/paypal-enhanced.ts(153,11): error TS1005: ':' expected.
+src/paypal-enhanced.ts(153,15): error TS1005: ',' expected.
+src/paypal-enhanced.ts(153,20): error TS1005: ',' expected.
+src/paypal-enhanced.ts(153,21): error TS1109: Expression expected.
+src/paypal-enhanced.ts(153,23): error TS1005: ':' expected.
+src/paypal-enhanced.ts(153,27): error TS1005: ',' expected.
+src/paypal-enhanced.ts(154,11): error TS1005: ':' expected.
+src/paypal-enhanced.ts(154,43): error TS1005: ',' expected.
+src/paypal-enhanced.ts(157,16): error TS1005: ',' expected.
+src/paypal-enhanced.ts(157,32): error TS1005: ',' expected.
+src/paypal-enhanced.ts(157,34): error TS1136: Property assignment expected.
+src/paypal-enhanced.ts(196,3): error TS1128: Declaration or statement expected.
+src/paypal-enhanced.ts(201,27): error TS1005: ',' expected.
+src/paypal-enhanced.ts(201,58): error TS1005: ',' expected.
+src/paypal-enhanced.ts(201,67): error TS1005: ';' expected.
+src/paypal-enhanced.ts(201,69): error TS1434: Unexpected keyword or identifier.
+src/paypal-enhanced.ts(229,26): error TS1005: ',' expected.
+src/paypal-enhanced.ts(229,57): error TS1005: ',' expected.
+src/paypal-enhanced.ts(229,66): error TS1005: ';' expected.
+src/paypal-enhanced.ts(229,68): error TS1434: Unexpected keyword or identifier.
+src/paypal-enhanced.ts(255,29): error TS1005: ',' expected.
+src/paypal-enhanced.ts(255,60): error TS1005: ',' expected.
+src/paypal-enhanced.ts(255,74): error TS1005: ',' expected.
+src/paypal-enhanced.ts(255,94): error TS1005: ';' expected.
+src/paypal-enhanced.ts(255,96): error TS1434: Unexpected keyword or identifier.
+src/paypal-enhanced.ts(278,33): error TS1005: ',' expected.
+src/paypal-enhanced.ts(278,53): error TS1005: ',' expected.
+src/paypal-enhanced.ts(278,62): error TS1005: ';' expected.
+src/paypal-enhanced.ts(279,9): error TS1003: Identifier expected.
+src/paypal-enhanced.ts(279,14): error TS1005: ',' expected.
+src/paypal-enhanced.ts(279,53): error TS1005: ',' expected.
+src/paypal-enhanced.ts(279,55): error TS1136: Property assignment expected.
+src/paypal-enhanced.ts(282,3): error TS1128: Declaration or statement expected.
+src/paypal-enhanced.ts(287,5): error TS1128: Declaration or statement expected.
+src/paypal-enhanced.ts(287,39): error TS1005: ',' expected.
+src/paypal-enhanced.ts(287,45): error TS1005: ';' expected.
+src/paypal-enhanced.ts(287,47): error TS1434: Unexpected keyword or identifier.
+src/paypal-enhanced.ts(297,5): error TS1128: Declaration or statement expected.
+src/paypal-enhanced.ts(297,41): error TS1005: ',' expected.
+src/paypal-enhanced.ts(297,47): error TS1005: ';' expected.
+src/paypal-enhanced.ts(297,49): error TS1434: Unexpected keyword or identifier.
+src/paypal-enhanced.ts(307,5): error TS1128: Declaration or statement expected.
+src/paypal-enhanced.ts(307,39): error TS1005: ',' expected.
+src/paypal-enhanced.ts(307,45): error TS1005: ';' expected.
+src/paypal-enhanced.ts(307,47): error TS1434: Unexpected keyword or identifier.
+src/paypal-enhanced.ts(316,5): error TS1128: Declaration or statement expected.
+src/paypal-enhanced.ts(316,39): error TS1005: ',' expected.
+src/paypal-enhanced.ts(316,45): error TS1005: ';' expected.
+src/paypal-enhanced.ts(316,47): error TS1434: Unexpected keyword or identifier.
+src/paypal-enhanced.ts(326,5): error TS1128: Declaration or statement expected.
+src/paypal-enhanced.ts(326,25): error TS1005: ';' expected.
+src/paypal-enhanced.ts(326,27): error TS1434: Unexpected keyword or identifier.
+src/paypal-enhanced.ts(329,3): error TS1128: Declaration or statement expected.
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path /workspace/packages/adapters
+npm error workspace @settler/adapters@1.0.0
+npm error location /workspace/packages/adapters
+npm error command failed
+npm error command sh -c tsc
