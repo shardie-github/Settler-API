@@ -211,10 +211,13 @@ export class ReconciliationGraphEngine extends EventEmitter {
   private levenshteinDistance(str1: string, str2: string): number {
     const matrix: number[][] = [];
     
+    // Initialize first column
     for (let i = 0; i <= str2.length; i++) {
-      matrix[i] = [i];
+      matrix[i] = new Array(str1.length + 1);
+      matrix[i][0] = i;
     }
     
+    // Initialize first row
     for (let j = 0; j <= str1.length; j++) {
       matrix[0][j] = j;
     }
