@@ -135,6 +135,7 @@ async function initializeSupabaseExtensions(): Promise<void> {
     // Use direct PostgreSQL connection for extensions
     // Use same connection string logic as migrations
     let connectionString = process.env.DATABASE_URL;
+    const useSupabase = !!process.env.SUPABASE_URL;
     
     if (!connectionString && useSupabase) {
       if (process.env.SUPABASE_DB_PASSWORD) {

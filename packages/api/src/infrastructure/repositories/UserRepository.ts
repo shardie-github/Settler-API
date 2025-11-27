@@ -3,7 +3,7 @@
  * PostgreSQL implementation of IUserRepository
  */
 
-import { User, UserRole } from '../../domain/entities/User';
+import { User, UserRole, UserProps } from '../../domain/entities/User';
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
 import { query } from '../../db';
 
@@ -57,12 +57,12 @@ export class UserRepository implements IUserRepository {
           props.tenantId,
           props.email,
           props.passwordHash,
-          props.name,
+          props.name ?? null,
           props.role,
           props.dataResidencyRegion,
           props.dataRetentionDays,
-          props.deletedAt,
-          props.deletionScheduledAt,
+          props.deletedAt ?? null,
+          props.deletionScheduledAt ?? null,
           props.id,
         ]
       );
@@ -79,12 +79,12 @@ export class UserRepository implements IUserRepository {
           props.tenantId,
           props.email,
           props.passwordHash,
-          props.name,
+          props.name ?? null,
           props.role,
           props.dataResidencyRegion,
           props.dataRetentionDays,
-          props.deletedAt,
-          props.deletionScheduledAt,
+          props.deletedAt ?? null,
+          props.deletionScheduledAt ?? null,
         ]
       );
     }
@@ -110,41 +110,33 @@ export class UserRepository implements IUserRepository {
     const rows = await query<{ count: string }>(
       `SELECT COUNT(*) as count FROM users WHERE deleted_at IS NULL`
     );
+    if (!rows[0]) {
+      return 0;
+    }
     return parseInt(rows[0].count, 10);
   }
 
-  private mapRowToProps(row: any): ReturnType<typeof User.fromPersistence> extends User ? Parameters<typeof User.fromPersistence>[0] : never {
-    return {
+  private mapRowToProps(row: any): UserProps {
+    const props: UserProps = {
       id: row.id,
       tenantId: row.tenant_id,
       email: row.email,
       passwordHash: row.password_hash,
-      name: row.name,
       role: row.role as UserRole,
       dataResidencyRegion: row.data_residency_region,
       dataRetentionDays: row.data_retention_days,
-      deletedAt: row.deleted_at ? new Date(row.deleted_at) : undefined,
-      deletionScheduledAt: row.deletion_scheduled_at
-        ? new Date(row.deletion_scheduled_at)
-        : undefined,
       createdAt: new Date(row.created_at),
       updatedAt: new Date(row.updated_at),
     };
+    if (row.name !== null && row.name !== undefined) {
+      props.name = row.name;
+    }
+    if (row.deleted_at) {
+      props.deletedAt = new Date(row.deleted_at);
+    }
+    if (row.deletion_scheduled_at) {
+      props.deletionScheduledAt = new Date(row.deletion_scheduled_at);
+    }
+    return props;
   }
 }
-
-// Type helper for UserProps
-type UserProps = {
-  id: string;
-  tenantId: string;
-  email: string;
-  passwordHash: string;
-  name?: string;
-  role: UserRole;
-  dataResidencyRegion: string;
-  dataRetentionDays: number;
-  deletedAt?: Date;
-  deletionScheduledAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-};

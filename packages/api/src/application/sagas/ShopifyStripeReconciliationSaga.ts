@@ -85,7 +85,7 @@ export class ShopifyStripeReconciliationSaga {
               reconciliation_id: reconciliationId,
               source: 'shopify',
               count: orders.length,
-              orders: orders.map((order) => ({
+              orders: orders.map((order: any) => ({
                 id: order.id,
                 amount: order.amount,
                 currency: order.currency,
@@ -157,7 +157,7 @@ export class ShopifyStripeReconciliationSaga {
               reconciliation_id: reconciliationId,
               source: 'stripe',
               count: payments.length,
-              payments: payments.map((payment) => ({
+              payments: payments.map((payment: any) => ({
                 id: payment.id,
                 amount: payment.amount,
                 currency: payment.currency,
@@ -211,7 +211,7 @@ export class ShopifyStripeReconciliationSaga {
           const reconciliationId = state.aggregateId;
           const orders = state.data.shopify_orders as any[];
           const payments = state.data.stripe_payments as any[];
-          const matchingRules = state.data.matching_rules as any;
+          const _matchingRules = state.data.matching_rules as any;
 
           const matched: any[] = [];
           const unmatched: any[] = [];
@@ -352,7 +352,7 @@ export class ShopifyStripeReconciliationSaga {
       timeoutMs: 30000,
       retryable: true,
       maxRetries: 3,
-      execute: async (state: SagaState): Promise<SagaStepResult> => {
+      execute: async (_state: SagaState): Promise<SagaStepResult> => {
         try {
           // In production, persist to database
           // For now, results are already persisted via events
@@ -475,7 +475,7 @@ export class ShopifyStripeReconciliationSaga {
         error: {
           type: error.name || 'UnknownError',
           message: error.message,
-          stack: error.stack,
+          ...(error.stack ? { stack: error.stack } : {}),
         },
         failed_at: new Date().toISOString(),
         step: state.currentStep,

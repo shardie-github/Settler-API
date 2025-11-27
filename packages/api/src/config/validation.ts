@@ -3,7 +3,7 @@
  * Uses envalid for type-safe environment variable validation
  */
 
-import { cleanEnv, str, num, url, bool, host, port, email, json } from 'envalid';
+import { cleanEnv, str, num, url, bool, host, port } from 'envalid';
 
 export const env = cleanEnv(process.env, {
   // Node Environment

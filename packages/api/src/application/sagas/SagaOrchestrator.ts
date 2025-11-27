@@ -64,8 +64,8 @@ export class SagaOrchestrator {
 
   constructor(
     private db: Pool = pool,
-    private eventStore: IEventStore,
-    private eventBus: IEventBus
+    private _eventStore: IEventStore,
+    private _eventBus: IEventBus
   ) {}
 
   /**
@@ -390,7 +390,7 @@ export class SagaOrchestrator {
   /**
    * Schedule retry for a step
    */
-  private async scheduleRetry(state: SagaState, step: SagaStep): Promise<void> {
+  private async scheduleRetry(state: SagaState, _step: SagaStep): Promise<void> {
     const retryCount = (state.data.retryCount as number) || 0;
     state.data.retryCount = retryCount + 1;
 
@@ -416,7 +416,7 @@ export class SagaOrchestrator {
   /**
    * Check if step should be retried
    */
-  private shouldRetryStep(state: SagaState, stepName: string): boolean {
+  private shouldRetryStep(state: SagaState, _stepName: string): boolean {
     const retryCount = (state.data.retryCount as number) || 0;
     const maxRetries = 3; // Default max retries
     return retryCount < maxRetries;

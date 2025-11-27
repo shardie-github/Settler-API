@@ -41,13 +41,18 @@ export function createEventMetadata(
   correlationId?: string,
   causationId?: string
 ): EventMetadata {
-  return {
+  const metadata: EventMetadata = {
     tenant_id: tenantId,
-    user_id: userId,
     timestamp: new Date().toISOString(),
     correlation_id: correlationId || crypto.randomUUID(),
-    causation_id: causationId,
   };
+  if (userId !== undefined) {
+    metadata.user_id = userId;
+  }
+  if (causationId !== undefined) {
+    metadata.causation_id = causationId;
+  }
+  return metadata;
 }
 
 /**

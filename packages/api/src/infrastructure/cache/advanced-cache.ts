@@ -3,7 +3,7 @@
  * Implements tag-based invalidation, cache warming, and coherency checks
  */
 
-import { get, set, del, cacheKey } from '../../utils/cache';
+import { get, set, del } from '../../utils/cache';
 import { logInfo, logWarn } from '../../utils/logger';
 
 export interface CacheTag {

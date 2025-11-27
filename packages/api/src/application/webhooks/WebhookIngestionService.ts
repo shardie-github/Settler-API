@@ -5,13 +5,9 @@
  * and retry logic as specified in the Product & Technical Specification.
  */
 
-import { EnhancedAdapter } from '@settler/adapters/enhanced-base';
-import { NormalizedEvent } from '@settler/adapters/enhanced-base';
+import { EnhancedAdapter, NormalizedEvent, StripeEnhancedAdapter, PayPalEnhancedAdapter, SquareEnhancedAdapter } from '@settler/adapters';
 import { Transaction, Settlement, RefundDispute } from '@settler/types';
 import { query } from '../../db';
-import { StripeEnhancedAdapter } from '@settler/adapters/stripe-enhanced';
-import { PayPalEnhancedAdapter } from '@settler/adapters/paypal-enhanced';
-import { SquareEnhancedAdapter } from '@settler/adapters/square-enhanced';
 
 export interface WebhookIngestionResult {
   success: boolean;
@@ -124,11 +120,14 @@ export class WebhookIngestionService {
       await this.storeIdempotencyKey(idempotencyKey, tenantId, events);
     }
 
-    return {
+    const result: WebhookIngestionResult = {
       success: errors.length === 0,
       events,
-      errors: errors.length > 0 ? errors : undefined,
     };
+    if (errors.length > 0) {
+      result.errors = errors;
+    }
+    return result;
   }
 
   /**
@@ -148,7 +147,7 @@ export class WebhookIngestionService {
     }
 
     if (event.fxConversion) {
-      await this.storeFXConversion(event.fxConversion, tenantId);
+      await this.storeFXConversion(event.fxConversion as unknown as Record<string, unknown>, tenantId);
     }
   }
 
@@ -172,14 +171,14 @@ export class WebhookIngestionService {
       [
         transaction.id,
         tenantId,
-        transaction.paymentId,
+        transaction.paymentId || null,
         transaction.provider,
         transaction.providerTransactionId,
         transaction.type,
         transaction.amount.value,
         transaction.amount.currency,
-        transaction.netAmount?.value,
-        transaction.netAmount?.currency,
+        transaction.netAmount?.value ?? null,
+        transaction.netAmount?.currency ?? null,
         transaction.status,
         JSON.stringify(transaction.rawPayload),
         transaction.created_at,
@@ -212,9 +211,9 @@ export class WebhookIngestionService {
         settlement.amount.value,
         settlement.amount.currency,
         settlement.currency,
-        settlement.fxRate,
+        settlement.fxRate ?? null,
         settlement.settlementDate,
-        settlement.expectedDate,
+        settlement.expectedDate ?? null,
         settlement.status,
         JSON.stringify(settlement.rawPayload),
         settlement.createdAt,
@@ -242,9 +241,9 @@ export class WebhookIngestionService {
         refundDispute.amount.value,
         refundDispute.amount.currency,
         refundDispute.status,
-        refundDispute.reason,
-        refundDispute.providerRefundId,
-        refundDispute.providerDisputeId,
+        refundDispute.reason ?? null,
+        refundDispute.providerRefundId ?? null,
+        refundDispute.providerDisputeId ?? null,
         JSON.stringify(refundDispute.rawPayload),
         refundDispute.createdAt,
         refundDispute.updatedAt,
@@ -263,17 +262,17 @@ export class WebhookIngestionService {
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       ON CONFLICT DO NOTHING`,
       [
-        fxConversion.id,
+        (fxConversion.id as string) || null,
         tenantId,
-        fxConversion.transactionId,
-        fxConversion.fromCurrency,
-        fxConversion.toCurrency,
-        fxConversion.fromAmount,
-        fxConversion.toAmount,
-        fxConversion.fxRate,
-        fxConversion.provider,
-        fxConversion.rateDate,
-        fxConversion.createdAt,
+        (fxConversion.transactionId as string) || null,
+        (fxConversion.fromCurrency as string) || null,
+        (fxConversion.toCurrency as string) || null,
+        (fxConversion.fromAmount as number) ?? null,
+        (fxConversion.toAmount as number) ?? null,
+        (fxConversion.fxRate as number) ?? null,
+        (fxConversion.provider as string) || null,
+        (fxConversion.rateDate as Date) || null,
+        (fxConversion.createdAt as Date) || null,
       ]
     );
   }
@@ -302,13 +301,13 @@ export class WebhookIngestionService {
     // Provider-specific idempotency key extraction
     switch (adapterName) {
       case 'stripe':
-        return payload.id || null;
+        return (typeof payload.id === 'string' ? payload.id : null);
       case 'paypal':
-        return payload.id || payload.webhook_id || null;
+        return (typeof payload.id === 'string' ? payload.id : (typeof payload.webhook_id === 'string' ? payload.webhook_id : null));
       case 'square':
-        return payload.event_id || payload.id || null;
+        return (typeof payload.event_id === 'string' ? payload.event_id : (typeof payload.id === 'string' ? payload.id : null));
       default:
-        return payload.id || null;
+        return (typeof payload.id === 'string' ? payload.id : null);
     }
   }
 

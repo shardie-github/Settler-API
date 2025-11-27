@@ -65,6 +65,9 @@ export async function rotateRefreshToken(oldRefreshToken: string): Promise<Token
       return null;
     }
 
+    if (!tokens[0]) {
+      return null;
+    }
     const tokenRecord = tokens[0];
 
     // Check if token is revoked

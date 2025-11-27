@@ -93,7 +93,7 @@ export class SecretsManager {
   /**
    * Redact secret from logs
    */
-  static redactSecret(value: string, secretName: string): string {
+  static redactSecret(value: string, _secretName: string): string {
     // Never log full secrets
     if (value.length <= 8) {
       return '***';

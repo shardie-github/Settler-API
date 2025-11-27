@@ -171,7 +171,7 @@ export function validateJson(input: string, maxDepth: number = REQUEST_LIMITS.MA
 /**
  * Validate file upload
  */
-export function validateFile(file: Express.Multer.File): void {
+export function validateFile(file: { size: number; mimetype: string; originalname: string }): void {
   if (file.size > REQUEST_LIMITS.MAX_FILE_SIZE) {
     throw new Error(`File size exceeds ${REQUEST_LIMITS.MAX_FILE_SIZE} bytes`);
   }

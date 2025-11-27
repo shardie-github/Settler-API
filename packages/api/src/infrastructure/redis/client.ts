@@ -9,7 +9,6 @@
  */
 
 import { Redis } from '@upstash/redis';
-import { config } from '../../config';
 
 // Upstash Redis configuration
 const redisUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL;

@@ -15,18 +15,26 @@ export abstract class ApiError extends Error {
     Error.captureStackTrace?.(this, this.constructor);
   }
 
-  override toJSON(): {
+  toJSON(): {
     error: string;
     errorCode: string;
     message: string;
     details?: unknown;
   } {
-    return {
+    const result: {
+      error: string;
+      errorCode: string;
+      message: string;
+      details?: unknown;
+    } = {
       error: this.name,
       errorCode: this.errorCode,
       message: this.message,
-      ...(this.details && { details: this.details }),
     };
+    if (this.details !== undefined) {
+      result.details = this.details;
+    }
+    return result;
   }
 }
 
@@ -34,7 +42,7 @@ export class ValidationError extends ApiError {
   readonly statusCode = 400;
   readonly errorCode = 'VALIDATION_ERROR';
   readonly field?: string;
-  readonly details?: Array<{
+  declare readonly details?: Array<{
     field: string;
     message: string;
     code: string;

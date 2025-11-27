@@ -170,7 +170,7 @@ export class MatchingEngine {
   private async matchByTransactionId(
     transactions: Transaction[],
     settlements: Settlement[],
-    rule: MatchingRulesConfig['strategies'][0],
+    _rule: MatchingRulesConfig['strategies'][0],
     tenantId: string,
     executionId?: string,
     jobId?: string

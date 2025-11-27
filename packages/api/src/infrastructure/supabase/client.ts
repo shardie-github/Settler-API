@@ -84,17 +84,21 @@ export async function transaction<T>(
  */
 export async function initializeSupabaseExtensions(): Promise<void> {
   // Enable pgvector extension for vector database
-  await supabase.rpc('exec_sql', {
-    sql: 'CREATE EXTENSION IF NOT EXISTS vector;',
-  }).catch(() => {
+  try {
+    await supabase.rpc('exec_sql', {
+      sql: 'CREATE EXTENSION IF NOT EXISTS vector;',
+    });
+  } catch {
     // Extension might already exist or not be available
     console.warn('pgvector extension not available or already enabled');
-  });
+  }
 
   // Enable uuid-ossp extension (if not already enabled)
-  await supabase.rpc('exec_sql', {
-    sql: 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";',
-  }).catch(() => {
+  try {
+    await supabase.rpc('exec_sql', {
+      sql: 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";',
+    });
+  } catch {
     console.warn('uuid-ossp extension not available or already enabled');
-  });
+  }
 }

@@ -99,7 +99,7 @@ export class FeatureFlagService {
     sql += ` ORDER BY user_id DESC NULLS LAST, tenant_id DESC NULLS LAST LIMIT 1`;
 
     const rows = await query<FeatureFlag>(sql, params);
-    return rows.length > 0 ? rows[0] : null;
+    return rows.length > 0 && rows[0] ? rows[0] : null;
   }
 
   /**
@@ -132,7 +132,7 @@ export class FeatureFlagService {
         [
           enabled,
           options.rolloutPercentage || 100,
-          options.description || existing.description,
+          options.description ?? existing.description ?? null,
           JSON.stringify(options.conditions || {}),
           existing.id,
         ]

@@ -139,7 +139,11 @@ export class Job {
   }
 
   updateSchedule(schedule: string | undefined): void {
-    this.props.schedule = schedule;
+    if (schedule !== undefined) {
+      this.props.schedule = schedule;
+    } else {
+      delete this.props.schedule;
+    }
     this.props.updatedAt = new Date();
     this.props.version += 1;
   }

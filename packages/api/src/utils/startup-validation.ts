@@ -7,7 +7,7 @@ import { config } from '../config';
 import { initDatabase } from '../db';
 import { getRedisClient } from './cache';
 import { logInfo, logError, logWarn } from './logger';
-import { getRequiredEnvVars, validateEnvVar } from '../../../config/env.schema';
+import { getRequiredEnvVars, validateEnvVar } from '../../../../config/env.schema';
 
 export interface ValidationResult {
   name: string;
