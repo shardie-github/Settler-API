@@ -20,6 +20,7 @@ export interface HealthStatus {
   checks: {
     database: HealthCheck;
     redis?: HealthCheck;
+    sentry?: HealthCheck;
     [key: string]: HealthCheck | undefined;
   };
   timestamp: string;
@@ -78,20 +79,52 @@ export class HealthCheckService {
     }
   }
 
+  async checkSentry(): Promise<HealthCheck> {
+    const start = Date.now();
+    try {
+      // Check if Sentry is configured
+      const sentryDsn = process.env.SENTRY_DSN;
+      if (!sentryDsn) {
+        return {
+          status: 'degraded',
+          error: 'Sentry not configured',
+          timestamp: new Date().toISOString(),
+        };
+      }
+
+      // Sentry SDK is initialized if DSN is set
+      // We can't directly test Sentry connectivity, but we can verify it's configured
+      const latency = Date.now() - start;
+      return {
+        status: 'healthy',
+        latency,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error: unknown) {
+      return {
+        status: 'degraded',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
   async checkAll(): Promise<HealthStatus> {
     const redisClient = this.getRedisClient();
-    const [database, redis] = await Promise.all([
+    const [database, redis, sentry] = await Promise.all([
       this.checkDatabase(),
       redisClient ? this.checkRedis() : Promise.resolve<HealthCheck>({
         status: 'degraded',
         error: 'Redis not configured',
         timestamp: new Date().toISOString(),
       }),
+      this.checkSentry(),
     ]);
 
     const checks = {
       database,
       redis,
+      sentry,
     };
 
     const allHealthy = Object.values(checks).every(

@@ -9,6 +9,9 @@ import { logInfo, logError } from "../utils/logger";
 import { handleRouteError } from "../utils/error-handler";
 import { config } from "../config";
 import { requirePermission } from "../middleware/authorization";
+import { rotateRefreshToken, storeRefreshToken } from "../infrastructure/security/token-rotation";
+import { v4 as uuidv4 } from "uuid";
+import { sendSuccess, sendError } from "../utils/api-response";
 
 const router = Router();
 
@@ -73,16 +76,20 @@ router.post(
         }
       );
 
-      // Generate refresh token (7 days)
+      // Generate refresh token with rotation support
+      const refreshTokenId = uuidv4();
       const refreshToken = jwt.sign(
-        { userId: user.id, type: 'refresh' },
-        config.jwt.refreshSecret!,
+        { userId: user.id, tokenId: refreshTokenId, type: 'refresh' },
+        config.jwt.refreshSecret || config.jwt.secret!,
         {
           expiresIn: config.jwt.refreshTokenExpiry,
           issuer: 'settler-api',
           audience: 'settler-client',
         }
       );
+
+      // Store refresh token in database for rotation
+      await storeRefreshToken(user.id, refreshTokenId, 7);
 
       // Log audit event
       await query(
@@ -97,16 +104,14 @@ router.post(
 
       logInfo('User logged in', { userId: user.id });
 
-      res.json({
-        data: {
-          accessToken,
-          refreshToken,
-          expiresIn: 900, // 15 minutes in seconds
-          user: {
-            id: user.id,
-            email,
-            role: user.role,
-          },
+      sendSuccess(res, {
+        accessToken,
+        refreshToken,
+        expiresIn: 900, // 15 minutes in seconds
+        user: {
+          id: user.id,
+          email,
+          role: user.role,
         },
       });
     } catch (error: unknown) {
@@ -115,7 +120,7 @@ router.post(
   }
 );
 
-// Refresh access token
+// Refresh access token with rotation
 router.post(
   "/refresh",
   validateRequest(refreshTokenSchema),
@@ -123,39 +128,18 @@ router.post(
     try {
       const { refreshToken } = req.body;
 
-      try {
-        const decoded = jwt.verify(refreshToken, config.jwt.refreshSecret!, {
-          issuer: 'settler-api',
-          audience: 'settler-client',
-        }) as { userId: string; type?: string };
+      // Rotate refresh token (invalidates old, issues new)
+      const tokenPair = await rotateRefreshToken(refreshToken);
 
-        if (decoded.type !== 'refresh') {
-          return res.status(401).json({ error: "Invalid token type" });
-        }
-
-        // Generate new access token
-        const accessToken = jwt.sign(
-          { userId: decoded.userId, type: 'access' },
-          config.jwt.secret!,
-          {
-            expiresIn: config.jwt.accessTokenExpiry,
-            issuer: 'settler-api',
-            audience: 'settler-client',
-          }
-        );
-
-        res.json({
-          data: {
-            accessToken,
-            expiresIn: 900,
-          },
-        });
-      } catch (error: unknown) {
-        if (error instanceof Error && error.name === 'TokenExpiredError') {
-          return res.status(401).json({ error: "Refresh token expired" });
-        }
-        throw error;
+      if (!tokenPair) {
+        return sendError(res, 401, 'INVALID_TOKEN', 'Invalid or expired refresh token');
       }
+
+      sendSuccess(res, {
+        accessToken: tokenPair.accessToken,
+        refreshToken: tokenPair.refreshToken,
+        expiresIn: 900, // 15 minutes in seconds
+      });
     } catch (error: unknown) {
       handleRouteError(res, error, "Failed to refresh token", 401);
     }
