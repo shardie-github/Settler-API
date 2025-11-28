@@ -180,15 +180,34 @@ async function runMigrations(): Promise<MigrationResult[]> {
 
   // Parse connection string to handle IPv6 issues
   let parsedConnection = connectionString;
-  if (connectionString.includes('supabase.co') && connectionString.includes('db.')) {
-    // For Supabase, try using the pooler which might have better IPv4 support
-    // But for migrations, we need direct connection, so we'll handle IPv6
-    // by ensuring Node.js can handle it
+  
+  // If using pooler hostname, resolve to IPv4 to avoid IPv6 issues
+  if (connectionString.includes('pooler.supabase.com')) {
+    try {
+      const dns = require('dns');
+      const { promisify } = require('util');
+      const resolve4 = promisify(dns.resolve4);
+      
+      // Extract hostname from connection string
+      const hostMatch = connectionString.match(/@([^:]+):/);
+      if (hostMatch) {
+        const hostname = hostMatch[1];
+        const ipv4 = await resolve4(hostname);
+        if (ipv4 && ipv4[0]) {
+          // Replace hostname with IPv4 address
+          parsedConnection = connectionString.replace(hostname, ipv4[0]);
+          console.log(`   Resolved ${hostname} to IPv4: ${ipv4[0]}`);
+        }
+      }
+    } catch (error) {
+      // If resolution fails, use original connection string
+      console.log(`   Could not resolve to IPv4, using original hostname`);
+    }
   }
 
   const pool = new Pool({
     connectionString: parsedConnection,
-    ssl: process.env.SUPABASE_URL || connectionString.includes('supabase.co') ? {
+    ssl: process.env.SUPABASE_URL || connectionString.includes('supabase.co') || connectionString.includes('pooler') ? {
       rejectUnauthorized: false, // Supabase uses self-signed certs
     } : (process.env.DB_SSL === 'true'),
     // Connection settings
