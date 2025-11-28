@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   ReconciliationDashboard,
   TransactionTable,
@@ -23,6 +23,9 @@ import type {
 } from '@settler/react-settler';
 import { SettlerClient } from '@settler/sdk';
 
+// Force dynamic rendering to avoid static generation issues
+export const dynamic = 'force-dynamic';
+
 export default function ReactSettlerDemoPage() {
   const [apiKey] = useState(() => {
     // In a real app, get from auth context or env
@@ -37,13 +40,7 @@ export default function ReactSettlerDemoPage() {
   const [loading, setLoading] = useState(true);
   const [configJson, setConfigJson] = useState<string>('');
 
-  useEffect(() => {
-    if (apiKey) {
-      loadData();
-    }
-  }, [apiKey]);
-
-  async function loadData() {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -56,7 +53,7 @@ export default function ReactSettlerDemoPage() {
       // you'd fetch actual transaction and exception data from reports
       const mockTransactions: ReconciliationTransaction[] = jobs.map((job, idx) => ({
         id: `tx-${job.id}`,
-        provider: (job.source as any)?.adapter || 'stripe',
+        provider: ((job.source as unknown) as Record<string, unknown>)?.adapter as string || 'stripe',
         providerTransactionId: `ch_${job.id.slice(0, 10)}`,
         amount: { value: 100.0 * (idx + 1), currency: 'USD' },
         currency: 'USD',
@@ -114,7 +111,13 @@ export default function ReactSettlerDemoPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [client]);
+
+  useEffect(() => {
+    if (apiKey) {
+      void loadData();
+    }
+  }, [apiKey, loadData]);
 
   if (!apiKey) {
     return (
