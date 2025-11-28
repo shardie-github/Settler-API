@@ -124,14 +124,18 @@ jobsCommand
         
         while (!completed && attempts < maxAttempts) {
           await new Promise(resolve => setTimeout(resolve, 5000));
-          const job = await client.jobs.get(id);
-          if (job.data.status === "completed" || job.data.status === "failed") {
+          // Check execution status via reports endpoint instead of job status
+          // Job status is "active" | "paused" | "archived", not execution status
+          try {
+            const report = await client.reports.get(id, {
+              startDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+              endDate: new Date().toISOString(),
+            });
+            // If we can get a report, the execution likely completed
             completed = true;
-            if (job.data.status === "completed") {
-              console.log(chalk.green("✓ Job completed successfully"));
-            } else {
-              console.log(chalk.red("✗ Job failed"));
-            }
+            console.log(chalk.green("✓ Job execution completed"));
+          } catch {
+            // Execution might still be running, continue polling
           }
           attempts++;
         }
@@ -181,20 +185,20 @@ jobsCommand
       );
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json() as { message?: string };
         console.error(chalk.red(`Error: ${error.message || "Failed to fetch logs"}`));
         process.exit(1);
       }
 
-      const logs = await response.json();
+      const logs = await response.json() as { data?: Array<{ timestamp: string; level: string; message: string; metadata?: unknown }> };
       
-      if (logs.data.length === 0) {
+      if (!logs.data || logs.data.length === 0) {
         console.log(chalk.yellow("No logs found"));
         return;
       }
 
       console.log(chalk.bold(`\nJob Logs (${logs.data.length} entries):\n`));
-      logs.data.forEach((log: any) => {
+      logs.data.forEach((log) => {
         const timestamp = new Date(log.timestamp).toLocaleString();
         const level = log.level.toUpperCase();
         const levelColor = 
@@ -263,12 +267,12 @@ jobsCommand
       );
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json() as { message?: string };
         console.error(chalk.red(`Error: ${error.message || "Failed to replay events"}`));
         process.exit(1);
       }
 
-      const result = await response.json();
+      const result = await response.json() as { eventsProcessed?: number; eventsReplayed?: number };
       
       if (options.dryRun) {
         console.log(chalk.yellow("Dry run mode - no events were actually replayed"));

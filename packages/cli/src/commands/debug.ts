@@ -22,11 +22,6 @@ debugCommand
         process.exit(1);
       }
 
-      const client = new Settler({
-        apiKey: settlerApiKey,
-        baseUrl: options.parent.parent?.baseUrl,
-      });
-
       console.log(chalk.blue(`Testing connection to ${options.adapter}...`));
 
       // Use the playground endpoint to test adapter connection
@@ -46,15 +41,19 @@ debugCommand
       );
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as { adapter?: string; status?: string; sampleData?: unknown[] };
         console.log(chalk.green("✅ Connection successful!"));
-        console.log(chalk.gray(`   Adapter: ${data.adapter}`));
-        console.log(chalk.gray(`   Status: ${data.status}`));
-        if (data.sampleData) {
+        if (data.adapter) {
+          console.log(chalk.gray(`   Adapter: ${data.adapter}`));
+        }
+        if (data.status) {
+          console.log(chalk.gray(`   Status: ${data.status}`));
+        }
+        if (data.sampleData && Array.isArray(data.sampleData)) {
           console.log(chalk.gray(`   Sample records: ${data.sampleData.length}`));
         }
       } else {
-        const error = await response.json();
+        const error = await response.json() as { message?: string };
         console.error(chalk.red("❌ Connection failed:"));
         console.error(chalk.red(`   ${error.message || "Unknown error"}`));
         process.exit(1);
