@@ -12,7 +12,7 @@ export declare class ReconciliationCommandHandlers {
     handleStartReconciliation(command: StartReconciliationCommand): Promise<void>;
     handleRetryReconciliation(command: RetryReconciliationCommand): Promise<void>;
     handleCancelReconciliation(command: CancelReconciliationCommand): Promise<void>;
-    handlePauseReconciliation(command: PauseReconciliationCommand): Promise<void>;
-    handleResumeReconciliation(command: ResumeReconciliationCommand): Promise<void>;
+    handlePauseReconciliation(_command: PauseReconciliationCommand): Promise<void>;
+    handleResumeReconciliation(_command: ResumeReconciliationCommand): Promise<void>;
 }
 //# sourceMappingURL=ReconciliationCommandHandlers.d.ts.map

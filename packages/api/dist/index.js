@@ -14,6 +14,23 @@ const health_1 = require("./routes/health");
 const metrics_1 = require("./routes/metrics");
 const openapi_1 = require("./routes/openapi");
 const auth_2 = require("./routes/auth");
+const api_keys_1 = require("./routes/api-keys");
+const exceptions_1 = require("./routes/exceptions");
+const test_mode_1 = require("./routes/test-mode");
+const dashboards_1 = require("./routes/dashboards");
+const feedback_1 = require("./routes/feedback");
+const alerts_1 = require("./routes/alerts");
+const adapter_test_1 = require("./routes/adapter-test");
+const reports_enhanced_1 = require("./routes/reports-enhanced");
+const confidence_1 = require("./routes/confidence");
+const reconciliation_status_1 = require("./routes/reconciliation-status");
+const rules_editor_1 = require("./routes/rules-editor");
+const playground_1 = require("./routes/playground");
+const cli_wizard_1 = require("./routes/cli-wizard");
+const export_enhanced_1 = require("./routes/export-enhanced");
+const ai_assistant_1 = require("./routes/ai-assistant");
+const audit_trail_1 = require("./routes/audit-trail");
+const test_mode_2 = require("./middleware/test-mode");
 const rate_limiter_1 = require("./utils/rate-limiter");
 const db_1 = require("./db");
 const config_1 = require("./config");
@@ -30,9 +47,15 @@ const SecretsManager_1 = require("./infrastructure/security/SecretsManager");
 const tracing_1 = require("./infrastructure/observability/tracing");
 const compression_1 = require("./middleware/compression");
 const observability_1 = require("./middleware/observability");
+const event_tracking_1 = require("./middleware/event-tracking");
 const graceful_shutdown_1 = require("./utils/graceful-shutdown");
 const request_timeout_1 = require("./middleware/request-timeout");
 const sentry_1 = require("./middleware/sentry");
+const profiling_1 = require("./infrastructure/observability/profiling");
+const csrf_1 = require("./middleware/csrf");
+const input_sanitization_1 = require("./middleware/input-sanitization");
+const startup_validation_1 = require("./utils/startup-validation");
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const app = (0, express_1.default)();
 const PORT = config_1.config.port;
 // Initialize Sentry before other middleware
@@ -58,8 +81,18 @@ app.use((0, cors_1.default)({
 // Compression middleware (Gzip and Brotli)
 app.use(compression_1.compressionMiddleware);
 app.use(compression_1.brotliCompressionMiddleware);
+// Cookie parser (needed for CSRF protection)
+app.use((0, cookie_parser_1.default)());
 // Observability middleware (tracing, metrics, logging)
 app.use(observability_1.observabilityMiddleware);
+// Performance profiling middleware
+app.use(profiling_1.profilingMiddleware);
+// CSRF token setup (for web UI)
+app.use(csrf_1.setCsrfToken);
+// CSRF protection (for web UI state-changing operations)
+app.use(csrf_1.csrfProtection);
+// Event tracking middleware (for analytics)
+app.use("/api", event_tracking_1.eventTrackingMiddleware);
 // Request timeout middleware (must be before routes)
 if (config_1.config.features.enableRequestTimeout) {
     app.use((req, res, next) => {
@@ -93,7 +126,7 @@ function countDepth(obj, current = 0) {
 }
 app.use(express_1.default.json({
     limit: "1mb", // Reduced from 10mb
-    verify: (req, res, buf) => {
+    verify: (_req, _res, buf) => {
         try {
             const parsed = JSON.parse(buf.toString());
             const depth = countDepth(parsed);
@@ -112,6 +145,9 @@ app.use(express_1.default.json({
 app.use(express_1.default.urlencoded({ extended: true, limit: "1mb" }));
 // Initialize tracing
 (0, tracing_1.initializeTracing)();
+// Input sanitization middleware (defense-in-depth)
+app.use(input_sanitization_1.sanitizeInput);
+app.use(input_sanitization_1.sanitizeUrlParams);
 // Validate secrets at startup (production and preview)
 if (config_1.config.nodeEnv === 'production' || config_1.config.nodeEnv === 'preview') {
     try {
@@ -137,9 +173,64 @@ app.use("/api/v2", (0, idempotency_1.idempotencyMiddleware)());
 // Rate limiting per API key
 app.use("/api/v1", auth_1.authMiddleware, (0, rate_limiter_1.rateLimitMiddleware)());
 app.use("/api/v2", auth_1.authMiddleware, (0, rate_limiter_1.rateLimitMiddleware)());
+// Test mode middleware (after auth, before routes)
+app.use("/api/v1", auth_1.authMiddleware, test_mode_2.testModeMiddleware);
+app.use("/api/v2", auth_1.authMiddleware, test_mode_2.testModeMiddleware);
+app.use("/api/v1", auth_1.authMiddleware, test_mode_2.validateTestMode);
+app.use("/api/v2", auth_1.authMiddleware, test_mode_2.validateTestMode);
 // Auth routes (no auth required for login/refresh)
 app.use("/api/v1/auth", auth_2.authRouter);
 app.use("/api/v2/auth", auth_2.authRouter);
+// API Keys routes (requires auth)
+app.use("/api/v1", auth_1.authMiddleware, api_keys_1.apiKeysRouter);
+app.use("/api/v2", auth_1.authMiddleware, api_keys_1.apiKeysRouter);
+// Exceptions routes (requires auth)
+app.use("/api/v1", auth_1.authMiddleware, exceptions_1.exceptionsRouter);
+app.use("/api/v2", auth_1.authMiddleware, exceptions_1.exceptionsRouter);
+// Test mode routes (requires auth)
+app.use("/api/v1", auth_1.authMiddleware, test_mode_1.testModeRouter);
+app.use("/api/v2", auth_1.authMiddleware, test_mode_1.testModeRouter);
+// Dashboard routes (requires auth)
+app.use("/api/v1", auth_1.authMiddleware, dashboards_1.dashboardsRouter);
+app.use("/api/v2", auth_1.authMiddleware, dashboards_1.dashboardsRouter);
+// Feedback routes (requires auth)
+app.use("/api/v1", auth_1.authMiddleware, feedback_1.feedbackRouter);
+app.use("/api/v2", auth_1.authMiddleware, feedback_1.feedbackRouter);
+// Alert routes (requires auth)
+app.use("/api/v1", auth_1.authMiddleware, alerts_1.alertsRouter);
+app.use("/api/v2", auth_1.authMiddleware, alerts_1.alertsRouter);
+// Adapter test routes (requires auth)
+app.use("/api/v1", auth_1.authMiddleware, adapter_test_1.adapterTestRouter);
+app.use("/api/v2", auth_1.authMiddleware, adapter_test_1.adapterTestRouter);
+// Enhanced reports routes (requires auth)
+app.use("/api/v1", auth_1.authMiddleware, reports_enhanced_1.reportsEnhancedRouter);
+app.use("/api/v2", auth_1.authMiddleware, reports_enhanced_1.reportsEnhancedRouter);
+// Confidence score routes (requires auth)
+app.use("/api/v1", auth_1.authMiddleware, confidence_1.confidenceRouter);
+app.use("/api/v2", auth_1.authMiddleware, confidence_1.confidenceRouter);
+// Reconciliation status routes (requires auth)
+app.use("/api/v1", auth_1.authMiddleware, reconciliation_status_1.reconciliationStatusRouter);
+app.use("/api/v2", auth_1.authMiddleware, reconciliation_status_1.reconciliationStatusRouter);
+// Rules editor routes (requires auth)
+app.use("/api/v1", auth_1.authMiddleware, rules_editor_1.rulesEditorRouter);
+app.use("/api/v2", auth_1.authMiddleware, rules_editor_1.rulesEditorRouter);
+// Playground routes (no auth, rate-limited)
+app.use("/api/v1/playground", playground_1.playgroundRouter);
+app.use("/api/v2/playground", playground_1.playgroundRouter);
+// CSRF token endpoint (for web UI)
+app.get("/api/csrf-token", csrf_1.getCsrfToken);
+// CLI wizard routes (requires auth)
+app.use("/api/v1", auth_1.authMiddleware, cli_wizard_1.cliWizardRouter);
+app.use("/api/v2", auth_1.authMiddleware, cli_wizard_1.cliWizardRouter);
+// Enhanced export routes (requires auth)
+app.use("/api/v1", auth_1.authMiddleware, export_enhanced_1.exportEnhancedRouter);
+app.use("/api/v2", auth_1.authMiddleware, export_enhanced_1.exportEnhancedRouter);
+// AI assistant routes (requires auth)
+app.use("/api/v1", auth_1.authMiddleware, ai_assistant_1.aiAssistantRouter);
+app.use("/api/v2", auth_1.authMiddleware, ai_assistant_1.aiAssistantRouter);
+// Audit trail routes (requires auth)
+app.use("/api/v1", auth_1.authMiddleware, audit_trail_1.auditTrailRouter);
+app.use("/api/v2", auth_1.authMiddleware, audit_trail_1.auditTrailRouter);
 // Versioned API routes
 app.use("/api/v1", auth_1.authMiddleware, v1_1.v1Router);
 app.use("/api/v2", auth_1.authMiddleware, v2_1.v2Router);
@@ -150,15 +241,26 @@ app.use((0, sentry_1.sentryErrorHandler)());
 // Error handling
 app.use(error_1.errorHandler);
 // 404 handler
-app.use((req, res) => {
+app.use((_req, res) => {
     res.status(404).json({
         error: "Not Found",
-        message: `Cannot ${req.method} ${req.path}`,
+        message: `Cannot ${_req.method} ${_req.path}`,
     });
 });
 // Initialize database on startup
 async function startServer() {
     try {
+        // Run startup validations
+        const validation = await (0, startup_validation_1.validateStartup)();
+        if (!validation.passed) {
+            (0, logger_1.logError)('Startup validation failed', undefined, { validation });
+            if (config_1.config.nodeEnv === 'production') {
+                process.exit(1);
+            }
+            else {
+                (0, logger_1.logWarn)('Continuing despite validation failures (non-production mode)');
+            }
+        }
         await (0, db_1.initDatabase)();
         (0, logger_1.logInfo)('Database initialized');
         // Start background jobs

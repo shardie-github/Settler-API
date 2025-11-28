@@ -11,7 +11,16 @@ exports.buildCursorOrderBy = buildCursorOrderBy;
 exports.createCursorPaginationResponse = createCursorPaginationResponse;
 exports.parseCursorPaginationParams = parseCursorPaginationParams;
 /**
- * Decode cursor from base64
+ * Decodes a base64-encoded cursor string into pagination parameters.
+ *
+ * @param cursor - Base64-encoded cursor string from previous pagination response
+ * @returns Decoded cursor object with `created_at` and `id`, or `null` if invalid
+ *
+ * @example
+ * ```typescript
+ * const cursor = decodeCursor("eyJjcmVhdGVkX2F0IjoiMjAyNC0wMS0wMSIsImlkIjoiMTIzIn0=");
+ * // Returns: { created_at: "2024-01-01", id: "123" }
+ * ```
  */
 function decodeCursor(cursor) {
     try {
@@ -23,7 +32,17 @@ function decodeCursor(cursor) {
     }
 }
 /**
- * Encode cursor to base64
+ * Encodes pagination parameters into a base64-encoded cursor string.
+ *
+ * @param created_at - Creation timestamp (ISO string or Date)
+ * @param id - Item ID
+ * @returns Base64-encoded cursor string
+ *
+ * @example
+ * ```typescript
+ * const cursor = encodeCursor(new Date(), "123");
+ * // Returns: "eyJjcmVhdGVkX2F0IjoiMjAyNC0wMS0wMSIsImlkIjoiMTIzIn0="
+ * ```
  */
 function encodeCursor(created_at, id) {
     const cursor = {
@@ -37,7 +56,9 @@ function encodeCursor(created_at, id) {
  */
 function buildCursorWhereClause(params, tableAlias = '') {
     const prefix = tableAlias ? `${tableAlias}.` : '';
-    const limit = Math.min(params.limit || 100, 1000);
+    // Limit is reserved for future query building
+    const _limit = Math.min(params.limit || 100, 1000);
+    void _limit;
     const direction = params.direction || 'next';
     let paramIndex = 1;
     const queryParams = [];
@@ -90,36 +111,49 @@ function createCursorPaginationResponse(items, limit, direction = 'next') {
         const lastItem = paginatedItems[paginatedItems.length - 1];
         if (direction === 'next') {
             // For next page, use last item as cursor
-            if (hasMore) {
+            if (hasMore && lastItem) {
                 nextCursor = encodeCursor(lastItem.created_at, lastItem.id);
             }
             // For previous page, use first item as cursor (reversed)
-            prevCursor = encodeCursor(firstItem.created_at, firstItem.id);
+            if (firstItem) {
+                prevCursor = encodeCursor(firstItem.created_at, firstItem.id);
+            }
         }
         else {
             // For prev page, use first item as cursor
-            if (hasMore) {
+            if (hasMore && firstItem) {
                 prevCursor = encodeCursor(firstItem.created_at, firstItem.id);
             }
             // For next page, use last item as cursor (reversed)
-            nextCursor = encodeCursor(lastItem.created_at, lastItem.id);
+            if (lastItem) {
+                nextCursor = encodeCursor(lastItem.created_at, lastItem.id);
+            }
         }
     }
-    return {
+    const result = {
         items: paginatedItems,
-        nextCursor,
-        prevCursor,
         hasMore,
     };
+    if (nextCursor) {
+        result.nextCursor = nextCursor;
+    }
+    if (prevCursor) {
+        result.prevCursor = prevCursor;
+    }
+    return result;
 }
 /**
  * Parse pagination params from query string
  */
 function parseCursorPaginationParams(req) {
-    return {
-        cursor: req.query.cursor,
-        limit: req.query.limit ? parseInt(req.query.limit, 10) : undefined,
-        direction: req.query.direction || 'next',
-    };
+    const result = {};
+    if (req.query.cursor) {
+        result.cursor = req.query.cursor;
+    }
+    if (req.query.limit) {
+        result.limit = parseInt(req.query.limit, 10);
+    }
+    result.direction = req.query.direction || 'next';
+    return result;
 }
 //# sourceMappingURL=pagination.js.map

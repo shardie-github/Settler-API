@@ -46,7 +46,7 @@ export declare class AdminService {
     /**
      * Dry-run reconciliation using historical events
      */
-    dryRunReconciliation(reconciliationId: string, events: EventEnvelope[]): Promise<{
+    dryRunReconciliation(_reconciliationId: string, events: EventEnvelope[]): Promise<{
         matched: number;
         unmatched: number;
         errors: number;

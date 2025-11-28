@@ -75,7 +75,9 @@ class ReconciliationGraphEngine extends events_1.EventEmitter {
             return [];
         }
         const matches = [];
-        const sourceNodes = Array.from(graph.nodes.values()).filter(n => n.jobId === jobId && n.type === 'transaction' && n.sourceId);
+        // Reserved for future source node filtering
+        const _sourceNodes = Array.from(graph.nodes.values()).filter(n => n.jobId === jobId && n.type === 'transaction' && n.sourceId);
+        void _sourceNodes;
         const targetNodes = Array.from(graph.nodes.values()).filter(n => n.jobId === jobId && n.type === 'transaction' && n.targetId);
         for (const targetNode of targetNodes) {
             if (targetNode.id === sourceNodeId)
@@ -179,6 +181,9 @@ class ReconciliationGraphEngine extends events_1.EventEmitter {
             matrix[i] = [i];
         }
         for (let j = 0; j <= str1.length; j++) {
+            if (!matrix[0]) {
+                matrix[0] = [];
+            }
             matrix[0][j] = j;
         }
         for (let i = 1; i <= str2.length; i++) {

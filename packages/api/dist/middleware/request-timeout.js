@@ -6,6 +6,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.requestTimeoutMiddleware = requestTimeoutMiddleware;
 exports.getRequestTimeout = getRequestTimeout;
+// Config import removed - not used
 const logger_1 = require("../utils/logger");
 const DEFAULT_TIMEOUT = 30000; // 30 seconds
 const MAX_TIMEOUT = 300000; // 5 minutes
@@ -39,12 +40,20 @@ function requestTimeoutMiddleware(timeoutMs = DEFAULT_TIMEOUT) {
             }
         }, timeout);
         // Clear timeout when response finishes
-        const originalEnd = res.end;
-        res.end = function (...args) {
+        const originalEnd = res.end.bind(res);
+        res.end = function (chunk, encoding, cb) {
             if (req.timeout) {
                 clearTimeout(req.timeout);
             }
-            originalEnd.apply(res, args);
+            if (encoding !== undefined && typeof encoding === 'string') {
+                originalEnd(chunk, encoding, cb);
+            }
+            else if (cb !== undefined) {
+                originalEnd(chunk, cb);
+            }
+            else {
+                originalEnd(chunk);
+            }
         };
         next();
     };

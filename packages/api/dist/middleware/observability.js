@@ -26,9 +26,9 @@ function observabilityMiddleware(req, res, next) {
     // Set span in context
     const ctx = api_1.trace.setSpan(api_1.context.active(), span);
     // Wrap response handlers
-    const originalSend = res.send;
-    const originalJson = res.json;
-    const originalEnd = res.end;
+    const originalSend = res.send.bind(res);
+    const originalJson = res.json.bind(res);
+    const originalEnd = res.end.bind(res);
     res.send = function (body) {
         recordMetrics();
         return originalSend.call(this, body);
@@ -37,9 +37,24 @@ function observabilityMiddleware(req, res, next) {
         recordMetrics();
         return originalJson.call(this, body);
     };
-    res.end = function (chunk, encoding) {
+    res.end = function (chunk, encoding, cb) {
         recordMetrics();
-        return originalEnd.call(this, chunk, encoding);
+        if (typeof encoding === 'function') {
+            // encoding is actually a callback function (two-arg overload: end(chunk, cb))
+            originalEnd(chunk, encoding);
+        }
+        else if (encoding !== undefined && typeof encoding === 'string') {
+            // encoding is a BufferEncoding string (three-arg overload: end(chunk, encoding, cb))
+            originalEnd(chunk, encoding, cb);
+        }
+        else if (cb !== undefined) {
+            // cb is provided but encoding is not (two-arg overload: end(chunk, cb))
+            originalEnd(chunk, cb);
+        }
+        else {
+            // Only chunk provided (one-arg overload: end(chunk))
+            originalEnd(chunk);
+        }
     };
     function recordMetrics() {
         const duration = (Date.now() - startTime) / 1000;

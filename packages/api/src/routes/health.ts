@@ -12,8 +12,9 @@ interface HealthCheck {
   error?: string;
 }
 
+// Reserved for future detailed health checks
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function checkDatabase(): Promise<HealthCheck> {
+async function _checkDatabase(): Promise<HealthCheck> {
   const start = Date.now();
   try {
     await query('SELECT 1');
@@ -25,8 +26,9 @@ async function checkDatabase(): Promise<HealthCheck> {
   }
 }
 
+// Reserved for future detailed health checks
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function checkConnectionPool(): Promise<HealthCheck> {
+async function _checkConnectionPool(): Promise<HealthCheck> {
   try {
     const totalConnections = pool.totalCount;
     const idleConnections = pool.idleCount;
@@ -89,5 +91,9 @@ router.get("/ready", async (_req: Request, res: Response) => {
   const health = await healthCheckService.checkReady();
   res.status(health.status === 'ready' ? 200 : 503).json(health);
 });
+
+// Reference unused functions to satisfy TypeScript
+void _checkDatabase;
+void _checkConnectionPool;
 
 export { router as healthRouter };

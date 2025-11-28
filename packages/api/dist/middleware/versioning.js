@@ -43,7 +43,7 @@ function versionMiddleware(req, res, next) {
  * Add deprecation headers for deprecated endpoints
  */
 function deprecateEndpoint(sunsetDate, migrationGuideUrl) {
-    return (req, res, next) => {
+    return (_req, res, next) => {
         res.setHeader('Deprecation', 'true');
         res.setHeader('Sunset', sunsetDate);
         if (migrationGuideUrl) {

@@ -9,6 +9,7 @@ const express_1 = require("express");
 const zod_1 = require("zod");
 const validation_1 = require("../../middleware/validation");
 const authorization_1 = require("../../middleware/authorization");
+const Permissions_1 = require("../../infrastructure/security/Permissions");
 const db_1 = require("../../db");
 const api_response_1 = require("../../utils/api-response");
 const error_handler_1 = require("../../utils/error-handler");
@@ -37,9 +38,10 @@ const getEffectiveRateSchema = zod_1.z.object({
  * GET /api/v1/fees
  * List fees with filtering and pagination
  */
-router.get('/', (0, authorization_1.requirePermission)('fees', 'read'), (0, validation_1.validateRequest)(getFeesSchema), async (req, res) => {
+router.get('/', (0, authorization_1.requirePermission)(Permissions_1.Permission.REPORTS_READ), (0, validation_1.validateRequest)(getFeesSchema), async (req, res) => {
     try {
-        const { page, limit, transactionId, settlementId, type, startDate, endDate } = req.query;
+        const queryParams = getFeesSchema.parse({ query: req.query });
+        const { page, limit, transactionId, settlementId, type, startDate, endDate } = queryParams.query;
         const tenantId = req.tenantId;
         const offset = (page - 1) * limit;
         let whereClause = 'tenant_id = $1';
@@ -62,16 +64,19 @@ router.get('/', (0, authorization_1.requirePermission)('fees', 'read'), (0, vali
         }
         if (startDate) {
             whereClause += ` AND created_at >= $${paramIndex}`;
-            params.push(startDate);
+            params.push(new Date(startDate).toISOString());
             paramIndex++;
         }
         if (endDate) {
             whereClause += ` AND created_at <= $${paramIndex}`;
-            params.push(endDate);
+            params.push(new Date(endDate).toISOString());
             paramIndex++;
         }
         // Get total count
         const countResult = await (0, db_1.query)(`SELECT COUNT(*) as count FROM fees WHERE ${whereClause}`, params);
+        if (!countResult[0]) {
+            throw new Error('Failed to get fee count');
+        }
         const total = parseInt(countResult[0].count, 10);
         // Get fees
         const fees = await (0, db_1.query)(`SELECT 
@@ -90,7 +95,8 @@ router.get('/', (0, authorization_1.requirePermission)('fees', 'read'), (0, vali
         WHERE ${whereClause}
         ORDER BY created_at DESC
         LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`, [...params, limit, offset]);
-        (0, api_response_1.sendPaginated)(res, fees, total, page, limit);
+        (0, api_response_1.sendPaginated)(res, fees, { page, limit, total });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to fetch fees', 500);
@@ -100,9 +106,10 @@ router.get('/', (0, authorization_1.requirePermission)('fees', 'read'), (0, vali
  * GET /api/v1/fees/effective-rate
  * Calculate effective rate for transactions
  */
-router.get('/effective-rate', (0, authorization_1.requirePermission)('fees', 'read'), (0, validation_1.validateRequest)(getEffectiveRateSchema), async (req, res) => {
+router.get('/effective-rate', (0, authorization_1.requirePermission)(Permissions_1.Permission.REPORTS_READ), (0, validation_1.validateRequest)(getEffectiveRateSchema), async (req, res) => {
     try {
-        const { transactionId, provider, startDate, endDate } = req.query;
+        const queryParams = getEffectiveRateSchema.parse({ query: req.query });
+        const { transactionId, provider, startDate, endDate } = queryParams.query;
         const tenantId = req.tenantId;
         let whereClause = 't.tenant_id = $1';
         const params = [tenantId];
@@ -119,12 +126,12 @@ router.get('/effective-rate', (0, authorization_1.requirePermission)('fees', 're
         }
         if (startDate) {
             whereClause += ` AND t.created_at >= $${paramIndex}`;
-            params.push(startDate);
+            params.push(new Date(startDate).toISOString());
             paramIndex++;
         }
         if (endDate) {
             whereClause += ` AND t.created_at <= $${paramIndex}`;
-            params.push(endDate);
+            params.push(new Date(endDate).toISOString());
             paramIndex++;
         }
         const result = await (0, db_1.query)(`SELECT 
@@ -143,9 +150,11 @@ router.get('/effective-rate', (0, authorization_1.requirePermission)('fees', 're
         GROUP BY t.id, t.provider, t.amount_value
         ORDER BY t.created_at DESC`, params);
         (0, api_response_1.sendSuccess)(res, result);
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to calculate effective rate', 500);
+        return;
     }
 });
 exports.default = router;

@@ -114,7 +114,7 @@ class ComplianceExportSystem extends events_1.EventEmitter {
     /**
      * Fetch export data (mock implementation)
      */
-    async fetchExportData(customerId, jurisdiction) {
+    async fetchExportData(customerId, _jurisdiction) {
         // TODO: Query database for actual data
         // For now, return mock data
         return {
@@ -130,7 +130,7 @@ class ComplianceExportSystem extends events_1.EventEmitter {
     /**
      * Format data according to jurisdiction and format
      */
-    formatData(data, jurisdiction, format) {
+    formatData(data, _jurisdiction, format) {
         switch (format) {
             case 'json':
                 return data;
@@ -175,7 +175,7 @@ class ComplianceExportSystem extends events_1.EventEmitter {
     /**
      * Generate download URL
      */
-    async generateDownloadUrl(exportId, data, format) {
+    async generateDownloadUrl(exportId, _data, _format) {
         // TODO: Upload to S3/R2 and generate signed URL
         // For now, return mock URL
         return `https://api.settler.io/api/v2/compliance/exports/${exportId}/download`;

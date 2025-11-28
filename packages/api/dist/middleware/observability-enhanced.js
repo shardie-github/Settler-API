@@ -59,7 +59,6 @@ function trackReconciliationEnd(jobId, status, durationSeconds) {
  * Tracks additional metrics beyond basic request/response
  */
 function observabilityEnhancedMiddleware(req, res, next) {
-    const startTime = Date.now();
     // Track cache status from headers
     res.on('finish', () => {
         const cacheStatus = res.getHeader('X-Cache');

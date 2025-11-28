@@ -12,9 +12,9 @@ export interface CircuitBreakerConfig {
 /**
  * Create a circuit breaker for a function
  */
-export declare function createCircuitBreaker<T extends unknown[], R>(fn: (...args: T) => Promise<R>, config?: CircuitBreakerConfig): CircuitBreaker;
+export declare function createCircuitBreaker<T extends unknown[], R>(fn: (...args: T) => Promise<R>, config?: CircuitBreakerConfig): CircuitBreaker<R>;
 /**
  * Circuit breaker for external API calls
  */
-export declare function createApiCircuitBreaker<T extends unknown[], R>(fn: (...args: T) => Promise<R>, apiName: string): CircuitBreaker;
+export declare function createApiCircuitBreaker<T extends unknown[], R>(fn: (...args: T) => Promise<R>, apiName: string): CircuitBreaker<R>;
 //# sourceMappingURL=circuit-breaker.d.ts.map

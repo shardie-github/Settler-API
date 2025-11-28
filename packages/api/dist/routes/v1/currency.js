@@ -9,6 +9,7 @@ const express_1 = require("express");
 const zod_1 = require("zod");
 const validation_1 = require("../../middleware/validation");
 const authorization_1 = require("../../middleware/authorization");
+const Permissions_1 = require("../../infrastructure/security/Permissions");
 const FXService_1 = require("../../application/currency/FXService");
 const api_response_1 = require("../../utils/api-response");
 const error_handler_1 = require("../../utils/error-handler");
@@ -36,13 +37,17 @@ const getFXRateSchema = zod_1.z.object({
  * POST /api/v1/currency/convert
  * Convert amount to base currency
  */
-router.post('/convert', (0, authorization_1.requirePermission)('currency', 'read'), (0, validation_1.validateRequest)(convertCurrencySchema), async (req, res) => {
+router.post('/convert', (0, authorization_1.requirePermission)(Permissions_1.Permission.REPORTS_READ), (0, validation_1.validateRequest)(convertCurrencySchema), async (req, res) => {
     try {
         const { amount, toCurrency, date } = req.body;
         const tenantId = req.tenantId;
-        const converted = await fxService.convertToBaseCurrency(tenantId, amount, toCurrency, date ? new Date(date) : undefined);
+        const moneyAmount = {
+            value: typeof amount === 'number' ? amount : parseFloat(String(amount)),
+            currency: toCurrency,
+        };
+        const converted = await fxService.convertToBaseCurrency(tenantId, moneyAmount, toCurrency, date ? new Date(date) : undefined);
         if (!converted) {
-            return (0, api_response_1.sendError)(res, 'Not Found', 'FX rate not available for currency pair', 404);
+            return (0, api_response_1.sendError)(res, 404, 'NOT_FOUND', 'FX rate not available for currency pair');
         }
         (0, api_response_1.sendSuccess)(res, { original: amount, converted });
     }
@@ -54,13 +59,13 @@ router.post('/convert', (0, authorization_1.requirePermission)('currency', 'read
  * GET /api/v1/currency/fx-rate
  * Get FX rate for currency pair
  */
-router.get('/fx-rate', (0, authorization_1.requirePermission)('currency', 'read'), (0, validation_1.validateRequest)(getFXRateSchema), async (req, res) => {
+router.get('/fx-rate', (0, authorization_1.requirePermission)(Permissions_1.Permission.REPORTS_READ), (0, validation_1.validateRequest)(getFXRateSchema), async (req, res) => {
     try {
         const { fromCurrency, toCurrency, date } = req.query;
         const tenantId = req.tenantId;
         const rate = await fxService.getFXRate(tenantId, fromCurrency, toCurrency, date ? new Date(date) : undefined);
         if (rate === null) {
-            return (0, api_response_1.sendError)(res, 'Not Found', 'FX rate not available for currency pair', 404);
+            return (0, api_response_1.sendError)(res, 404, 'NOT_FOUND', 'FX rate not available for currency pair');
         }
         (0, api_response_1.sendSuccess)(res, {
             fromCurrency,
@@ -77,7 +82,7 @@ router.get('/fx-rate', (0, authorization_1.requirePermission)('currency', 'read'
  * GET /api/v1/currency/base-currency
  * Get base currency for tenant
  */
-router.get('/base-currency', (0, authorization_1.requirePermission)('currency', 'read'), async (req, res) => {
+router.get('/base-currency', (0, authorization_1.requirePermission)(Permissions_1.Permission.REPORTS_READ), async (req, res) => {
     try {
         const tenantId = req.tenantId;
         const baseCurrency = await fxService.getBaseCurrency(tenantId);
@@ -91,7 +96,7 @@ router.get('/base-currency', (0, authorization_1.requirePermission)('currency', 
  * GET /api/v1/currency/fx-rates
  * Get all FX rates for tenant
  */
-router.get('/fx-rates', (0, authorization_1.requirePermission)('currency', 'read'), async (req, res) => {
+router.get('/fx-rates', (0, authorization_1.requirePermission)(Permissions_1.Permission.REPORTS_READ), async (req, res) => {
     try {
         const tenantId = req.tenantId;
         const date = req.query.date ? new Date(req.query.date) : undefined;

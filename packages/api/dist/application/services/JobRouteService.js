@@ -29,8 +29,11 @@ class JobRouteService {
                 target.adapter,
                 encryptedTargetConfig,
                 JSON.stringify(rules),
-                schedule,
+                schedule || null,
             ]);
+            if (!result[0]) {
+                throw new Error('Failed to create job');
+            }
             const jobId = result[0].id;
             // Log audit event
             await (0, db_1.query)(`INSERT INTO audit_logs (event, user_id, metadata)
@@ -40,17 +43,20 @@ class JobRouteService {
                 JSON.stringify({ jobId, name }),
             ]);
             (0, logger_1.logInfo)('Job created', { jobId, userId, name });
-            return {
+            const response = {
                 id: jobId,
                 userId,
                 name,
                 source: { adapter: source.adapter },
                 target: { adapter: target.adapter },
                 rules,
-                schedule,
                 status: 'active',
                 createdAt: new Date().toISOString(),
             };
+            if (schedule !== undefined) {
+                response.schedule = schedule;
+            }
+            return response;
         }
         catch (error) {
             (0, logger_1.logError)('Failed to create job', error, { userId });
@@ -69,6 +75,9 @@ class JobRouteService {
             return null;
         }
         const job = jobs[0];
+        if (!job) {
+            return null;
+        }
         // Decrypt configs (but don't expose full API keys in response)
         const sourceConfig = JSON.parse((0, encryption_1.decrypt)(job.source_config_encrypted));
         const targetConfig = JSON.parse((0, encryption_1.decrypt)(job.target_config_encrypted));
@@ -85,7 +94,7 @@ class JobRouteService {
                 ? '***'
                 : value,
         ]));
-        return {
+        const response = {
             id: job.id,
             userId: job.user_id,
             name: job.name,
@@ -98,10 +107,13 @@ class JobRouteService {
                 config: redactedTargetConfig,
             },
             rules: JSON.parse(job.rules),
-            schedule: job.schedule || undefined,
             status: job.status,
             createdAt: job.created_at.toISOString(),
         };
+        if (job.schedule) {
+            response.schedule = job.schedule;
+        }
+        return response;
     }
     /**
      * List jobs with pagination
@@ -116,18 +128,27 @@ class JobRouteService {
          LIMIT $2 OFFSET $3`, [userId, limit, offset]),
             (0, db_1.query)(`SELECT COUNT(*) as count FROM jobs WHERE user_id = $1`, [userId]),
         ]);
+        if (!totalResult[0]) {
+            return { jobs: [], total: 0 };
+        }
         const total = parseInt(totalResult[0].count, 10);
+        const defaultRules = {
+            matching: [],
+        };
         return {
-            jobs: jobs.map((job) => ({
-                id: job.id,
-                userId: job.user_id,
-                name: job.name,
-                source: { adapter: job.source_adapter },
-                target: { adapter: job.target_adapter },
-                rules: {},
-                status: job.status,
-                createdAt: job.created_at.toISOString(),
-            })),
+            jobs: jobs.map((job) => {
+                const response = {
+                    id: job.id,
+                    userId: job.user_id,
+                    name: job.name,
+                    source: { adapter: job.source_adapter },
+                    target: { adapter: job.target_adapter },
+                    rules: defaultRules,
+                    status: job.status,
+                    createdAt: job.created_at.toISOString(),
+                };
+                return response;
+            }),
             total,
         };
     }

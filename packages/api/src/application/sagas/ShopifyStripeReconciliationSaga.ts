@@ -212,8 +212,8 @@ export class ShopifyStripeReconciliationSaga {
           const orders = state.data.shopify_orders as any[];
           const payments = state.data.stripe_payments as any[];
           // Matching rules reserved for future use
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const _matchingRules = state.data.matching_rules as any;
+          void _matchingRules;
 
           const matched: any[] = [];
           const unmatched: any[] = [];

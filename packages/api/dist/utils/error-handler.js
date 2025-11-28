@@ -40,13 +40,15 @@ function isHttpError(error) {
 /**
  * Handles errors in route handlers with proper typing
  */
-function handleRouteError(res, error, defaultMessage = 'An error occurred', defaultStatusCode = 500, context) {
+function handleRouteError(res, error, defaultMessage = 'An error occurred', _defaultStatusCode = 500, context) {
     const apiError = (0, typed_errors_1.toApiError)(error);
     const message = apiError.message || defaultMessage;
-    const statusCode = apiError.statusCode;
-    const errorCode = apiError.errorCode;
+    const statusCode = apiError.statusCode ?? _defaultStatusCode;
+    const errorCode = apiError.errorCode || 'INTERNAL_ERROR';
     const details = apiError.details;
     (0, logger_1.logError)(defaultMessage, error, context);
-    (0, api_response_1.sendError)(res, apiError.name, message, statusCode, errorCode, details);
+    // Extract traceId from request if available
+    const traceId = res.req.traceId;
+    (0, api_response_1.sendError)(res, statusCode, errorCode, message, details, traceId);
 }
 //# sourceMappingURL=error-handler.js.map

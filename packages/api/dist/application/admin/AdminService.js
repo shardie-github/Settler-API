@@ -69,7 +69,7 @@ class AdminService {
     /**
      * Dry-run reconciliation using historical events
      */
-    async dryRunReconciliation(reconciliationId, events) {
+    async dryRunReconciliation(_reconciliationId, events) {
         // Replay events to simulate reconciliation
         let matched = 0;
         let unmatched = 0;

@@ -18,14 +18,17 @@ class ReconciliationCommandHandlers {
         // Validate permissions and input
         // In a real implementation, check tenant permissions, job exists, etc.
         // Create and emit ReconciliationStarted event
-        const event = ReconciliationEvents_1.ReconciliationEvents.ReconciliationStarted(command.reconciliation_id, {
+        const eventData = {
             reconciliation_id: command.reconciliation_id,
             job_id: command.job_id,
             source_adapter: command.source_adapter,
             target_adapter: command.target_adapter,
             date_range: command.date_range,
-            initiated_by: command.user_id,
-        }, command.tenant_id, command.user_id, command.correlation_id || crypto.randomUUID());
+        };
+        if (command.user_id) {
+            eventData.initiated_by = command.user_id;
+        }
+        const event = ReconciliationEvents_1.ReconciliationEvents.ReconciliationStarted(command.reconciliation_id, eventData, command.tenant_id, command.user_id, command.correlation_id || crypto.randomUUID());
         // Append to event store
         await this.eventStore.append(event);
         // Publish to event bus for projections and saga orchestration
@@ -38,16 +41,22 @@ class ReconciliationCommandHandlers {
             throw new Error('Reconciliation not found');
         }
         const lastEvent = events[events.length - 1];
+        if (!lastEvent) {
+            throw new Error('Reconciliation not found');
+        }
         const correlationId = command.correlation_id || lastEvent.metadata.correlation_id;
         // Create retry event (could be a new event type)
-        const retryEvent = ReconciliationEvents_1.ReconciliationEvents.ReconciliationStarted(command.reconciliation_id, {
+        const retryEventData = {
             reconciliation_id: command.reconciliation_id,
             job_id: lastEvent.data.job_id,
             source_adapter: lastEvent.data.source_adapter,
             target_adapter: lastEvent.data.target_adapter,
             date_range: lastEvent.data.date_range,
-            initiated_by: command.user_id,
-        }, command.tenant_id, command.user_id, correlationId);
+        };
+        if (command.user_id) {
+            retryEventData.initiated_by = command.user_id;
+        }
+        const retryEvent = ReconciliationEvents_1.ReconciliationEvents.ReconciliationStarted(command.reconciliation_id, retryEventData, command.tenant_id, command.user_id, correlationId);
         await this.eventStore.append(retryEvent);
         await this.eventBus.publish(new ReconciliationRetryDomainEvent(command.reconciliation_id, correlationId));
     }
@@ -57,6 +66,9 @@ class ReconciliationCommandHandlers {
             throw new Error('Reconciliation not found');
         }
         const lastEvent = events[events.length - 1];
+        if (!lastEvent) {
+            throw new Error('Reconciliation not found');
+        }
         const correlationId = command.correlation_id || lastEvent.metadata.correlation_id;
         const cancelEvent = ReconciliationEvents_1.ReconciliationEvents.ReconciliationFailed(command.reconciliation_id, {
             reconciliation_id: command.reconciliation_id,
@@ -70,11 +82,11 @@ class ReconciliationCommandHandlers {
         await this.eventStore.append(cancelEvent);
         await this.eventBus.publish(new ReconciliationCancelledDomainEvent(command.reconciliation_id, correlationId));
     }
-    async handlePauseReconciliation(command) {
+    async handlePauseReconciliation(_command) {
         // Similar implementation for pause
         // Would emit a ReconciliationPaused event
     }
-    async handleResumeReconciliation(command) {
+    async handleResumeReconciliation(_command) {
         // Similar implementation for resume
         // Would emit a ReconciliationResumed event
     }

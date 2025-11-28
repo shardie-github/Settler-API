@@ -15,7 +15,8 @@ function createAdminRouter(adminService) {
             const { sagaType, sagaId } = req.params;
             const status = await adminService.getSagaStatus(sagaId, sagaType);
             if (!status) {
-                return res.status(404).json({ error: 'Saga not found' });
+                res.status(404).json({ error: 'Saga not found' });
+                return;
             }
             res.json(status);
         }

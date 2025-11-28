@@ -10,6 +10,7 @@ exports.batchProcess = batchProcess;
 exports.debounce = debounce;
 exports.throttle = throttle;
 exports.memoize = memoize;
+const logger_1 = require("./logger");
 /**
  * Measure execution time of async function
  */
@@ -18,7 +19,11 @@ async function measureAsync(fn, label) {
     const result = await fn();
     const duration = performance.now() - start;
     if (label && duration > 100) {
-        console.warn(`[Performance] ${label} took ${duration.toFixed(2)}ms`);
+        (0, logger_1.logWarn)(`Performance: ${label} took ${duration.toFixed(2)}ms`, {
+            label,
+            duration,
+            threshold: 100,
+        });
     }
     return { result, duration };
 }
@@ -30,7 +35,11 @@ function measureSync(fn, label) {
     const result = fn();
     const duration = performance.now() - start;
     if (label && duration > 100) {
-        console.warn(`[Performance] ${label} took ${duration.toFixed(2)}ms`);
+        (0, logger_1.logWarn)(`Performance: ${label} took ${duration.toFixed(2)}ms`, {
+            label,
+            duration,
+            threshold: 100,
+        });
     }
     return { result, duration };
 }

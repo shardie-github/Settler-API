@@ -17,12 +17,15 @@ const router = (0, express_1.Router)();
 router.post('/:jobId/nodes', async (req, res) => {
     try {
         const { jobId } = req.params;
+        if (!jobId) {
+            return res.status(400).json({ error: 'Job ID is required' });
+        }
         const node = {
             id: req.body.id || `node_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             type: req.body.type || 'transaction',
             jobId,
-            sourceId: req.body.sourceId,
-            targetId: req.body.targetId,
+            sourceId: req.body.sourceId || undefined,
+            targetId: req.body.targetId || undefined,
             data: req.body.data || {},
             amount: req.body.amount,
             currency: req.body.currency,
@@ -32,24 +35,35 @@ router.post('/:jobId/nodes', async (req, res) => {
         };
         graph_engine_1.graphEngine.addNode(jobId, node);
         // Add to stream processor for real-time matching
-        await stream_processor_1.streamProcessor.addEvent({
+        const event = {
             id: node.id,
-            jobId,
+            jobId: jobId,
             type: node.sourceId ? 'source' : 'target',
-            sourceId: node.sourceId,
-            targetId: node.targetId,
             data: node.data,
-            amount: node.amount,
-            currency: node.currency,
             timestamp: node.timestamp,
-        });
+        };
+        if (node.sourceId) {
+            event.sourceId = node.sourceId;
+        }
+        if (node.targetId) {
+            event.targetId = node.targetId;
+        }
+        if (node.amount !== undefined) {
+            event.amount = node.amount;
+        }
+        if (node.currency) {
+            event.currency = node.currency;
+        }
+        await stream_processor_1.streamProcessor.addEvent(event);
         res.status(201).json({
             data: node,
             message: 'Node added successfully',
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to add node', 400);
+        return;
     }
 });
 /**
@@ -59,10 +73,13 @@ router.post('/:jobId/nodes', async (req, res) => {
 router.post('/:jobId/edges', async (req, res) => {
     try {
         const { jobId } = req.params;
+        if (!jobId) {
+            return res.status(400).json({ error: 'Job ID is required' });
+        }
         const edge = {
             id: req.body.id || `edge_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            source: req.body.source,
-            target: req.body.target,
+            source: req.body.source || '',
+            target: req.body.target || '',
             type: req.body.type || 'matches',
             confidence: req.body.confidence || 1.0,
             metadata: req.body.metadata,
@@ -73,9 +90,11 @@ router.post('/:jobId/edges', async (req, res) => {
             data: edge,
             message: 'Edge added successfully',
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to add edge', 400);
+        return;
     }
 });
 /**
@@ -85,18 +104,34 @@ router.post('/:jobId/edges', async (req, res) => {
 router.get('/:jobId/query', async (req, res) => {
     try {
         const { jobId } = req.params;
-        const query = {
+        if (!jobId) {
+            return res.status(400).json({ error: 'Job ID is required' });
+        }
+        const queryOptions = {
             jobId,
-            nodeType: req.query.nodeType,
-            sourceId: req.query.sourceId,
-            targetId: req.query.targetId,
-            dateRange: req.query.startDate && req.query.endDate ? {
+        };
+        if (req.query.nodeType) {
+            queryOptions.nodeType = req.query.nodeType;
+        }
+        if (req.query.sourceId) {
+            queryOptions.sourceId = req.query.sourceId;
+        }
+        if (req.query.targetId) {
+            queryOptions.targetId = req.query.targetId;
+        }
+        if (req.query.startDate && req.query.endDate) {
+            queryOptions.dateRange = {
                 start: new Date(req.query.startDate),
                 end: new Date(req.query.endDate),
-            } : undefined,
-            limit: req.query.limit ? parseInt(req.query.limit) : undefined,
-            offset: req.query.offset ? parseInt(req.query.offset) : undefined,
-        };
+            };
+        }
+        if (req.query.limit) {
+            queryOptions.limit = parseInt(req.query.limit);
+        }
+        if (req.query.offset) {
+            queryOptions.offset = parseInt(req.query.offset);
+        }
+        const query = queryOptions;
         const result = graph_engine_1.graphEngine.query(query);
         res.json({
             data: {
@@ -105,9 +140,11 @@ router.get('/:jobId/query', async (req, res) => {
                 count: result.nodes.length,
             },
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to query graph', 400);
+        return;
     }
 });
 /**
@@ -117,6 +154,9 @@ router.get('/:jobId/query', async (req, res) => {
 router.get('/:jobId/state', async (req, res) => {
     try {
         const { jobId } = req.params;
+        if (!jobId) {
+            return res.status(400).json({ error: 'Job ID is required' });
+        }
         const graph = graph_engine_1.graphEngine.getGraphState(jobId);
         if (!graph) {
             return res.status(404).json({
@@ -132,9 +172,11 @@ router.get('/:jobId/state', async (req, res) => {
                 updatedAt: graph.updatedAt,
             },
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to get graph state', 400);
+        return;
     }
 });
 /**
@@ -143,6 +185,10 @@ router.get('/:jobId/state', async (req, res) => {
  */
 router.get('/:jobId/stream', (req, res) => {
     const { jobId } = req.params;
+    if (!jobId) {
+        res.status(400).json({ error: 'Job ID is required' });
+        return;
+    }
     // Set up SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');

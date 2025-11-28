@@ -28,7 +28,7 @@ v2Router.use('/knowledge', knowledgeRouter);
 v2Router.use('/compliance', complianceRouter);
 
 // Health check for v2
-v2Router.get('/health', (req, res) => {
+v2Router.get('/health', (_req, res) => {
   res.json({
     status: 'ok',
     version: '2.0.0',

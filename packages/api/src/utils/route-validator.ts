@@ -4,7 +4,7 @@
  */
 
 import { Express } from 'express';
-import { logInfo, logWarn } from './logger';
+import { logInfo } from './logger';
 
 export interface RouteInfo {
   method: string;
@@ -23,7 +23,7 @@ export interface RouteValidationResult {
  * Extract route information from Express app
  * Note: This is a simplified version. Full route introspection requires more complex logic.
  */
-export function validateRoutes(app: Express): RouteValidationResult[] {
+export function validateRoutes(_app: Express): RouteValidationResult[] {
   const results: RouteValidationResult[] = [];
 
   // This is a placeholder - full route introspection would require

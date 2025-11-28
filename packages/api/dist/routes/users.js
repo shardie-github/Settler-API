@@ -5,11 +5,12 @@ const express_1 = require("express");
 const zod_1 = require("zod");
 const validation_1 = require("../middleware/validation");
 const authorization_1 = require("../middleware/authorization");
+const Permissions_1 = require("../infrastructure/security/Permissions");
 const db_1 = require("../db");
 const hash_1 = require("../utils/hash");
 const logger_1 = require("../utils/logger");
 const error_handler_1 = require("../utils/error-handler");
-const authorization_2 = require("../middleware/authorization");
+const User_1 = require("../domain/entities/User");
 const router = (0, express_1.Router)();
 exports.usersRouter = router;
 const deleteUserDataSchema = zod_1.z.object({
@@ -23,7 +24,7 @@ const exportUserDataSchema = zod_1.z.object({
     }),
 });
 // GDPR: Delete user data
-router.delete("/:id/data", (0, authorization_1.requirePermission)("users", "delete"), (0, validation_1.validateRequest)(deleteUserDataSchema), async (req, res) => {
+router.delete("/:id/data", (0, authorization_1.requirePermission)(Permissions_1.Permission.USERS_DELETE), (0, validation_1.validateRequest)(deleteUserDataSchema), async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.userId;
@@ -32,13 +33,16 @@ router.delete("/:id/data", (0, authorization_1.requirePermission)("users", "dele
         if (id !== userId) {
             // Check if user is admin
             const users = await (0, db_1.query)('SELECT role FROM users WHERE id = $1', [userId]);
-            if (users.length === 0 || users[0].role !== authorization_2.Role.ADMIN && users[0].role !== authorization_2.Role.OWNER) {
+            if (users.length === 0 || !users[0] || (users[0].role !== User_1.UserRole.ADMIN && users[0].role !== User_1.UserRole.OWNER)) {
                 return res.status(403).json({ error: 'Forbidden' });
             }
         }
+        if (!id || !userId) {
+            return res.status(400).json({ error: 'User ID is required' });
+        }
         // Verify password
         const targetUsers = await (0, db_1.query)('SELECT password_hash FROM users WHERE id = $1', [id]);
-        if (targetUsers.length === 0) {
+        if (targetUsers.length === 0 || !targetUsers[0]) {
             return res.status(404).json({ error: 'User not found' });
         }
         const isValid = await (0, hash_1.verifyPassword)(password, targetUsers[0].password_hash);
@@ -74,13 +78,15 @@ router.delete("/:id/data", (0, authorization_1.requirePermission)("users", "dele
             message: 'Deletion scheduled. Data will be permanently deleted in 30 days.',
             deletionDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, "Failed to delete user data", 500, { userId: req.userId });
+        return;
     }
 });
 // GDPR: Export user data
-router.get("/:id/data-export", (0, authorization_1.requirePermission)("users", "read"), (0, validation_1.validateRequest)(exportUserDataSchema), async (req, res) => {
+router.get("/:id/data-export", (0, authorization_1.requirePermission)(Permissions_1.Permission.USERS_READ), (0, validation_1.validateRequest)(exportUserDataSchema), async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.userId;
@@ -133,9 +139,11 @@ router.get("/:id/data-export", (0, authorization_1.requirePermission)("users", "
         ]);
         (0, logger_1.logInfo)('User data exported', { userId });
         res.json({ data: exportData });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, "Failed to export user data", 500, { userId: req.userId });
+        return;
     }
 });
 //# sourceMappingURL=users.js.map

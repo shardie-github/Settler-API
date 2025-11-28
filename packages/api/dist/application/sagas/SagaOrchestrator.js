@@ -16,13 +16,18 @@ var SagaStatus;
 })(SagaStatus || (exports.SagaStatus = SagaStatus = {}));
 class SagaOrchestrator {
     db;
-    eventStore;
-    eventBus;
+    _eventStore;
+    _eventBus;
     sagas = new Map();
-    constructor(db = db_1.pool, eventStore, eventBus) {
+    constructor(db = db_1.pool, 
+    // Event store and bus are reserved for future event sourcing implementation
+    _eventStore, _eventBus) {
         this.db = db;
-        this.eventStore = eventStore;
-        this.eventBus = eventBus;
+        this._eventStore = _eventStore;
+        this._eventBus = _eventBus;
+        // Reference unused properties to satisfy TypeScript
+        void this._eventStore;
+        void this._eventBus;
     }
     /**
      * Register a saga definition
@@ -184,6 +189,9 @@ class SagaOrchestrator {
         // Compensate in reverse order
         for (let i = failedStepIndex - 1; i >= 0; i--) {
             const step = saga.steps[i];
+            if (!step) {
+                continue;
+            }
             if (step.compensate) {
                 const stepCompleted = state.stepHistory.some((h) => h.step === step.name && h.status === 'completed');
                 if (stepCompleted) {
@@ -260,8 +268,8 @@ class SagaOrchestrator {
         const history = state.stepHistory.find((h) => h.step === stepName && h.status === 'completed');
         if (history) {
             history.status = 'compensated';
+            await this.saveSagaState(state);
         }
-        await this.saveSagaState(state);
     }
     /**
      * Mark saga as completed
@@ -295,7 +303,7 @@ class SagaOrchestrator {
     /**
      * Schedule retry for a step
      */
-    async scheduleRetry(state, step) {
+    async scheduleRetry(state, _step) {
         const retryCount = state.data.retryCount || 0;
         state.data.retryCount = retryCount + 1;
         const nextRetryAt = new Date();
@@ -318,7 +326,7 @@ class SagaOrchestrator {
     /**
      * Check if step should be retried
      */
-    shouldRetryStep(state, stepName) {
+    shouldRetryStep(state, _stepName) {
         const retryCount = state.data.retryCount || 0;
         const maxRetries = 3; // Default max retries
         return retryCount < maxRetries;

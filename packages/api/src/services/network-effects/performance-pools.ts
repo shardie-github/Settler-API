@@ -119,7 +119,7 @@ export class PerformanceTuningPools extends EventEmitter {
   /**
    * Get recommended rules for a use case
    */
-  getRecommendedRules(adapter: string, useCase: string): Array<{
+  getRecommendedRules(adapter: string, _useCase: string): Array<{
     ruleType: string;
     confidence: number;
     expectedAccuracy: number;

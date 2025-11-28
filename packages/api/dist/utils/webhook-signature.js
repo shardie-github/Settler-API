@@ -13,7 +13,7 @@ async function verifyWebhookSignature(adapter, payload, signature) {
     if (configs.length === 0) {
         throw new Error(`Unknown adapter: ${adapter}`);
     }
-    const config = configs[0];
+    const config = configs[0]; // Safe: we checked length above
     const payloadBuffer = typeof payload === 'string' ? Buffer.from(payload) : payload;
     switch (adapter) {
         case 'stripe': {

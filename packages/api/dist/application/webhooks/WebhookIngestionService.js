@@ -7,18 +7,16 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebhookIngestionService = void 0;
+const adapters_1 = require("@settler/adapters");
 const db_1 = require("../../db");
-const stripe_enhanced_1 = require("@settler/adapters/stripe-enhanced");
-const paypal_enhanced_1 = require("@settler/adapters/paypal-enhanced");
-const square_enhanced_1 = require("@settler/adapters/square-enhanced");
 class WebhookIngestionService {
     adapters;
     constructor() {
         this.adapters = new Map();
         // Register adapters
-        this.adapters.set('stripe', new stripe_enhanced_1.StripeEnhancedAdapter());
-        this.adapters.set('paypal', new paypal_enhanced_1.PayPalEnhancedAdapter());
-        this.adapters.set('square', new square_enhanced_1.SquareEnhancedAdapter());
+        this.adapters.set('stripe', new adapters_1.StripeEnhancedAdapter());
+        this.adapters.set('paypal', new adapters_1.PayPalEnhancedAdapter());
+        this.adapters.set('square', new adapters_1.SquareEnhancedAdapter());
     }
     /**
      * Register a custom adapter
@@ -97,11 +95,14 @@ class WebhookIngestionService {
         if (idempotencyKey) {
             await this.storeIdempotencyKey(idempotencyKey, tenantId, events);
         }
-        return {
+        const result = {
             success: errors.length === 0,
             events,
-            errors: errors.length > 0 ? errors : undefined,
         };
+        if (errors.length > 0) {
+            result.errors = errors;
+        }
+        return result;
     }
     /**
      * Process a normalized event
@@ -138,14 +139,14 @@ class WebhookIngestionService {
         updated_at = EXCLUDED.updated_at`, [
             transaction.id,
             tenantId,
-            transaction.paymentId,
+            transaction.paymentId || null,
             transaction.provider,
             transaction.providerTransactionId,
             transaction.type,
             transaction.amount.value,
             transaction.amount.currency,
-            transaction.netAmount?.value,
-            transaction.netAmount?.currency,
+            transaction.netAmount?.value ?? null,
+            transaction.netAmount?.currency ?? null,
             transaction.status,
             JSON.stringify(transaction.rawPayload),
             transaction.created_at,
@@ -174,9 +175,9 @@ class WebhookIngestionService {
             settlement.amount.value,
             settlement.amount.currency,
             settlement.currency,
-            settlement.fxRate,
+            settlement.fxRate ?? null,
             settlement.settlementDate,
-            settlement.expectedDate,
+            settlement.expectedDate ?? null,
             settlement.status,
             JSON.stringify(settlement.rawPayload),
             settlement.createdAt,
@@ -200,9 +201,9 @@ class WebhookIngestionService {
             refundDispute.amount.value,
             refundDispute.amount.currency,
             refundDispute.status,
-            refundDispute.reason,
-            refundDispute.providerRefundId,
-            refundDispute.providerDisputeId,
+            refundDispute.reason ?? null,
+            refundDispute.providerRefundId ?? null,
+            refundDispute.providerDisputeId ?? null,
             JSON.stringify(refundDispute.rawPayload),
             refundDispute.createdAt,
             refundDispute.updatedAt,
@@ -217,17 +218,17 @@ class WebhookIngestionService {
         from_amount, to_amount, fx_rate, provider, rate_date, created_at
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       ON CONFLICT DO NOTHING`, [
-            fxConversion.id,
+            fxConversion.id || null,
             tenantId,
-            fxConversion.transactionId,
-            fxConversion.fromCurrency,
-            fxConversion.toCurrency,
-            fxConversion.fromAmount,
-            fxConversion.toAmount,
-            fxConversion.fxRate,
-            fxConversion.provider,
-            fxConversion.rateDate,
-            fxConversion.createdAt,
+            fxConversion.transactionId || null,
+            fxConversion.fromCurrency || null,
+            fxConversion.toCurrency || null,
+            fxConversion.fromAmount ?? null,
+            fxConversion.toAmount ?? null,
+            fxConversion.fxRate ?? null,
+            fxConversion.provider || null,
+            fxConversion.rateDate || null,
+            fxConversion.createdAt || null,
         ]);
     }
     /**
@@ -245,13 +246,13 @@ class WebhookIngestionService {
         // Provider-specific idempotency key extraction
         switch (adapterName) {
             case 'stripe':
-                return payload.id || null;
+                return (typeof payload.id === 'string' ? payload.id : null);
             case 'paypal':
-                return payload.id || payload.webhook_id || null;
+                return (typeof payload.id === 'string' ? payload.id : (typeof payload.webhook_id === 'string' ? payload.webhook_id : null));
             case 'square':
-                return payload.event_id || payload.id || null;
+                return (typeof payload.event_id === 'string' ? payload.event_id : (typeof payload.id === 'string' ? payload.id : null));
             default:
-                return payload.id || null;
+                return (typeof payload.id === 'string' ? payload.id : null);
         }
     }
     /**

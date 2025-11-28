@@ -32,23 +32,35 @@ router.post('/decisions', async (req, res) => {
  */
 router.get('/decisions', async (req, res) => {
     try {
-        const decisions = decision_log_1.decisionLog.queryDecisions({
-            status: req.query.status,
-            decisionMaker: req.query.decisionMaker,
-            tag: req.query.tag,
-            dateRange: req.query.startDate && req.query.endDate ? {
+        const queryOptions = {};
+        if (req.query.status) {
+            queryOptions.status = req.query.status;
+        }
+        if (req.query.decisionMaker) {
+            queryOptions.decisionMaker = req.query.decisionMaker;
+        }
+        if (req.query.tag) {
+            queryOptions.tag = req.query.tag;
+        }
+        if (req.query.startDate && req.query.endDate) {
+            queryOptions.dateRange = {
                 start: new Date(req.query.startDate),
                 end: new Date(req.query.endDate),
-            } : undefined,
-            search: req.query.search,
-        });
+            };
+        }
+        if (req.query.search) {
+            queryOptions.search = req.query.search;
+        }
+        const decisions = decision_log_1.decisionLog.queryDecisions(queryOptions);
         res.json({
             data: decisions,
             count: decisions.length,
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to query decisions', 400);
+        return;
     }
 });
 /**
@@ -58,6 +70,9 @@ router.get('/decisions', async (req, res) => {
 router.get('/decisions/:id', async (req, res) => {
     try {
         const { id } = req.params;
+        if (!id) {
+            return res.status(400).json({ error: 'Decision ID is required' });
+        }
         const decision = decision_log_1.decisionLog.getDecision(id);
         if (!decision) {
             return res.status(404).json({
@@ -72,9 +87,11 @@ router.get('/decisions/:id', async (req, res) => {
                 relatedDecisions: related,
             },
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to get decision', 400);
+        return;
     }
 });
 /**
@@ -85,6 +102,9 @@ router.patch('/decisions/:id/outcomes', async (req, res) => {
     try {
         const { id } = req.params;
         const { outcome } = req.body;
+        if (!id) {
+            return res.status(400).json({ error: 'Decision ID is required' });
+        }
         if (!outcome) {
             return res.status(400).json({
                 error: 'Missing outcome',
@@ -95,9 +115,11 @@ router.patch('/decisions/:id/outcomes', async (req, res) => {
             data: decision,
             message: 'Outcome updated successfully',
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to update outcome', 400);
+        return;
     }
 });
 /**
@@ -107,7 +129,7 @@ router.patch('/decisions/:id/outcomes', async (req, res) => {
 router.post('/assistant/query', async (req, res) => {
     try {
         const { question, context } = req.body;
-        if (!question) {
+        if (!question || typeof question !== 'string') {
             return res.status(400).json({
                 error: 'Missing question',
             });
@@ -119,16 +141,18 @@ router.post('/assistant/query', async (req, res) => {
         res.json({
             data: response,
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to query assistant', 400);
+        return;
     }
 });
 /**
  * GET /api/v2/knowledge/stats
  * Get knowledge base statistics
  */
-router.get('/stats', async (req, res) => {
+router.get('/stats', async (_req, res) => {
     try {
         const assistantStats = ai_assistant_1.aiKnowledgeAssistant.getStats();
         // Get decision stats
@@ -146,9 +170,11 @@ router.get('/stats', async (req, res) => {
                 },
             },
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to get stats', 500);
+        return;
     }
 });
 exports.default = router;

@@ -81,7 +81,7 @@ For "${query.question}", I recommend reviewing our decision logs and documentati
   /**
    * Generate related questions
    */
-  private generateRelatedQuestions(question: string): string[] {
+  private generateRelatedQuestions(_question: string): string[] {
     // Mock related questions
     // In production, would use LLM to generate related questions
     return [

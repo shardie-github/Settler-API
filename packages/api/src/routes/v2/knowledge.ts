@@ -171,7 +171,7 @@ router.post('/assistant/query', async (req: Request, res: Response) => {
  * GET /api/v2/knowledge/stats
  * Get knowledge base statistics
  */
-router.get('/stats', async (req: Request, res: Response) => {
+router.get('/stats', async (_req: Request, res: Response) => {
   try {
     const assistantStats = aiKnowledgeAssistant.getStats();
     

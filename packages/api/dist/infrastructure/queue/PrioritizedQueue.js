@@ -30,11 +30,14 @@ class PrioritizedQueue {
     constructor(queueName, processor) {
         this.queueName = queueName;
         this.processor = processor;
-        this.redis = new ioredis_1.default({
+        const redisOptions = {
             host: config_1.config.redis.host,
             port: config_1.config.redis.port,
-            url: config_1.config.redis.url,
-        });
+        };
+        if (config_1.config.redis.url) {
+            redisOptions.url = config_1.config.redis.url;
+        }
+        this.redis = new ioredis_1.default(redisOptions);
         this.queue = new bullmq_1.Queue(queueName, {
             connection: this.redis,
             defaultJobOptions: {
@@ -69,11 +72,18 @@ class PrioritizedQueue {
         // Calculate priority score (higher = more important)
         const priorityScore = this.calculatePriority(data.tenantTier, priority);
         return await (0, tracing_1.traceQueue)(this.queueName, 'add', async () => {
-            return await this.queue.add('job', data, {
-                priority: priorityScore,
-                delay: options.delay,
-                jobId: data.jobId,
-            });
+            return await this.queue.add('job', data, (() => {
+                const jobOptions = {
+                    priority: priorityScore,
+                };
+                if (options.delay !== undefined) {
+                    jobOptions.delay = options.delay;
+                }
+                if (data.jobId !== undefined) {
+                    jobOptions.jobId = data.jobId;
+                }
+                return jobOptions;
+            })());
         }, data.tenantId, data.jobId);
     }
     /**

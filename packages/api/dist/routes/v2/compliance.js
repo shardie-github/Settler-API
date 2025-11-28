@@ -29,9 +29,11 @@ router.post('/exports', async (req, res) => {
             data: export_,
             message: 'Export created successfully',
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to create export', 400);
+        return;
     }
 });
 /**
@@ -51,9 +53,11 @@ router.get('/exports', async (req, res) => {
             data: exports,
             count: exports.length,
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to list exports', 500);
+        return;
     }
 });
 /**
@@ -63,6 +67,9 @@ router.get('/exports', async (req, res) => {
 router.get('/exports/:id', async (req, res) => {
     try {
         const { id } = req.params;
+        if (!id) {
+            return res.status(400).json({ error: 'Export ID is required' });
+        }
         const export_ = export_system_1.complianceExportSystem.getExport(id);
         if (!export_) {
             return res.status(404).json({
@@ -73,25 +80,29 @@ router.get('/exports/:id', async (req, res) => {
         res.json({
             data: export_,
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to get export', 500);
+        return;
     }
 });
 /**
  * GET /api/v2/compliance/templates
  * Get available export templates
  */
-router.get('/templates', async (req, res) => {
+router.get('/templates', async (_req, res) => {
     try {
         const templates = export_system_1.complianceExportSystem.getTemplates();
         res.json({
             data: templates,
             count: templates.length,
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to get templates', 500);
+        return;
     }
 });
 /**
@@ -123,9 +134,11 @@ router.post('/edge/initialize', async (req, res) => {
             },
             message: 'Edge agent initialized successfully',
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to initialize edge agent', 400);
+        return;
     }
 });
 exports.default = router;

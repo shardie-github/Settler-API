@@ -5,23 +5,43 @@ const express_1 = require("express");
 const zod_1 = require("zod");
 const validation_1 = require("../middleware/validation");
 const authorization_1 = require("../middleware/authorization");
+const Permissions_1 = require("../infrastructure/security/Permissions");
 const db_1 = require("../db");
 const logger_1 = require("../utils/logger");
 const async_mutex_1 = require("async-mutex");
 const JobRouteService_1 = require("../application/services/JobRouteService");
 const api_response_1 = require("../utils/api-response");
 const error_handler_1 = require("../utils/error-handler");
+const event_tracker_1 = require("../utils/event-tracker");
+const adapter_config_validator_1 = require("../utils/adapter-config-validator");
 const router = (0, express_1.Router)();
 exports.jobsRouter = router;
 const jobService = new JobRouteService_1.JobRouteService();
 // Per-job mutex to prevent concurrent execution
+// Cleanup mutexes after 1 hour of inactivity to prevent memory leaks
 const jobMutexes = new Map();
+const MUTEX_TTL = 60 * 60 * 1000; // 1 hour
 function getJobMutex(jobId) {
-    if (!jobMutexes.has(jobId)) {
-        jobMutexes.set(jobId, new async_mutex_1.Mutex());
+    const entry = jobMutexes.get(jobId);
+    if (entry) {
+        entry.lastUsed = Date.now();
+        return entry.mutex;
     }
-    return jobMutexes.get(jobId);
+    const mutex = new async_mutex_1.Mutex();
+    jobMutexes.set(jobId, { mutex, lastUsed: Date.now() });
+    return mutex;
 }
+// Cleanup old mutexes periodically
+function cleanupOldMutexes() {
+    const now = Date.now();
+    for (const [jobId, entry] of jobMutexes.entries()) {
+        if (now - entry.lastUsed > MUTEX_TTL) {
+            jobMutexes.delete(jobId);
+        }
+    }
+}
+// Run cleanup every 30 minutes
+setInterval(cleanupOldMutexes, 30 * 60 * 1000);
 // Validation schemas with input sanitization
 const adapterConfigSchema = zod_1.z.record(zod_1.z.union([
     zod_1.z.string().max(1000),
@@ -68,20 +88,30 @@ const paginationSchema = zod_1.z.object({
     }),
 });
 // Create reconciliation job
-router.post("/", (0, authorization_1.requirePermission)("jobs", "create"), (0, validation_1.validateRequest)(createJobSchema), async (req, res) => {
+router.post("/", (0, authorization_1.requirePermission)(Permissions_1.Permission.JOBS_WRITE), (0, validation_1.validateRequest)(createJobSchema), async (req, res) => {
     try {
         const userId = req.userId;
+        // Validate adapter configs (UX-002)
+        (0, adapter_config_validator_1.validateAdapterConfig)(req.body.source.adapter, req.body.source.config);
+        (0, adapter_config_validator_1.validateAdapterConfig)(req.body.target.adapter, req.body.target.config);
         const job = await jobService.createJob(userId, req.body);
+        // Track event
+        (0, event_tracker_1.trackEventAsync)(userId, 'JobCreated', {
+            jobId: job.id,
+            sourceAdapter: req.body.source.adapter,
+            targetAdapter: req.body.target.adapter,
+            hasSchedule: !!req.body.schedule,
+        });
         (0, api_response_1.sendCreated)(res, job, "Reconciliation job created successfully");
     }
     catch (error) {
         const message = error instanceof Error ? error.message : "Failed to create reconciliation job";
         (0, logger_1.logError)('Failed to create job', error, { userId: req.userId });
-        (0, api_response_1.sendError)(res, "Internal Server Error", message, 500);
+        (0, api_response_1.sendError)(res, 500, 'INTERNAL_ERROR', message, undefined, req.traceId);
     }
 });
 // Get all jobs with pagination
-router.get("/", (0, authorization_1.requirePermission)("jobs", "read"), (0, validation_1.validateRequest)(paginationSchema), async (req, res) => {
+router.get("/", (0, authorization_1.requirePermission)(Permissions_1.Permission.JOBS_READ), (0, validation_1.validateRequest)(paginationSchema), async (req, res) => {
     try {
         const userId = req.userId;
         const page = parseInt(req.query.page) || 1;
@@ -95,6 +125,9 @@ router.get("/", (0, authorization_1.requirePermission)("jobs", "read"), (0, vali
            LIMIT $2 OFFSET $3`, [userId, limit, offset]),
             (0, db_1.query)(`SELECT COUNT(*) as count FROM jobs WHERE user_id = $1`, [userId]),
         ]);
+        if (!totalResult[0]) {
+            throw new Error('Failed to get job count');
+        }
         const total = parseInt(totalResult[0].count);
         res.json({
             data: jobs.map(job => ({
@@ -117,10 +150,13 @@ router.get("/", (0, authorization_1.requirePermission)("jobs", "read"), (0, vali
     }
 });
 // Get job by ID
-router.get("/:id", (0, authorization_1.requirePermission)("jobs", "read"), (0, validation_1.validateRequest)(getJobSchema), async (req, res) => {
+router.get("/:id", (0, authorization_1.requirePermission)(Permissions_1.Permission.JOBS_READ), (0, validation_1.validateRequest)(getJobSchema), async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.userId;
+        if (!id || !userId) {
+            return (0, api_response_1.sendError)(res, 400, 'BAD_REQUEST', 'Job ID and User ID are required', undefined, req.traceId);
+        }
         // Check ownership
         await new Promise((resolve, reject) => {
             (0, authorization_1.requireResourceOwnership)(req, res, (err) => {
@@ -132,7 +168,7 @@ router.get("/:id", (0, authorization_1.requirePermission)("jobs", "read"), (0, v
         });
         const job = await jobService.getJob(id, userId);
         if (!job) {
-            return (0, api_response_1.sendError)(res, "Not Found", "Job not found", 404);
+            return (0, api_response_1.sendError)(res, 404, 'NOT_FOUND', 'Job not found', undefined, req.traceId);
         }
         (0, api_response_1.sendSuccess)(res, job);
     }
@@ -141,9 +177,12 @@ router.get("/:id", (0, authorization_1.requirePermission)("jobs", "read"), (0, v
     }
 });
 // Trigger job execution with race condition prevention
-router.post("/:id/run", (0, authorization_1.requirePermission)("jobs", "create"), (0, validation_1.validateRequest)(getJobSchema), async (req, res) => {
+router.post("/:id/run", (0, authorization_1.requirePermission)(Permissions_1.Permission.JOBS_WRITE), (0, validation_1.validateRequest)(getJobSchema), async (req, res) => {
     const { id } = req.params;
     const userId = req.userId;
+    if (!id || !userId) {
+        return (0, api_response_1.sendError)(res, 400, 'BAD_REQUEST', 'Job ID and User ID are required', undefined, req.traceId);
+    }
     const mutex = getJobMutex(id);
     const release = await mutex.acquire();
     try {
@@ -158,25 +197,28 @@ router.post("/:id/run", (0, authorization_1.requirePermission)("jobs", "create")
         });
         // Check if job is already running (optimistic locking)
         const jobs = await (0, db_1.query)(`SELECT status, version FROM jobs WHERE id = $1 AND user_id = $2`, [id, userId]);
-        if (jobs.length === 0) {
-            return res.status(404).json({ error: "Job not found" });
+        if (jobs.length === 0 || !jobs[0]) {
+            return (0, api_response_1.sendError)(res, 404, 'NOT_FOUND', 'Job not found', undefined, req.traceId);
         }
         const job = jobs[0];
         if (job.status === 'running') {
-            return res.status(409).json({ error: "Job is already running" });
+            return (0, api_response_1.sendError)(res, 409, 'CONFLICT', 'Job is already running', undefined, req.traceId);
         }
         // Update job status atomically
         const updated = await (0, db_1.query)(`UPDATE jobs
          SET status = 'running', version = version + 1, updated_at = NOW()
          WHERE id = $1 AND user_id = $2 AND version = $3
          RETURNING id`, [id, userId, job.version]);
-        if (updated.length === 0) {
-            return res.status(409).json({ error: "Job state changed, please retry" });
+        if (updated.length === 0 || !updated[0]) {
+            return (0, api_response_1.sendError)(res, 409, 'CONFLICT', 'Job state changed, please retry', undefined, req.traceId);
         }
         // Create execution record
         const executions = await (0, db_1.query)(`INSERT INTO executions (job_id, status)
          VALUES ($1, 'running')
          RETURNING id`, [id]);
+        if (executions.length === 0 || !executions[0]) {
+            return (0, api_response_1.sendError)(res, 500, 'INTERNAL_ERROR', 'Failed to create execution record', undefined, req.traceId);
+        }
         const executionId = executions[0].id;
         // Log audit event
         await (0, db_1.query)(`INSERT INTO audit_logs (event, user_id, metadata)
@@ -219,10 +261,13 @@ router.post("/:id/run", (0, authorization_1.requirePermission)("jobs", "create")
     }
 });
 // Delete job
-router.delete("/:id", (0, authorization_1.requirePermission)("jobs", "delete"), (0, validation_1.validateRequest)(getJobSchema), async (req, res) => {
+router.delete("/:id", (0, authorization_1.requirePermission)(Permissions_1.Permission.JOBS_DELETE), (0, validation_1.validateRequest)(getJobSchema), async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.userId;
+        if (!id || !userId) {
+            return (0, api_response_1.sendError)(res, 400, 'BAD_REQUEST', 'Job ID and User ID are required', undefined, req.traceId);
+        }
         // Check ownership
         await new Promise((resolve, reject) => {
             (0, authorization_1.requireResourceOwnership)(req, res, (err) => {
@@ -234,7 +279,7 @@ router.delete("/:id", (0, authorization_1.requirePermission)("jobs", "delete"), 
         });
         const deleted = await jobService.deleteJob(id, userId);
         if (!deleted) {
-            return (0, api_response_1.sendError)(res, "Not Found", "Job not found", 404);
+            return (0, api_response_1.sendError)(res, 404, 'NOT_FOUND', 'Job not found', undefined, req.traceId);
         }
         (0, api_response_1.sendNoContent)(res);
     }

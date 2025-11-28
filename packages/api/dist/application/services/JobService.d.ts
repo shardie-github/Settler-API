@@ -21,7 +21,7 @@ export declare class JobService {
         schedule: string;
         sourceConfig: Record<string, unknown>;
         targetConfig: Record<string, unknown>;
-    }>): Promise<Job>;
+    }>): Promise<void>;
     deleteJob(jobId: string, userId: string): Promise<void>;
 }
 //# sourceMappingURL=JobService.d.ts.map

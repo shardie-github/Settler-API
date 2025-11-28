@@ -9,6 +9,7 @@ const express_1 = require("express");
 const zod_1 = require("zod");
 const validation_1 = require("../../middleware/validation");
 const authorization_1 = require("../../middleware/authorization");
+const Permissions_1 = require("../../infrastructure/security/Permissions");
 const QuickBooksExporter_1 = require("../../application/export/QuickBooksExporter");
 const CSVExporter_1 = require("../../application/export/CSVExporter");
 const JSONExporter_1 = require("../../application/export/JSONExporter");
@@ -37,7 +38,7 @@ const exportSchema = zod_1.z.object({
  * POST /api/v1/exports
  * Create export
  */
-router.post('/', (0, authorization_1.requirePermission)('exports', 'create'), (0, validation_1.validateRequest)(exportSchema), async (req, res) => {
+router.post('/', (0, authorization_1.requirePermission)(Permissions_1.Permission.REPORTS_EXPORT), (0, validation_1.validateRequest)(exportSchema), async (req, res) => {
     try {
         const { jobId, format, dateRange, options = {} } = req.body;
         const tenantId = req.tenantId;
@@ -86,7 +87,7 @@ router.post('/', (0, authorization_1.requirePermission)('exports', 'create'), (0
                 return (0, api_response_1.sendSuccess)(res, exportData);
             }
             default:
-                return (0, api_response_1.sendError)(res, 'Bad Request', `Unsupported format: ${format}`, 400);
+                return (0, api_response_1.sendError)(res, 400, 'BAD_REQUEST', `Unsupported format: ${format}`);
         }
     }
     catch (error) {

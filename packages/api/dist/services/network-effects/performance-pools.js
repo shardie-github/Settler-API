@@ -87,7 +87,7 @@ class PerformanceTuningPools extends events_1.EventEmitter {
     /**
      * Get recommended rules for a use case
      */
-    getRecommendedRules(adapter, useCase) {
+    getRecommendedRules(adapter, _useCase) {
         const insights = this.getInsights(adapter);
         return insights
             .map(insight => ({
@@ -132,13 +132,19 @@ class PerformanceTuningPools extends events_1.EventEmitter {
         }
         const topPerformers = Array.from(adapterRuleStats.entries())
             .map(([key, stats]) => {
-            const [adapter, ruleType] = key.split(':');
+            const parts = key.split(':');
+            const adapter = parts[0];
+            const ruleType = parts[1];
+            if (!adapter || !ruleType) {
+                return null;
+            }
             return {
                 adapter,
                 ruleType,
                 avgAccuracy: stats.accuracy / stats.count,
             };
         })
+            .filter((item) => item !== null)
             .sort((a, b) => b.avgAccuracy - a.avgAccuracy)
             .slice(0, 10);
         return {

@@ -6,13 +6,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tenantMiddleware = tenantMiddleware;
 const Container_1 = require("../infrastructure/di/Container");
+const db_1 = require("../db");
 /**
  * Extract tenant from request
  * Priority: custom domain > subdomain > header > user's tenant
  */
 async function tenantMiddleware(req, res, next) {
     try {
-        const tenantRepo = Container_1.Container.get('ITenantRepository');
+        const container = Container_1.Container.getInstance();
+        const tenantRepo = container.get('ITenantRepository');
         let tenant = null;
         // 1. Check custom domain
         const host = req.get('host') || '';
@@ -33,12 +35,12 @@ async function tenantMiddleware(req, res, next) {
                 tenant = await tenantRepo.findById(tenantId);
             }
         }
-        // 4. Fall back to user's tenant
-        if (!tenant && req.user) {
-            // User's tenant is already set via auth middleware
-            const userTenantId = req.user.tenantId;
-            if (userTenantId) {
-                tenant = await tenantRepo.findById(userTenantId);
+        // 4. Fall back to user's tenantId from auth middleware
+        if (!tenant && req.userId) {
+            // Try to get tenant from user
+            const userResult = await (0, db_1.query)(`SELECT tenant_id FROM users WHERE id = $1`, [req.userId]);
+            if (userResult.length > 0 && userResult[0]) {
+                tenant = await tenantRepo.findById(userResult[0].tenant_id);
             }
         }
         if (!tenant) {

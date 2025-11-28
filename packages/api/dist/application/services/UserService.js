@@ -57,14 +57,18 @@ class UserService {
         // Hash password
         const passwordHash = await (0, password_1.hashPassword)(command.password);
         // Create user entity
-        const user = User_1.User.create({
+        const userProps = {
             email: command.email,
             passwordHash,
-            name: command.name,
+            tenantId: 'default', // TODO: Get from context
             role: command.role || User_1.UserRole.DEVELOPER,
             dataResidencyRegion: command.dataResidencyRegion || 'us',
             dataRetentionDays: 365,
-        });
+        };
+        if (command.name !== undefined) {
+            userProps.name = command.name;
+        }
+        const user = User_1.User.create(userProps);
         // Save user
         const savedUser = await this.userRepository.save(user);
         // Emit domain event
@@ -95,7 +99,7 @@ class UserService {
         user.scheduleDeletion(30);
         await this.userRepository.save(user);
         // Emit domain event
-        await this.eventBus.publish(new UserDeletedEvent(userId));
+        await this.eventBus.publish(new DomainEvent_1.UserDeletedEvent(userId));
     }
     async exportUserData(userId) {
         const user = await this.userRepository.findById(userId);

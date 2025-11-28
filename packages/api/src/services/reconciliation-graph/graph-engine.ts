@@ -5,7 +5,7 @@
  * Updates continuously as new transactions arrive.
  */
 
-import { ReconciliationNode, ReconciliationEdge, ReconciliationGraph, GraphQuery, GraphUpdate, RealTimeUpdate } from './types';
+import { ReconciliationNode, ReconciliationEdge, ReconciliationGraph, GraphQuery, RealTimeUpdate } from './types';
 import { EventEmitter } from 'events';
 
 export class ReconciliationGraphEngine extends EventEmitter {
@@ -87,9 +87,11 @@ export class ReconciliationGraphEngine extends EventEmitter {
     }
 
     const matches: ReconciliationEdge[] = [];
-    const sourceNodes = Array.from(graph.nodes.values()).filter(
+    // Reserved for future source node filtering
+    const _sourceNodes = Array.from(graph.nodes.values()).filter(
       n => n.jobId === jobId && n.type === 'transaction' && n.sourceId
     );
+    void _sourceNodes;
     const targetNodes = Array.from(graph.nodes.values()).filter(
       n => n.jobId === jobId && n.type === 'transaction' && n.targetId
     );

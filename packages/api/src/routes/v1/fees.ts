@@ -11,7 +11,7 @@ import { AuthRequest } from '../../middleware/auth';
 import { requirePermission } from '../../middleware/authorization';
 import { Permission } from '../../infrastructure/security/Permissions';
 import { query } from '../../db';
-import { sendSuccess, sendError, sendPaginated } from '../../utils/api-response';
+import { sendSuccess, sendPaginated } from '../../utils/api-response';
 import { handleRouteError } from '../../utils/error-handler';
 
 const router = Router();

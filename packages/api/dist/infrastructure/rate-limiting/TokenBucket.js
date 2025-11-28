@@ -13,14 +13,17 @@ const config_1 = require("../../config");
 class TokenBucket {
     redis;
     constructor() {
-        this.redis = new ioredis_1.default({
+        const redisOptions = {
             host: config_1.config.redis.host,
             port: config_1.config.redis.port,
-            url: config_1.config.redis.url,
             retryStrategy: (times) => {
                 return Math.min(times * 50, 2000);
             },
-        });
+        };
+        if (config_1.config.redis.url) {
+            redisOptions.url = config_1.config.redis.url;
+        }
+        this.redis = new ioredis_1.default(redisOptions);
     }
     /**
      * Try to consume tokens from bucket
@@ -94,7 +97,7 @@ class TokenBucket {
     /**
      * Adaptive rate limiting: adjust rate based on tenant behavior
      */
-    async adjustRate(key, currentConfig, successRate // 0-1, percentage of successful requests
+    async adjustRate(_key, currentConfig, successRate // 0-1, percentage of successful requests
     ) {
         if (!currentConfig.adaptive) {
             return currentConfig;

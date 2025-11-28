@@ -5,7 +5,7 @@ const logger_1 = require("../utils/logger");
 const config_1 = require("../config");
 const sentry_1 = require("./sentry");
 const typed_errors_1 = require("../utils/typed-errors");
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res, _next) => {
     const authReq = req;
     const apiError = (0, typed_errors_1.toApiError)(err);
     // Set Sentry user context
@@ -34,7 +34,6 @@ const errorHandler = (err, req, res, next) => {
             },
             user: {
                 id: authReq.userId,
-                email: authReq.email,
             },
         });
     }
@@ -43,14 +42,16 @@ const errorHandler = (err, req, res, next) => {
         error: apiError.name,
         errorCode: apiError.errorCode,
         message: apiError.message,
-        traceId: authReq.traceId,
     };
+    if (authReq.traceId !== undefined) {
+        response.traceId = authReq.traceId;
+    }
     // Include details if present
     if (apiError.details) {
         response.details = apiError.details;
     }
     // Only include stack in development
-    if (config_1.config.nodeEnv === "development" && err instanceof Error) {
+    if (config_1.config.nodeEnv === "development" && err instanceof Error && err.stack !== undefined) {
         response.stack = err.stack;
     }
     res.status(statusCode).json(response);

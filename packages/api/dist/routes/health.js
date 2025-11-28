@@ -8,7 +8,9 @@ const health_1 = require("../infrastructure/observability/health");
 const router = (0, express_1.Router)();
 exports.healthRouter = router;
 const healthCheckService = new health_1.HealthCheckService();
-async function checkDatabase() {
+// Reserved for future detailed health checks
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function _checkDatabase() {
     const start = Date.now();
     try {
         await (0, db_1.query)('SELECT 1');
@@ -20,7 +22,9 @@ async function checkDatabase() {
         return { status: 'unhealthy', error: message };
     }
 }
-async function checkConnectionPool() {
+// Reserved for future detailed health checks
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function _checkConnectionPool() {
     try {
         const totalConnections = db_2.pool.totalCount;
         const idleConnections = db_2.pool.idleCount;
@@ -46,7 +50,7 @@ async function checkConnectionPool() {
     }
 }
 // Basic health check (liveness probe)
-router.get("/", async (req, res) => {
+router.get("/", async (_req, res) => {
     const health = await healthCheckService.checkLive();
     res.json({
         status: health.status,
@@ -56,7 +60,7 @@ router.get("/", async (req, res) => {
     });
 });
 // Detailed health check with dependency checks
-router.get("/detailed", async (req, res) => {
+router.get("/detailed", async (_req, res) => {
     const health = await healthCheckService.checkAll();
     res.status(health.status === 'healthy' ? 200 : 503).json({
         status: health.status,
@@ -67,13 +71,16 @@ router.get("/detailed", async (req, res) => {
     });
 });
 // Liveness probe (always returns OK if process is alive)
-router.get("/live", async (req, res) => {
+router.get("/live", async (_req, res) => {
     const health = await healthCheckService.checkLive();
     res.status(200).json(health);
 });
 // Readiness probe (returns ready only if dependencies are healthy)
-router.get("/ready", async (req, res) => {
+router.get("/ready", async (_req, res) => {
     const health = await healthCheckService.checkReady();
     res.status(health.status === 'ready' ? 200 : 503).json(health);
 });
+// Reference unused functions to satisfy TypeScript
+void _checkDatabase;
+void _checkConnectionPool;
 //# sourceMappingURL=health.js.map

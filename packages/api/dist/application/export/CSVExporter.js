@@ -55,15 +55,18 @@ class CSVExporter {
         // Add fees if included
         if (includeFees) {
             for (const match of matches) {
-                const fees = await (0, db_1.query)(`SELECT type, amount_value, amount_currency, description 
-           FROM fees WHERE transaction_id = $1 AND tenant_id = $2`, [match.transaction_id, tenantId]);
-                for (const fee of fees) {
-                    const row = [];
-                    for (const col of columns) {
-                        const value = this.getFeeColumnValue(fee, col, match);
-                        row.push(this.escapeCSV(value));
+                const transactionId = match.transaction_id;
+                if (typeof transactionId === 'string') {
+                    const fees = await (0, db_1.query)(`SELECT type, amount_value, amount_currency, description 
+             FROM fees WHERE transaction_id = $1 AND tenant_id = $2`, [transactionId, tenantId]);
+                    for (const fee of fees) {
+                        const row = [];
+                        for (const col of columns) {
+                            const value = this.getFeeColumnValue(fee, col, match);
+                            row.push(this.escapeCSV(value));
+                        }
+                        csvRows.push(row.join(','));
                     }
-                    csvRows.push(row.join(','));
                 }
             }
         }
@@ -100,7 +103,13 @@ class CSVExporter {
      */
     getColumnValue(match, column) {
         const value = match[column];
-        return value !== null && value !== undefined ? String(value) : '';
+        if (value === null || value === undefined) {
+            return '';
+        }
+        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || value instanceof Date) {
+            return String(value);
+        }
+        return '';
     }
     /**
      * Get fee column value
@@ -108,9 +117,23 @@ class CSVExporter {
     getFeeColumnValue(fee, column, match) {
         if (column.startsWith('fee_')) {
             const feeField = column.replace('fee_', '');
-            return fee[feeField] || '';
+            const value = fee[feeField];
+            if (value === null || value === undefined) {
+                return '';
+            }
+            if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || value instanceof Date) {
+                return String(value);
+            }
+            return '';
         }
-        return match[column] || '';
+        const value = match[column];
+        if (value === null || value === undefined) {
+            return '';
+        }
+        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || value instanceof Date) {
+            return String(value);
+        }
+        return '';
     }
     /**
      * Escape CSV value

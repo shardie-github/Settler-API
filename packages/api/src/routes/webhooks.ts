@@ -5,7 +5,7 @@ import { AuthRequest } from "../middleware/auth";
 import { requirePermission, requireResourceOwnership } from "../middleware/authorization";
 import { Permission } from "../infrastructure/security/Permissions";
 import { query } from "../db";
-import { verifyWebhookSignature, generateWebhookSignature } from "../utils/webhook-signature";
+import { verifyWebhookSignature } from "../utils/webhook-signature";
 import { validateExternalUrl } from "../infrastructure/security/SSRFProtection";
 import { logInfo, logError, logWarn } from "../utils/logger";
 import { handleRouteError } from "../utils/error-handler";

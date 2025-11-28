@@ -104,7 +104,7 @@ router.post('/intelligence/check-pattern', async (req: Request, res: Response) =
  * GET /api/v2/network-effects/intelligence/insights
  * Get network insights (anonymized)
  */
-router.get('/intelligence/insights', async (req: Request, res: Response) => {
+router.get('/intelligence/insights', async (_req: Request, res: Response) => {
   try {
     const insights = crossCustomerIntelligence.getNetworkInsights();
 
@@ -248,7 +248,7 @@ router.get('/performance/recommendations', async (req: Request, res: Response) =
  * GET /api/v2/network-effects/stats
  * Get network effects statistics
  */
-router.get('/stats', async (req: Request, res: Response) => {
+router.get('/stats', async (_req: Request, res: Response) => {
   try {
     const intelligenceInsights = crossCustomerIntelligence.getNetworkInsights();
     const performanceStats = performanceTuningPools.getStats();

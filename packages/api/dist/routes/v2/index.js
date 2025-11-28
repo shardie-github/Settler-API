@@ -26,7 +26,7 @@ exports.v2Router.use('/knowledge', knowledge_1.default);
 // Compliance
 exports.v2Router.use('/compliance', compliance_1.default);
 // Health check for v2
-exports.v2Router.get('/health', (req, res) => {
+exports.v2Router.get('/health', (_req, res) => {
     res.json({
         status: 'ok',
         version: '2.0.0',

@@ -149,19 +149,34 @@ class EdgeAgent extends events_1.EventEmitter {
             matrix[i] = [i];
         }
         for (let j = 0; j <= str1.length; j++) {
+            if (!matrix[0]) {
+                matrix[0] = [];
+            }
             matrix[0][j] = j;
         }
         for (let i = 1; i <= str2.length; i++) {
             for (let j = 1; j <= str1.length; j++) {
+                if (!matrix[i]) {
+                    matrix[i] = [];
+                }
+                const prevRow = matrix[i - 1];
+                const currRow = matrix[i];
+                if (!prevRow || !currRow) {
+                    continue;
+                }
                 if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
-                    matrix[i][j] = matrix[i - 1][j - 1];
+                    currRow[j] = prevRow[j - 1] ?? 0;
                 }
                 else {
-                    matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j] + 1);
+                    currRow[j] = Math.min((prevRow[j - 1] ?? 0) + 1, (currRow[j - 1] ?? 0) + 1, (prevRow[j] ?? 0) + 1);
                 }
             }
         }
-        return matrix[str2.length][str1.length];
+        const lastRow = matrix[str2.length];
+        if (!lastRow) {
+            return str1.length;
+        }
+        return lastRow[str1.length] ?? str1.length;
     }
     /**
      * Create encrypted metadata (only results, not raw data)

@@ -10,13 +10,14 @@ import { validateRequest } from "../middleware/validation";
 import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
 import { Permission } from "../infrastructure/security/Permissions";
-import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 import { calculateConfidenceScore } from "../services/confidence-scoring";
 
 const router = Router();
 
-const createRuleSchema = z.object({
+// Reserved for future rule creation endpoint
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _createRuleSchema = z.object({
   body: z.object({
     name: z.string().min(1).max(255),
     field: z.string().min(1),
@@ -253,7 +254,7 @@ router.post(
 
 function generateRecommendations(
   confidence: ReturnType<typeof calculateConfidenceScore>,
-  rules: unknown[]
+  _rules: unknown[]
 ): string[] {
   const recommendations: string[] = [];
 
@@ -351,7 +352,7 @@ function generateImpactRecommendations(
 function generateRuleSuggestions(
   sourceAdapter?: string,
   targetAdapter?: string,
-  useCase?: string
+  _useCase?: string
 ): Array<{
   name: string;
   rules: unknown[];
@@ -414,5 +415,8 @@ function generateRuleSuggestions(
 
   return suggestions;
 }
+
+// Reference unused schema to satisfy TypeScript
+void _createRuleSchema;
 
 export { router as rulesEditorRouter };

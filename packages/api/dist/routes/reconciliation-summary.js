@@ -9,6 +9,7 @@ const express_1 = require("express");
 const zod_1 = require("zod");
 const validation_1 = require("../middleware/validation");
 const authorization_1 = require("../middleware/authorization");
+const Permissions_1 = require("../infrastructure/security/Permissions");
 const api_gateway_cache_1 = require("../middleware/api-gateway-cache");
 const query_optimization_1 = require("../infrastructure/query-optimization");
 const api_response_1 = require("../utils/api-response");
@@ -27,10 +28,13 @@ const getSummarySchema = zod_1.z.object({
     }),
 });
 // Get reconciliation summary (cached, uses materialized view)
-router.get('/:jobId', (0, authorization_1.requirePermission)('reports', 'read'), (0, api_gateway_cache_1.apiGatewayCache)(api_gateway_cache_1.cacheConfigs.reconciliationSummary()), (0, validation_1.validateRequest)(getSummarySchema), async (req, res) => {
+router.get('/:jobId', (0, authorization_1.requirePermission)(Permissions_1.Permission.REPORTS_READ), (0, api_gateway_cache_1.apiGatewayCache)(api_gateway_cache_1.cacheConfigs.reconciliationSummary()), (0, validation_1.validateRequest)(getSummarySchema), async (req, res) => {
     try {
         const { jobId } = req.params;
         const { start, end, useView = true, refreshView = false } = req.query;
+        if (!jobId) {
+            return (0, api_response_1.sendError)(res, 400, 'BAD_REQUEST', 'Job ID is required');
+        }
         const dateRange = start && end
             ? { start: new Date(start), end: new Date(end) }
             : undefined;
@@ -47,15 +51,18 @@ router.get('/:jobId', (0, authorization_1.requirePermission)('reports', 'read'),
     }
 });
 // Get job performance metrics
-router.get('/:jobId/performance', (0, authorization_1.requirePermission)('reports', 'read'), (0, api_gateway_cache_1.apiGatewayCache)({ ttl: 300, includeUserId: true }), async (req, res) => {
+router.get('/:jobId/performance', (0, authorization_1.requirePermission)(Permissions_1.Permission.REPORTS_READ), (0, api_gateway_cache_1.apiGatewayCache)({ ttl: 300, includeUserId: true }), async (req, res) => {
     try {
         const { jobId } = req.params;
+        if (!jobId) {
+            return (0, api_response_1.sendError)(res, 400, 'BAD_REQUEST', 'Job ID is required');
+        }
         const performance = await (0, query_optimization_1.getJobPerformance)(jobId, {
             useMaterializedView: true,
             cache: true,
         });
         if (!performance) {
-            return (0, api_response_1.sendError)(res, 'Not Found', 'Job performance data not found', 404);
+            return (0, api_response_1.sendError)(res, 404, 'NOT_FOUND', 'Job performance data not found');
         }
         (0, api_response_1.sendSuccess)(res, performance, 'Job performance retrieved successfully');
     }
@@ -64,15 +71,18 @@ router.get('/:jobId/performance', (0, authorization_1.requirePermission)('report
     }
 });
 // Get match accuracy
-router.get('/:jobId/accuracy', (0, authorization_1.requirePermission)('reports', 'read'), (0, api_gateway_cache_1.apiGatewayCache)({ ttl: 300, includeUserId: true }), async (req, res) => {
+router.get('/:jobId/accuracy', (0, authorization_1.requirePermission)(Permissions_1.Permission.REPORTS_READ), (0, api_gateway_cache_1.apiGatewayCache)({ ttl: 300, includeUserId: true }), async (req, res) => {
     try {
         const { jobId } = req.params;
+        if (!jobId) {
+            return (0, api_response_1.sendError)(res, 400, 'BAD_REQUEST', 'Job ID is required');
+        }
         const accuracy = await (0, query_optimization_1.getMatchAccuracy)(jobId, {
             useMaterializedView: true,
             cache: true,
         });
         if (!accuracy) {
-            return (0, api_response_1.sendError)(res, 'Not Found', 'Match accuracy data not found', 404);
+            return (0, api_response_1.sendError)(res, 404, 'NOT_FOUND', 'Match accuracy data not found');
         }
         (0, api_response_1.sendSuccess)(res, accuracy, 'Match accuracy retrieved successfully');
     }

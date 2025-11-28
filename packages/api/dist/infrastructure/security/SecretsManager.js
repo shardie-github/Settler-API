@@ -71,7 +71,7 @@ class SecretsManager {
     /**
      * Redact secret from logs
      */
-    static redactSecret(value, secretName) {
+    static redactSecret(value, _secretName) {
         // Never log full secrets
         if (value.length <= 8) {
             return '***';

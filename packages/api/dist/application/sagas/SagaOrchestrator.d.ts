@@ -34,6 +34,7 @@ export interface SagaState {
     sagaType: string;
     aggregateId: string;
     currentStep: string;
+    status?: SagaStatus;
     stepHistory: Array<{
         step: string;
         status: 'started' | 'completed' | 'failed' | 'compensated';
@@ -52,10 +53,10 @@ export interface SagaDefinition {
 }
 export declare class SagaOrchestrator {
     private db;
-    private eventStore;
-    private eventBus;
+    private _eventStore;
+    private _eventBus;
     private sagas;
-    constructor(db: Pool | undefined, eventStore: IEventStore, eventBus: IEventBus);
+    constructor(db: Pool | undefined, _eventStore: IEventStore, _eventBus: IEventBus);
     /**
      * Register a saga definition
      */
