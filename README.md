@@ -428,9 +428,26 @@ Scott brings extensive experience in building and scaling technology companies, 
 3. Explore [Integration Recipes](./docs/integration-recipes.md) for examples
 4. Join our [Discord](https://discord.gg/settler) for support
 
+## React.Settler - Open Source Protocol
+
+Settler also offers **React.Settler**, an open-source React component library for building reconciliation UIs declaratively.
+
+### React.Settler Tiers
+
+- 🆓 **OSS (Free)** - Core protocol, basic components, security basics, mobile & accessibility
+- 💼 **Commercial ($99/month)** - Platform integrations (Shopify, Stripe, MCP), virtualization, telemetry
+- 🏢 **Enterprise (Custom)** - SSO, RBAC, white-label, dedicated support
+
+**Learn More:** [React.Settler Documentation](./packages/react-settler/README.md)
+
 ## License
 
-MIT
+### Settler API
+Proprietary (Closed Source) - See [Terms of Service](./LEGAL/TERMS_OF_SERVICE.md)
+
+### React.Settler
+- **OSS Components:** MIT License (Free)
+- **Commercial Features:** Commercial License (Requires Subscription) - See [Commercial License](./LEGAL/COMMERCIAL_LICENSE.md)
 
 ## Contributing
 

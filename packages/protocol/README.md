@@ -59,4 +59,19 @@ See [PROTOCOL.md](./PROTOCOL.md) for the complete protocol specification.
 
 ## License
 
-MIT
+**MIT License** - Free Forever
+
+This package is licensed under the MIT License. You may use it freely for any purpose, including commercial use.
+
+See [LICENSE](./LICENSE) for full license text.
+
+## Commercial Features
+
+While this protocol package is free and open-source, some features in `@settler/react-settler` require a Commercial subscription:
+
+- Platform integrations (Shopify, Stripe, MCP)
+- Virtualized tables
+- Advanced telemetry
+- Audit logging
+
+See [React.Settler Pricing](../react-settler/docs/PRICING.md) for details.
