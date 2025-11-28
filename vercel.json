@@ -1,8 +1,7 @@
 {
-  "buildCommand": "cd ../.. && npm run build --filter=@settler/web",
-  "installCommand": "cd ../.. && npm install --frozen-lockfile",
+  "buildCommand": "npm run build --filter=@settler/web",
+  "installCommand": "npm install --frozen-lockfile",
   "framework": "nextjs",
-  "rootDirectory": "packages/web",
   "regions": ["iad1"],
   "build": {
     "env": {
