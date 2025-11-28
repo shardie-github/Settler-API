@@ -34,7 +34,7 @@ export const TransactionTable = React.memo(function TransactionTable({
       id: sanitizeString(tx.id),
       provider: sanitizeString(tx.provider),
       providerTransactionId: sanitizeString(tx.providerTransactionId),
-      referenceId: tx.referenceId ? sanitizeString(tx.referenceId) : undefined
+      ...(tx.referenceId ? { referenceId: sanitizeString(tx.referenceId) } : {})
     }));
   }, [transactions]);
 

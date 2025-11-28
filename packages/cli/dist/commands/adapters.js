@@ -17,14 +17,14 @@ adaptersCommand
     .description("List all available adapters")
     .action(async (options) => {
     try {
-        const apiKey = process.env.SETTLER_API_KEY || options.parent.apiKey;
+        const apiKey = process.env.SETTLER_API_KEY || options.parent?.apiKey;
         if (!apiKey) {
             console.error(chalk_1.default.red("Error: API key required"));
             process.exit(1);
         }
         const client = new sdk_1.default({
             apiKey,
-            baseUrl: options.parent.baseUrl,
+            ...(options.parent?.baseUrl ? { baseUrl: options.parent.baseUrl } : {}),
         });
         const response = await client.adapters.list();
         console.log(chalk_1.default.bold("\nAvailable Adapters:\n"));

@@ -11,9 +11,9 @@ jobsCommand
 jobsCommand
   .command("list")
   .description("List all reconciliation jobs")
-  .action(async (options) => {
+  .action(async (options: { parent?: { apiKey?: string; baseUrl?: string } }) => {
     try {
-      const apiKey = process.env.SETTLER_API_KEY || options.parent.apiKey;
+      const apiKey = process.env.SETTLER_API_KEY || options.parent?.apiKey;
       if (!apiKey) {
         console.error(chalk.red("Error: API key required. Set SETTLER_API_KEY or use --api-key"));
         process.exit(1);
@@ -21,7 +21,7 @@ jobsCommand
 
       const client = new Settler({
         apiKey,
-        baseUrl: options.parent.baseUrl,
+        ...(options.parent?.baseUrl ? { baseUrl: options.parent.baseUrl } : {}),
       });
 
       const response = await client.jobs.list();
@@ -51,9 +51,9 @@ jobsCommand
   .option("-n, --name <name>", "Job name")
   .option("-s, --source <adapter>", "Source adapter")
   .option("-t, --target <adapter>", "Target adapter")
-  .action(async (options) => {
+  .action(async (options: { name?: string; source?: string; target?: string; parent?: { parent?: { apiKey?: string; baseUrl?: string } } }) => {
     try {
-      const apiKey = process.env.SETTLER_API_KEY || options.parent.parent.apiKey;
+      const apiKey = process.env.SETTLER_API_KEY || options.parent?.parent?.apiKey;
       if (!apiKey) {
         console.error(chalk.red("Error: API key required"));
         process.exit(1);
@@ -65,24 +65,25 @@ jobsCommand
       
       const client = new Settler({
         apiKey,
-        baseUrl: options.parent.parent.baseUrl,
+        ...(options.parent?.parent?.baseUrl ? { baseUrl: options.parent.parent.baseUrl } : {}),
       });
 
       // Example job creation
+      const emptyConfig: Record<string, unknown> = {};
       const response = await client.jobs.create({
         name: options.name || "New Reconciliation Job",
         source: {
           adapter: options.source || "shopify",
-          config: {},
+          config: emptyConfig,
         },
         target: {
           adapter: options.target || "stripe",
-          config: {},
+          config: emptyConfig,
         },
         rules: {
           matching: [
-            { field: "order_id", type: "exact" },
-            { field: "amount", type: "exact", tolerance: 0.01 },
+            { field: "order_id" as const, type: "exact" as const },
+            { field: "amount" as const, type: "exact" as const, tolerance: 0.01 },
           ],
         },
       });
@@ -176,7 +177,7 @@ jobsCommand
       }
       
       const response = await fetch(
-        `${baseUrl}/api/v1/jobs/${id}/logs?${params}`,
+        `${baseUrl}/api/v1/jobs/${id}/logs?${params.toString()}`,
         {
           headers: {
             "X-API-Key": apiKey,
@@ -186,11 +187,11 @@ jobsCommand
 
       if (!response.ok) {
         const error = await response.json() as { message?: string };
-        console.error(chalk.red(`Error: ${error.message || "Failed to fetch logs"}`));
+        console.error(chalk.red(`Error: ${error?.message || "Failed to fetch logs"}`));
         process.exit(1);
       }
 
-      const logs = await response.json() as { data?: Array<{ timestamp: string; level: string; message: string; metadata?: unknown }> };
+      const logs = await response.json() as { data?: Array<{ timestamp: string; level: string; message: string; metadata?: Record<string, unknown> }> };
       
       if (!logs.data || logs.data.length === 0) {
         console.log(chalk.yellow("No logs found"));
@@ -240,7 +241,7 @@ jobsCommand
 
       const baseUrl = options.parent.parent?.baseUrl || "https://api.settler.io";
       
-      const body: any = {
+      const body: Record<string, unknown> = {
         dryRun: options.dryRun || false,
       };
       

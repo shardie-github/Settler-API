@@ -11,9 +11,9 @@ adaptersCommand
 adaptersCommand
   .command("list")
   .description("List all available adapters")
-  .action(async (options) => {
+  .action(async (options: { parent?: { apiKey?: string; baseUrl?: string } }) => {
     try {
-      const apiKey = process.env.SETTLER_API_KEY || options.parent.apiKey;
+      const apiKey = process.env.SETTLER_API_KEY || options.parent?.apiKey;
       if (!apiKey) {
         console.error(chalk.red("Error: API key required"));
         process.exit(1);
@@ -21,7 +21,7 @@ adaptersCommand
 
       const client = new Settler({
         apiKey,
-        baseUrl: options.parent.baseUrl,
+        ...(options.parent?.baseUrl ? { baseUrl: options.parent.baseUrl } : {}),
       });
 
       const response = await client.adapters.list();

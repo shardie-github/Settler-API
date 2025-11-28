@@ -4,16 +4,14 @@
  * 
  * ⚠️ Commercial Feature: Requires Settler Commercial subscription
  */
-import { requireFeature, FEATURE_FLAGS, useFeatureGate } from '../utils/licensing';
+import { FEATURE_FLAGS, useFeatureGate } from '../utils/licensing';
 
-import React from 'react';
-import {
-  ReconciliationDashboard,
-  TransactionTable,
-  ExceptionTable,
-  MetricCard,
-  ExportButton
-} from '../components';
+import { ReconciliationDashboard } from '../components/ReconciliationDashboard';
+import { TransactionTable } from '../components/TransactionTable';
+import { ExceptionTable } from '../components/ExceptionTable';
+import { MetricCard } from '../components/MetricCard';
+import { ExportButton } from '../components/ExportButton';
+import { UpgradePrompt } from '../components/UpgradePrompt';
 import type {
   ReconciliationTransaction,
   ReconciliationException
@@ -36,7 +34,7 @@ export function StripeApp({
   exceptions = [],
   onExport
 }: StripeAppProps) {
-  const { hasAccess, UpgradePrompt } = useFeatureGate(FEATURE_FLAGS.STRIPE_INTEGRATION);
+  const { hasAccess } = useFeatureGate(FEATURE_FLAGS.STRIPE_INTEGRATION);
   
   if (!hasAccess) {
     return <UpgradePrompt feature={FEATURE_FLAGS.STRIPE_INTEGRATION} featureName="Stripe Integration" />;

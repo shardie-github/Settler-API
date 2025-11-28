@@ -6,3 +6,70 @@ npm warn config       Default value does install optional deps unless otherwise 
 > @settler/web@1.0.0 lint
 > next lint
 
+
+./src/app/playground/page.tsx
+78:46  Warning: Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
+
+./src/app/realtime-dashboard/page.tsx
+57:15  Warning: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+57:50  Warning: Unsafe argument of type `any` assigned to a parameter of type `string`.  @typescript-eslint/no-unsafe-argument
+
+./src/components/AuditTrail.tsx
+26:5  Warning: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+27:6  Warning: React Hook useEffect has a missing dependency: 'loadLogs'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+42:13  Warning: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+43:15  Warning: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<AuditLog[]>`.  @typescript-eslint/no-unsafe-argument
+43:20  Warning: Unsafe member access .data on an `any` value.  @typescript-eslint/no-unsafe-member-access
+
+./src/components/Dashboard.tsx
+30:5  Warning: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+31:6  Warning: React Hook useEffect has a missing dependency: 'loadJobs'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+242:5  Warning: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+243:6  Warning: React Hook useEffect has a missing dependency: 'loadReport'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/ExceptionQueue.tsx
+44:5  Warning: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+45:5  Warning: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+46:6  Warning: React Hook useEffect has missing dependencies: 'loadExceptions' and 'loadStats'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+59:13  Warning: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+60:21  Warning: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<Exception[]>`.  @typescript-eslint/no-unsafe-argument
+60:26  Warning: Unsafe member access .data on an `any` value.  @typescript-eslint/no-unsafe-member-access
+74:13  Warning: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+75:16  Warning: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<{ total: number; open: number; resolved: number; high: number; }>`.  @typescript-eslint/no-unsafe-argument
+75:21  Warning: Unsafe member access .data on an `any` value.  @typescript-eslint/no-unsafe-member-access
+88:7  Warning: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+89:7  Warning: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+108:7  Warning: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+109:7  Warning: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+
+./src/components/Playground.tsx
+62:5  Warning: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+68:13  Warning: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+69:19  Warning: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<PlaygroundExample[]>`.  @typescript-eslint/no-unsafe-argument
+69:24  Warning: Unsafe member access .data on an `any` value.  @typescript-eslint/no-unsafe-member-access
+70:16  Warning: Unsafe member access .data on an `any` value.  @typescript-eslint/no-unsafe-member-access
+71:28  Warning: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<PlaygroundExample | null>`.  @typescript-eslint/no-unsafe-argument
+71:33  Warning: Unsafe member access .data on an `any` value.  @typescript-eslint/no-unsafe-member-access
+94:13  Warning: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+95:17  Warning: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<ReconciliationResult | null>`.  @typescript-eslint/no-unsafe-argument
+95:22  Warning: Unsafe member access .data on an `any` value.  @typescript-eslint/no-unsafe-member-access
+109:22  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./src/components/RulesEditor.tsx
+55:5  Warning: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+56:5  Warning: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+57:6  Warning: React Hook useEffect has a missing dependency: 'loadAISuggestions'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+62:13  Warning: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+63:20  Warning: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<RuleTemplate[]>`.  @typescript-eslint/no-unsafe-argument
+63:25  Warning: Unsafe member access .data on an `any` value.  @typescript-eslint/no-unsafe-member-access
+76:13  Warning: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+77:24  Warning: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<MatchingRule[]>`.  @typescript-eslint/no-unsafe-argument
+77:29  Warning: Unsafe member access .data on an `any` value.  @typescript-eslint/no-unsafe-member-access
+135:13  Warning: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+136:24  Warning: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<PreviewResult | null>`.  @typescript-eslint/no-unsafe-argument
+136:29  Warning: Unsafe member access .data on an `any` value.  @typescript-eslint/no-unsafe-member-access
+149:13  Warning: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+150:25  Warning: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<ImpactAnalysis | null>`.  @typescript-eslint/no-unsafe-argument
+150:30  Warning: Unsafe member access .data on an `any` value.  @typescript-eslint/no-unsafe-member-access
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules

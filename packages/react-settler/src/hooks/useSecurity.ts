@@ -4,11 +4,10 @@
  * 
  * ⚠️ Commercial Feature: Advanced security features require Settler Commercial subscription
  */
-import { requireFeature, FEATURE_FLAGS, hasFeature } from '../utils/licensing';
+import { FEATURE_FLAGS, hasFeature } from '../utils/licensing';
 
-import { useCallback, useContext } from 'react';
+import { useCallback } from 'react';
 import {
-  SecurityContext,
   AuditEvent,
   AuditLogEntry
 } from '@settler/protocol';
@@ -45,13 +44,13 @@ export function useSecurity() {
       id: `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date().toISOString(),
       event,
-      userId: securityContext?.userId,
-      sessionId: securityContext?.sessionId,
-      ipAddress: securityContext?.ipAddress,
-      userAgent: securityContext?.userAgent,
+      ...(securityContext?.userId ? { userId: securityContext.userId } : {}),
+      ...(securityContext?.sessionId ? { sessionId: securityContext.sessionId } : {}),
+      ...(securityContext?.ipAddress ? { ipAddress: securityContext.ipAddress } : {}),
+      ...(securityContext?.userAgent ? { userAgent: securityContext.userAgent } : {}),
       action,
       result,
-      metadata
+      ...(metadata ? { metadata } : {})
     };
 
     auditLogHandler(entry);

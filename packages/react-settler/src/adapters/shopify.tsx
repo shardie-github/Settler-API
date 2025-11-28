@@ -4,15 +4,13 @@
  * 
  * ⚠️ Commercial Feature: Requires Settler Commercial subscription
  */
-import { requireFeature, FEATURE_FLAGS, useFeatureGate } from '../utils/licensing';
+import { FEATURE_FLAGS, useFeatureGate } from '../utils/licensing';
 
 import React from 'react';
-import {
-  ReconciliationDashboard,
-  TransactionTable,
-  ExceptionTable,
-  MetricCard
-} from '../components';
+import { ReconciliationDashboard } from '../components/ReconciliationDashboard';
+import { TransactionTable } from '../components/TransactionTable';
+import { ExceptionTable } from '../components/ExceptionTable';
+import { MetricCard } from '../components/MetricCard';
 import type {
   ReconciliationTransaction,
   ReconciliationException
@@ -32,7 +30,6 @@ export interface ShopifyAppProps {
  */
 export function ShopifyApp({
   shop,
-  apiKey,
   transactions = [],
   exceptions = [],
   onAction
@@ -40,7 +37,7 @@ export function ShopifyApp({
   const { hasAccess, UpgradePrompt } = useFeatureGate(FEATURE_FLAGS.SHOPIFY_INTEGRATION);
   
   if (!hasAccess) {
-    return <UpgradePrompt feature={FEATURE_FLAGS.SHOPIFY_INTEGRATION} featureName="Shopify Integration" />;
+    return <UpgradePrompt />;
   }
   
   return (
@@ -104,7 +101,7 @@ export function ShopifyApp({
             >
               <TransactionTable
                 transactions={transactions}
-                onSelect={(tx) => onAction?.('transaction.selected', tx)}
+                onSelect={(tx: ReconciliationTransaction) => onAction?.('transaction.selected', tx)}
               />
             </div>
           </div>
@@ -124,7 +121,7 @@ export function ShopifyApp({
             >
               <ExceptionTable
                 exceptions={exceptions}
-                onResolve={(exc) => onAction?.('exception.resolved', exc)}
+                onResolve={(exc: ReconciliationException) => onAction?.('exception.resolved', exc)}
               />
             </div>
           </div>

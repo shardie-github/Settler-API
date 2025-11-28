@@ -6,12 +6,12 @@
  * rules, widgets, and view configurations from the React tree.
  */
 
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
 import {
-  ReconciliationConfig,
-  WidgetConfig
+  ReconciliationConfig
 } from '@settler/protocol';
-import { CompilationProvider } from './context';
+// Note: CompilationProvider would be used in a real implementation to render components
+// import { CompilationProvider } from './context';
 
 /**
  * Compile a React component tree into a ReconciliationConfig
@@ -23,7 +23,7 @@ import { CompilationProvider } from './context';
  * you may need to use react-dom/server's renderToString or similar.
  */
 export function compileToConfig(
-  component: ReactElement,
+  _component: ReactElement,
   options?: {
     name?: string;
     description?: string;
@@ -33,7 +33,7 @@ export function compileToConfig(
     version: '1.0.0',
     metadata: {
       name: options?.name || 'Reconciliation Workflow',
-      description: options?.description,
+      ...(options?.description ? { description: options.description } : {}),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     },
@@ -43,19 +43,18 @@ export function compileToConfig(
   };
 
   // Create a wrapper component that provides compilation context
-  const Wrapper = ({ children }: { children: ReactElement }) => {
-    return (
-      <CompilationProvider mode="config" config={config}>
-        {children}
-      </CompilationProvider>
-    );
-  };
+  // Note: In a real implementation, we would render the component tree here
+  // const Wrapper = ({ children }: { children: ReactElement }) => {
+  //   return (
+  //     <CompilationProvider mode="config" config={config}>
+  //       {children}
+  //     </CompilationProvider>
+  //   );
+  // };
 
   // Render the component tree in config mode
   // Components will mutate the config object during render
-  const wrapped = <Wrapper>{component}</Wrapper>;
-
-  // In a real implementation, we'd use React's renderer here
+  // Note: In a real implementation, we'd use React's renderer here
   // For now, we rely on components mutating config during their render phase
   // This works because React components are functions that execute synchronously
   
@@ -69,7 +68,7 @@ export function compileToConfig(
     version: config.version || '1.0.0',
     metadata: {
       name: config.metadata?.name || 'Reconciliation Workflow',
-      description: config.metadata?.description,
+      ...(config.metadata?.description ? { description: config.metadata.description } : {}),
       createdAt: config.metadata?.createdAt || new Date().toISOString(),
       updatedAt: config.metadata?.updatedAt || new Date().toISOString()
     },

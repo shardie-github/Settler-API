@@ -33,7 +33,7 @@ export function VirtualizedTable({
   const [scrollTop, setScrollTop] = useState(0);
   
   if (!hasAccess) {
-    return <UpgradePrompt feature={FEATURE_FLAGS.VIRTUALIZATION} featureName="Virtualized Tables" />;
+    return <UpgradePrompt />;
   }
 
   const visibleRange = useMemo(() => {

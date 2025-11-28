@@ -3,7 +3,6 @@
  * Shows upgrade messaging for commercial features
  */
 
-import React from 'react';
 import { getUpgradeMessage } from '../utils/licensing';
 
 export interface UpgradePromptProps {

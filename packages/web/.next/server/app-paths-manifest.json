@@ -3,5 +3,6 @@
   "/docs/page": "app/docs/page.js",
   "/page": "app/page.js",
   "/playground/page": "app/playground/page.js",
-  "/realtime-dashboard/page": "app/realtime-dashboard/page.js"
+  "/realtime-dashboard/page": "app/realtime-dashboard/page.js",
+  "/react-settler-demo/page": "app/react-settler-demo/page.js"
 }

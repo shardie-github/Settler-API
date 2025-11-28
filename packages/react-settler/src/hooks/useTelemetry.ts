@@ -11,6 +11,7 @@ import {
   TelemetryEvent,
   TelemetryProvider,
   TelemetryConfig,
+  TelemetryContext,
   PerformanceMetrics,
   ErrorTelemetry
 } from '@settler/protocol';
@@ -85,10 +86,8 @@ export function useTelemetry(componentName?: string) {
       timestamp: new Date().toISOString(),
       type: 'component.interaction',
       name: eventName,
-      properties: globalConfig.scrubPII ? scrubPII(properties) : properties,
-      context: {
-        component: componentName
-      }
+      ...(properties ? { properties: globalConfig.scrubPII ? scrubPII(properties) : properties } as { properties: Record<string, unknown> } : {}),
+      ...(componentName ? { context: { component: componentName } as TelemetryContext } : {})
     };
 
     globalTelemetryProvider.track(event);
@@ -101,8 +100,8 @@ export function useTelemetry(componentName?: string) {
 
     const errorTelemetry: ErrorTelemetry = {
       error,
-      component: componentName,
-      context: globalConfig.scrubPII ? scrubPII(context) : context,
+      ...(componentName ? { component: componentName } as { component: string } : {}),
+      ...(context ? { context: globalConfig.scrubPII ? scrubPII(context) : context } as { context: Record<string, unknown> } : {}),
       timestamp: new Date().toISOString()
     };
 
@@ -120,9 +119,7 @@ export function useTelemetry(componentName?: string) {
       type: 'performance',
       name: 'component.performance',
       measurements: metrics as Record<string, number>,
-      context: {
-        component: component || componentName
-      }
+      ...((component || componentName) ? { context: { component: component || componentName } as TelemetryContext } : {})
     };
 
     globalTelemetryProvider.track(event);

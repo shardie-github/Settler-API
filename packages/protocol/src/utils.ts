@@ -4,9 +4,6 @@
  */
 
 import {
-  ReconciliationTransaction,
-  ReconciliationSettlement,
-  ReconciliationException,
   Money
 } from './index';
 
@@ -141,6 +138,7 @@ export function maskPII(input: string, maskChar: string = '*'): string {
   // Mask email addresses
   input = input.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, (email) => {
     const [local, domain] = email.split('@');
+    if (!local || !domain) return email;
     return `${local[0]}${maskChar.repeat(Math.max(0, local.length - 2))}@${domain}`;
   });
   

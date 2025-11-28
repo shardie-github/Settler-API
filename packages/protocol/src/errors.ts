@@ -8,8 +8,8 @@
  */
 export class ReconciliationError extends Error {
   code: string;
-  statusCode?: number;
-  details?: Record<string, unknown>;
+  statusCode?: number | undefined;
+  details?: Record<string, unknown> | undefined;
   timestamp: string;
 
   constructor(
@@ -32,7 +32,7 @@ export class ReconciliationError extends Error {
  * Validation Error
  */
 export class ValidationError extends ReconciliationError {
-  field?: string;
+  field?: string | undefined;
   value?: unknown;
 
   constructor(
@@ -65,9 +65,9 @@ export class SecurityError extends ReconciliationError {
  * Compilation Error
  */
 export class CompilationError extends ReconciliationError {
-  component?: string;
-  line?: number;
-  column?: number;
+  component?: string | undefined;
+  line?: number | undefined;
+  column?: number | undefined;
 
   constructor(
     message: string,
@@ -88,7 +88,7 @@ export class CompilationError extends ReconciliationError {
  * Configuration Error
  */
 export class ConfigurationError extends ReconciliationError {
-  configPath?: string;
+  configPath?: string | undefined;
 
   constructor(
     message: string,

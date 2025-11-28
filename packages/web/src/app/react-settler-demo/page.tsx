@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   ReconciliationDashboard,
   TransactionTable,
@@ -23,6 +23,9 @@ import type {
 } from '@settler/react-settler';
 import { SettlerClient } from '@settler/sdk';
 
+// Force dynamic rendering to avoid static generation issues
+export const dynamic = 'force-dynamic';
+
 export default function ReactSettlerDemoPage() {
   const [apiKey] = useState(() => {
     // In a real app, get from auth context or env
@@ -31,19 +34,22 @@ export default function ReactSettlerDemoPage() {
       : '';
   });
 
-  const [client] = useState(() => new SettlerClient({ apiKey }));
+  const [client] = useState(() => {
+    // Only create client if API key is available
+    if (!apiKey) {
+      return null as unknown as SettlerClient;
+    }
+    return new SettlerClient({ apiKey });
+  });
   const [transactions, setTransactions] = useState<ReconciliationTransaction[]>([]);
   const [exceptions, setExceptions] = useState<ReconciliationException[]>([]);
   const [loading, setLoading] = useState(true);
   const [configJson, setConfigJson] = useState<string>('');
 
-  useEffect(() => {
-    if (apiKey) {
-      loadData();
+  const loadData = useCallback(async () => {
+    if (!client || !apiKey) {
+      return;
     }
-  }, [apiKey]);
-
-  async function loadData() {
     try {
       setLoading(true);
       
@@ -56,7 +62,7 @@ export default function ReactSettlerDemoPage() {
       // you'd fetch actual transaction and exception data from reports
       const mockTransactions: ReconciliationTransaction[] = jobs.map((job, idx) => ({
         id: `tx-${job.id}`,
-        provider: (job.source as any)?.adapter || 'stripe',
+        provider: ((job.source as unknown) as Record<string, unknown>)?.adapter as string || 'stripe',
         providerTransactionId: `ch_${job.id.slice(0, 10)}`,
         amount: { value: 100.0 * (idx + 1), currency: 'USD' },
         currency: 'USD',
@@ -114,7 +120,13 @@ export default function ReactSettlerDemoPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [client, apiKey]);
+
+  useEffect(() => {
+    if (apiKey) {
+      void loadData();
+    }
+  }, [apiKey, loadData]);
 
   if (!apiKey) {
     return (
@@ -178,7 +190,7 @@ export default function ReactSettlerDemoPage() {
           <div className="p-6">
             <TransactionTable
               transactions={transactions}
-              onSelect={(tx) => {
+              onSelect={(tx: ReconciliationTransaction) => {
                 console.log('Selected transaction:', tx);
                 alert(`Selected transaction: ${tx.id}`);
               }}
@@ -194,7 +206,7 @@ export default function ReactSettlerDemoPage() {
           <div className="p-6">
             <ExceptionTable
               exceptions={exceptions}
-              onResolve={(exc) => {
+              onResolve={(exc: ReconciliationException) => {
                 console.log('Resolving exception:', exc);
                 alert(`Resolving exception: ${exc.id}`);
               }}

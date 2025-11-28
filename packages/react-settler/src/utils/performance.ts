@@ -3,11 +3,9 @@
  * Optimizations for reconciliation components
  */
 
-import React, { useMemo, useCallback } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
-  ReconciliationTransaction,
-  ReconciliationSettlement,
-  ReconciliationException
+  ReconciliationTransaction
 } from '@settler/protocol';
 
 /**
@@ -122,9 +120,9 @@ export function useSortedTransactions(
  * Debounce hook
  */
 export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = React.useState<T>(value);
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedValue(value);
     }, delay);

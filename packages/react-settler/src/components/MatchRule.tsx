@@ -3,11 +3,11 @@
  * Defines a single reconciliation matching rule
  */
 
-import React from 'react';
 import {
   ReconciliationRule,
   RuleField,
-  RuleType
+  RuleType,
+  RuleTolerance
 } from '@settler/protocol';
 import { useCompilationContext } from '../context';
 
@@ -50,13 +50,16 @@ export function MatchRule({
     }
 
     const ruleset = context.config.rulesets[context.config.rulesets.length - 1];
+    if (!ruleset) {
+      return null;
+    }
     const rule: ReconciliationRule = {
       id,
       name,
       field,
       type,
-      tolerance,
-      priority,
+      ...(tolerance ? { tolerance: tolerance as RuleTolerance } : {}),
+      ...(priority !== undefined ? { priority } : {}),
       enabled
     };
 

@@ -3,7 +3,6 @@
  * Displays a key reconciliation metric
  */
 
-import React from 'react';
 import { useCompilationContext } from '../context';
 
 export interface MetricCardProps {

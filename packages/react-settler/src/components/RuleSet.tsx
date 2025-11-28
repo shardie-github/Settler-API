@@ -3,10 +3,9 @@
  * Defines a collection of reconciliation rules
  */
 
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import {
-  ReconciliationRuleSet,
-  ReconciliationRule
+  ReconciliationRuleSet
 } from '@settler/protocol';
 import { useCompilationContext } from '../context';
 
@@ -28,7 +27,7 @@ export function RuleSet({
   const context = useCompilationContext();
 
   // Extract rules from children (MatchRule components)
-  const rules: ReconciliationRule[] = [];
+  // Rules are collected by MatchRule components during render
 
   // In config mode, collect rules and register ruleset
   if (context.mode === 'config') {

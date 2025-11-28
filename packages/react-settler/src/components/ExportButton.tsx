@@ -3,18 +3,18 @@
  * Export reconciliation data to various formats
  */
 
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useCompilationContext } from '../context';
 import { useTelemetry } from '../hooks/useTelemetry';
 import { useSecurity } from '../hooks/useSecurity';
 
 export interface ExportButtonProps {
   data: unknown[];
-  filename?: string;
-  format?: 'csv' | 'json' | 'xlsx';
-  onExport?: (format: string, data: unknown[]) => void;
-  className?: string;
-  disabled?: boolean;
+  filename?: string | undefined;
+  format?: 'csv' | 'json' | 'xlsx' | undefined;
+  onExport?: ((format: string, data: unknown[]) => void) | undefined;
+  className?: string | undefined;
+  disabled?: boolean | undefined;
 }
 
 export function ExportButton({

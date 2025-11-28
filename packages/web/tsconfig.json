@@ -10,7 +10,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -22,7 +22,13 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@settler/react-settler": ["../react-settler/dist/src"],
+      "@settler/react-settler/*": ["../react-settler/dist/src/*"],
+      "@settler/protocol": ["../protocol/dist"],
+      "@settler/protocol/*": ["../protocol/dist/*"],
+      "@settler/sdk": ["../sdk/dist"],
+      "@settler/sdk/*": ["../sdk/dist/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

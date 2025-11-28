@@ -3,11 +3,7 @@
  * Helpers for integrating React.Settler with webhook systems
  */
 
-import {
-  ReconciliationTransaction,
-  ReconciliationSettlement,
-  ReconciliationException
-} from '@settler/protocol';
+// Webhook utilities - imports removed as unused
 import { sanitizeString, generateSecureId } from '@settler/protocol';
 
 export interface WebhookPayload {

@@ -3,7 +3,7 @@
  * Search functionality for reconciliation data
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useCompilationContext } from '../context';
 import { useTelemetry } from '../hooks/useTelemetry';
 

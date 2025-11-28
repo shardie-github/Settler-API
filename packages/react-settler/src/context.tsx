@@ -3,7 +3,7 @@
  * Provides compilation mode and config state to React components
  */
 
-import React, { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode } from 'react';
 import {
   CompilationContext as ProtocolCompilationContext,
   ReconciliationConfig,

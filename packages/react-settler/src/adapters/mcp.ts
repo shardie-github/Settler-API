@@ -5,9 +5,7 @@
 
 import {
   ReconciliationConfig,
-  ReconciliationTransaction,
-  ReconciliationSettlement,
-  ReconciliationException
+  ReconciliationTransaction
 } from '@settler/protocol';
 
 export interface MCPServerConfig {
@@ -19,8 +17,8 @@ export interface MCPServerConfig {
 export interface MCPResource {
   uri: string;
   name: string;
-  description?: string;
-  mimeType?: string;
+  description?: string | undefined;
+  mimeType?: string | undefined;
 }
 
 export interface MCPTool {
@@ -74,7 +72,7 @@ export class ReactSettlerMCPServer {
       resources.push({
         uri: `settler://workflow/${id}`,
         name: config.metadata.name,
-        description: config.metadata.description,
+        description: config.metadata.description ?? undefined,
         mimeType: 'application/json'
       });
     });
@@ -87,7 +85,7 @@ export class ReactSettlerMCPServer {
    */
   getResource(uri: string): ReconciliationConfig | null {
     const match = uri.match(/^settler:\/\/workflow\/(.+)$/);
-    if (!match) {
+    if (!match || !match[1]) {
       return null;
     }
 
