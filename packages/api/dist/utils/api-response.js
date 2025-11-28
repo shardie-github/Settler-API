@@ -11,6 +11,16 @@ exports.sendCreated = sendCreated;
 exports.sendNoContent = sendNoContent;
 /**
  * Send success response
+ *
+ * @param res - Express response object
+ * @param data - Response data
+ * @param message - Optional success message
+ * @param statusCode - HTTP status code (default: 200)
+ *
+ * @example
+ * ```typescript
+ * sendSuccess(res, { id: '123', name: 'Job' }, 'Job created successfully', 201);
+ * ```
  */
 function sendSuccess(res, data, message, statusCode = 200) {
     const response = {
@@ -22,18 +32,34 @@ function sendSuccess(res, data, message, statusCode = 200) {
     res.status(statusCode).json(response);
 }
 /**
- * Send error response
+ * Send standardized error response
+ *
+ * @param res - Express response object
+ * @param statusCode - HTTP status code (default: 400)
+ * @param code - Machine-readable error code (e.g., "VALIDATION_ERROR")
+ * @param message - Human-readable error message
+ * @param details - Optional additional error details
+ * @param traceId - Optional trace ID for debugging (auto-extracted from request if available)
+ *
+ * @example
+ * ```typescript
+ * sendError(res, 400, 'VALIDATION_ERROR', 'Invalid input', { fields: ['name'] });
+ * sendError(res, 404, 'NOT_FOUND', 'Job not found', undefined, req.traceId);
+ * ```
  */
-function sendError(res, error, message, statusCode = 400, code, details) {
+function sendError(res, statusCode, code, message, details, traceId) {
     const response = {
-        error,
+        error: code,
         message,
     };
-    if (code) {
-        response.code = code;
-    }
     if (details) {
         response.details = details;
+    }
+    // Extract traceId from request if available
+    const requestTraceId = res.req.traceId;
+    const finalTraceId = traceId || requestTraceId;
+    if (finalTraceId) {
+        response.traceId = finalTraceId;
     }
     res.status(statusCode).json(response);
 }
@@ -47,7 +73,7 @@ function sendPaginated(res, data, meta) {
             page: meta.page,
             limit: meta.limit,
             total: meta.total,
-            cursor: meta.cursor,
+            ...(meta.cursor !== undefined && { cursor: meta.cursor }),
         },
     };
     res.status(200).json(response);

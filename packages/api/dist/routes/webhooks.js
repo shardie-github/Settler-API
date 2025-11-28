@@ -8,6 +8,7 @@ const express_1 = require("express");
 const zod_1 = require("zod");
 const validation_1 = require("../middleware/validation");
 const authorization_1 = require("../middleware/authorization");
+const Permissions_1 = require("../infrastructure/security/Permissions");
 const db_1 = require("../db");
 const webhook_signature_1 = require("../utils/webhook-signature");
 const SSRFProtection_1 = require("../infrastructure/security/SSRFProtection");
@@ -39,7 +40,7 @@ const getWebhookSchema = zod_1.z.object({
     }),
 });
 // Create webhook endpoint with SSRF protection
-router.post("/", (0, authorization_1.requirePermission)("webhooks", "create"), (0, validation_1.validateRequest)(createWebhookSchema), async (req, res) => {
+router.post("/", (0, authorization_1.requirePermission)(Permissions_1.Permission.WEBHOOKS_WRITE), (0, validation_1.validateRequest)(createWebhookSchema), async (req, res) => {
     try {
         const { url, events, secret } = req.body;
         const userId = req.userId;
@@ -56,6 +57,9 @@ router.post("/", (0, authorization_1.requirePermission)("webhooks", "create"), (
         const result = await (0, db_1.query)(`INSERT INTO webhooks (user_id, url, events, secret, status)
          VALUES ($1, $2, $3, $4, 'active')
          RETURNING id`, [userId, url, events, webhookSecret]);
+        if (!result[0]) {
+            throw new Error('Failed to create webhook');
+        }
         const webhookId = result[0].id;
         // Log audit event
         await (0, db_1.query)(`INSERT INTO audit_logs (event, user_id, metadata)
@@ -76,13 +80,15 @@ router.post("/", (0, authorization_1.requirePermission)("webhooks", "create"), (
             },
             message: "Webhook created successfully",
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, "Failed to create webhook", 500, { userId: req.userId });
+        return;
     }
 });
 // List webhooks with pagination
-router.get("/", (0, authorization_1.requirePermission)("webhooks", "read"), async (req, res) => {
+router.get("/", (0, authorization_1.requirePermission)(Permissions_1.Permission.WEBHOOKS_READ), async (req, res) => {
     try {
         const userId = req.userId;
         const page = parseInt(req.query.page) || 1;
@@ -96,6 +102,9 @@ router.get("/", (0, authorization_1.requirePermission)("webhooks", "read"), asyn
            LIMIT $2 OFFSET $3`, [userId, limit, offset]),
             (0, db_1.query)(`SELECT COUNT(*) as count FROM webhooks WHERE user_id = $1`, [userId]),
         ]);
+        if (!totalResult[0]) {
+            throw new Error('Failed to get webhook count');
+        }
         const total = parseInt(totalResult[0].count);
         res.json({
             data: webhooks.map(w => ({
@@ -113,9 +122,11 @@ router.get("/", (0, authorization_1.requirePermission)("webhooks", "read"), asyn
                 totalPages: Math.ceil(total / limit),
             },
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, "Failed to fetch webhooks", 500, { userId: req.userId });
+        return;
     }
 });
 // Webhook endpoint for receiving external webhooks with signature verification
@@ -142,6 +153,9 @@ router.post("/receive/:adapter", webhookReceiveLimiter, async (req, res) => {
             return res.status(401).json({ error: "Missing webhook signature" });
         }
         try {
+            if (!adapter) {
+                return res.status(400).json({ error: 'Adapter is required' });
+            }
             const isValid = await (0, webhook_signature_1.verifyWebhookSignature)(adapter, rawBody, signature);
             if (!isValid) {
                 (0, logger_1.logWarn)('Invalid webhook signature', { adapter, ip: req.ip });
@@ -155,7 +169,7 @@ router.post("/receive/:adapter", webhookReceiveLimiter, async (req, res) => {
         }
         // Store webhook payload for async processing
         await (0, db_1.query)(`INSERT INTO webhook_payloads (adapter, payload, signature, received_at)
-         VALUES ($1, $2, $3, NOW())`, [adapter, JSON.stringify(req.body), signature]);
+         VALUES ($1, $2, $3, NOW())`, [adapter || '', JSON.stringify(req.body), signature || '']);
         // Queue for async processing (in production, use Bull/Redis queue)
         // For now, acknowledge immediately
         (0, logger_1.logInfo)('Webhook received', { adapter, ip: req.ip });
@@ -163,13 +177,15 @@ router.post("/receive/:adapter", webhookReceiveLimiter, async (req, res) => {
             received: true,
             message: "Webhook received and queued for processing",
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, "Failed to process webhook", 500, { adapter: req.params.adapter });
+        return;
     }
 });
 // Delete webhook
-router.delete("/:id", (0, authorization_1.requirePermission)("webhooks", "delete"), (0, validation_1.validateRequest)(getWebhookSchema), async (req, res) => {
+router.delete("/:id", (0, authorization_1.requirePermission)(Permissions_1.Permission.WEBHOOKS_DELETE), (0, validation_1.validateRequest)(getWebhookSchema), async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.userId;
@@ -180,9 +196,9 @@ router.delete("/:id", (0, authorization_1.requirePermission)("webhooks", "delete
                     reject(err);
                 else
                     resolve();
-            }, 'webhook', id);
+            }, 'webhook', id || '');
         });
-        await (0, db_1.query)(`DELETE FROM webhooks WHERE id = $1 AND user_id = $2`, [id, userId]);
+        await (0, db_1.query)(`DELETE FROM webhooks WHERE id = $1 AND user_id = $2`, [id || '', userId]);
         // Log audit event
         await (0, db_1.query)(`INSERT INTO audit_logs (event, user_id, metadata)
          VALUES ($1, $2, $3)`, [
@@ -192,9 +208,11 @@ router.delete("/:id", (0, authorization_1.requirePermission)("webhooks", "delete
         ]);
         (0, logger_1.logInfo)('Webhook deleted', { webhookId: id, userId });
         res.status(204).send();
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, "Failed to delete webhook", 500, { userId: req.userId, webhookId: req.params.id });
+        return;
     }
 });
 //# sourceMappingURL=webhooks.js.map

@@ -9,7 +9,7 @@ const express_1 = require("express");
 const metrics_1 = require("../infrastructure/observability/metrics");
 const router = (0, express_1.Router)();
 exports.metricsRouter = router;
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
     try {
         res.set('Content-Type', metrics_1.register.contentType);
         const metrics = await metrics_1.register.metrics();

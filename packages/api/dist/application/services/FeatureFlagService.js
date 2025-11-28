@@ -66,7 +66,7 @@ class FeatureFlagService {
         }
         sql += ` ORDER BY user_id DESC NULLS LAST, tenant_id DESC NULLS LAST LIMIT 1`;
         const rows = await (0, db_1.query)(sql, params);
-        return rows.length > 0 ? rows[0] : null;
+        return rows.length > 0 && rows[0] ? rows[0] : null;
     }
     /**
      * Create or update feature flag
@@ -82,7 +82,7 @@ class FeatureFlagService {
          WHERE id = $5`, [
                 enabled,
                 options.rolloutPercentage || 100,
-                options.description || existing.description,
+                options.description ?? existing.description ?? null,
                 JSON.stringify(options.conditions || {}),
                 existing.id,
             ]);

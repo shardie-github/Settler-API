@@ -20,10 +20,15 @@ const sseConnections = new Map();
 router.get('/reconciliations/:jobId', async (req, res) => {
     const { jobId } = req.params;
     const tenantId = req.tenantId || req.userId;
+    if (!jobId || !tenantId) {
+        res.status(400).json({ error: 'Job ID and Tenant ID are required' });
+        return;
+    }
     // Verify job ownership
     const jobs = await (0, db_1.query)(`SELECT id FROM jobs WHERE id = $1 AND tenant_id = $2`, [jobId, tenantId]);
     if (jobs.length === 0) {
-        return res.status(404).json({ error: 'Job not found' });
+        res.status(404).json({ error: 'Job not found' });
+        return;
     }
     // Set SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
@@ -59,7 +64,7 @@ router.get('/reconciliations/:jobId', async (req, res) => {
             ORDER BY started_at DESC
             LIMIT 1
           `, [jobId, tenantId]);
-            if (executions.length > 0) {
+            if (executions.length > 0 && executions[0]) {
                 const execution = executions[0];
                 const update = {
                     type: 'execution_update',

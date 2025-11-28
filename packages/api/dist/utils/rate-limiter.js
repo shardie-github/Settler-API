@@ -19,7 +19,7 @@ async function checkRateLimit(req) {
     let limit = config_1.config.rateLimiting.defaultLimit;
     if (req.apiKeyId) {
         const keys = await (0, db_1.query)('SELECT rate_limit FROM api_keys WHERE id = $1', [req.apiKeyId]);
-        if (keys.length > 0) {
+        if (keys.length > 0 && keys[0]) {
             limit = keys[0].rate_limit;
         }
     }

@@ -5,8 +5,8 @@ import { AuthRequest } from "../middleware/auth";
 import { requirePermission } from "../middleware/authorization";
 import { Permission } from "../infrastructure/security/Permissions";
 import { query, transaction } from "../db";
-import { hashPassword, verifyPassword } from "../utils/hash";
-import { logInfo, logError } from "../utils/logger";
+import { verifyPassword } from "../utils/hash";
+import { logInfo } from "../utils/logger";
 import { handleRouteError } from "../utils/error-handler";
 import { UserRole } from "../domain/entities/User";
 

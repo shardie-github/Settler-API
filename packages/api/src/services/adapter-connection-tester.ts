@@ -171,7 +171,7 @@ async function testPayPalConnection(config: Record<string, unknown>): Promise<Co
   }
 }
 
-async function testQuickBooksConnection(config: Record<string, unknown>): Promise<ConnectionTestResult> {
+async function testQuickBooksConnection(_config: Record<string, unknown>): Promise<ConnectionTestResult> {
   const startTime = Date.now();
   // QuickBooks connection testing requires OAuth flow
   // For now, just validate config
@@ -185,8 +185,9 @@ async function testQuickBooksConnection(config: Record<string, unknown>): Promis
 
 async function testXeroConnection(config: Record<string, unknown>): Promise<ConnectionTestResult> {
   const startTime = Date.now();
-  const clientId = config.clientId as string;
-  const clientSecret = config.clientSecret as string;
+  // Reserved for future OAuth implementation
+  void config.clientId;
+  void config.clientSecret;
   const tenantId = config.tenantId as string;
   const accessToken = config.accessToken as string | undefined;
 

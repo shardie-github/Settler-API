@@ -37,20 +37,23 @@ class InfrastructureOptimizerAgent extends orchestrator_1.BaseAgent {
             case 'get_opportunities':
                 return this.optimizationHistory;
             case 'get_stats':
-                return await this.getStats();
+                return await this.getStatus();
             default:
                 throw new Error(`Unknown action: ${action}`);
         }
     }
     async getStatus() {
-        return {
+        const status = {
             enabled: this.enabled,
-            lastExecution: this.lastOptimization,
-            metrics: {
-                opportunitiesFound: this.optimizationHistory.length,
-                autoApplied: this.optimizationHistory.filter(o => o.recommendedAction === 'auto-apply').length,
-            },
         };
+        if (this.lastOptimization) {
+            status.lastExecution = this.lastOptimization;
+        }
+        status.metrics = {
+            opportunitiesFound: this.optimizationHistory.length,
+            autoApplied: this.optimizationHistory.filter(o => o.recommendedAction === 'auto-apply').length,
+        };
+        return status;
     }
     /**
      * Analyze infrastructure for optimization opportunities

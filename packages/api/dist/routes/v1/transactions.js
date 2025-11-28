@@ -9,6 +9,7 @@ const express_1 = require("express");
 const zod_1 = require("zod");
 const validation_1 = require("../../middleware/validation");
 const authorization_1 = require("../../middleware/authorization");
+const Permissions_1 = require("../../infrastructure/security/Permissions");
 const db_1 = require("../../db");
 const api_response_1 = require("../../utils/api-response");
 const error_handler_1 = require("../../utils/error-handler");
@@ -35,9 +36,10 @@ const getTransactionSchema = zod_1.z.object({
  * GET /api/v1/transactions
  * List transactions with filtering and pagination
  */
-router.get('/', (0, authorization_1.requirePermission)('transactions', 'read'), (0, validation_1.validateRequest)(getTransactionsSchema), async (req, res) => {
+router.get('/', (0, authorization_1.requirePermission)(Permissions_1.Permission.REPORTS_READ), (0, validation_1.validateRequest)(getTransactionsSchema), async (req, res) => {
     try {
-        const { page, limit, provider, status, type, paymentId, startDate, endDate } = req.query;
+        const queryParams = getTransactionsSchema.parse({ query: req.query });
+        const { page, limit, provider, status, type, paymentId, startDate, endDate } = queryParams.query;
         const tenantId = req.tenantId;
         const offset = (page - 1) * limit;
         let whereClause = 'tenant_id = $1';
@@ -65,16 +67,19 @@ router.get('/', (0, authorization_1.requirePermission)('transactions', 'read'), 
         }
         if (startDate) {
             whereClause += ` AND created_at >= $${paramIndex}`;
-            params.push(startDate);
+            params.push(new Date(startDate).toISOString());
             paramIndex++;
         }
         if (endDate) {
             whereClause += ` AND created_at <= $${paramIndex}`;
-            params.push(endDate);
+            params.push(new Date(endDate).toISOString());
             paramIndex++;
         }
         // Get total count
         const countResult = await (0, db_1.query)(`SELECT COUNT(*) as count FROM transactions WHERE ${whereClause}`, params);
+        if (!countResult[0]) {
+            throw new Error('Failed to get transaction count');
+        }
         const total = parseInt(countResult[0].count, 10);
         // Get transactions
         const transactions = await (0, db_1.query)(`SELECT 
@@ -96,17 +101,19 @@ router.get('/', (0, authorization_1.requirePermission)('transactions', 'read'), 
         WHERE ${whereClause}
         ORDER BY created_at DESC
         LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`, [...params, limit, offset]);
-        (0, api_response_1.sendPaginated)(res, transactions, total, page, limit);
+        (0, api_response_1.sendPaginated)(res, transactions, { page, limit, total });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to fetch transactions', 500);
+        return;
     }
 });
 /**
  * GET /api/v1/transactions/:id
  * Get transaction by ID
  */
-router.get('/:id', (0, authorization_1.requirePermission)('transactions', 'read'), (0, validation_1.validateRequest)(getTransactionSchema), async (req, res) => {
+router.get('/:id', (0, authorization_1.requirePermission)(Permissions_1.Permission.REPORTS_READ), (0, validation_1.validateRequest)(getTransactionSchema), async (req, res) => {
     try {
         const { id } = req.params;
         const tenantId = req.tenantId;
@@ -126,11 +133,12 @@ router.get('/:id', (0, authorization_1.requirePermission)('transactions', 'read'
           created_at as "createdAt",
           updated_at as "updatedAt"
         FROM transactions 
-        WHERE id = $1 AND tenant_id = $2`, [id, tenantId]);
-        if (transactions.length === 0) {
-            return (0, api_response_1.sendError)(res, 'Not Found', 'Transaction not found', 404);
+        WHERE id = $1 AND tenant_id = $2`, [id || '', tenantId]);
+        if (transactions.length === 0 || !transactions[0]) {
+            return (0, api_response_1.sendError)(res, 404, 'NOT_FOUND', 'Transaction not found');
         }
         (0, api_response_1.sendSuccess)(res, transactions[0]);
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to fetch transaction', 500);

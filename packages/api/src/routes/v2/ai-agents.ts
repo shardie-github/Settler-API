@@ -26,7 +26,7 @@ agentOrchestrator.initializeAll().catch(console.error);
  * GET /api/v2/ai-agents
  * List all agents
  */
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (_req: Request, res: Response) => {
   try {
     const agents = agentOrchestrator.listAgents();
     res.json({
@@ -180,7 +180,7 @@ router.post('/:agentId/disable', async (req: Request, res: Response) => {
  * GET /api/v2/ai-agents/stats
  * Get orchestrator stats
  */
-router.get('/stats', async (req: Request, res: Response) => {
+router.get('/stats', async (_req: Request, res: Response) => {
   try {
     const stats = agentOrchestrator.getStats();
     res.json({

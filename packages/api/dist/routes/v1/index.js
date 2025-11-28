@@ -9,11 +9,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.v1Router = void 0;
 const express_1 = require("express");
-const jobs_1 = require("./jobs");
-const reports_1 = require("./reports");
-const webhooks_1 = require("./webhooks");
-const users_1 = require("./users");
-const tenants_1 = require("./tenants");
 const realtime_1 = require("../realtime");
 const reconciliation_summary_1 = require("../reconciliation-summary");
 const transactions_1 = __importDefault(require("./transactions"));
@@ -24,12 +19,7 @@ const currency_1 = __importDefault(require("./currency"));
 const receive_1 = __importDefault(require("./webhooks/receive"));
 exports.v1Router = (0, express_1.Router)();
 // Mount v1 routes
-exports.v1Router.use('/jobs', jobs_1.jobsRouter);
-exports.v1Router.use('/reports', reports_1.reportsRouter);
-exports.v1Router.use('/webhooks', webhooks_1.webhooksRouter);
 exports.v1Router.use('/webhooks/receive', receive_1.default);
-exports.v1Router.use('/users', users_1.usersRouter);
-exports.v1Router.use('/tenants', tenants_1.tenantsRouter);
 exports.v1Router.use('/realtime', realtime_1.realtimeRouter);
 exports.v1Router.use('/reconciliations', reconciliation_summary_1.reconciliationSummaryRouter);
 // Canonical data model routes
@@ -39,7 +29,7 @@ exports.v1Router.use('/fees', fees_1.default);
 exports.v1Router.use('/exports', exports_1.default);
 exports.v1Router.use('/currency', currency_1.default);
 // Health check
-exports.v1Router.get('/health', (req, res) => {
+exports.v1Router.get('/health', (_req, res) => {
     res.json({
         version: '1.0.0',
         status: 'healthy',

@@ -1,6 +1,5 @@
 import { Command } from "commander";
 import chalk from "chalk";
-import Settler from "@settler/sdk";
 
 const debugCommand = new Command("debug");
 

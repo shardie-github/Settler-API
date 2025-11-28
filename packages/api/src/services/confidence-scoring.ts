@@ -152,7 +152,9 @@ export function calculateConfidenceScore(
  */
 function calculateSimilarity(str1: string, str2: string): number {
   const longer = str1.length > str2.length ? str1 : str2;
-  const shorter = str1.length > str2.length ? str2 : str1;
+  // Reserved for future optimization
+  const _shorter = str1.length > str2.length ? str2 : str1;
+  void _shorter;
 
   if (longer.length === 0) {
     return 1.0;
@@ -212,7 +214,8 @@ function levenshteinDistance(str1: string, str2: string): number {
  * Explain confidence score in human-readable format
  */
 export function explainConfidenceScore(confidence: ConfidenceScore): string {
-  const { score, breakdown, factors } = confidence;
+  const { score, breakdown: _breakdown, factors } = confidence;
+  void _breakdown;
 
   if (score >= 0.95) {
     return `High confidence (${(score * 100).toFixed(1)}%): ${factors.exactMatches} exact matches, all rules satisfied.`;

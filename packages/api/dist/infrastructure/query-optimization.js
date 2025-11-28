@@ -10,8 +10,8 @@ exports.getTenantUsage = getTenantUsage;
 exports.getMatchAccuracy = getMatchAccuracy;
 exports.refreshMaterializedView = refreshMaterializedView;
 exports.refreshAllMaterializedViews = refreshAllMaterializedViews;
-const db_1 = require("../../db");
-const logger_1 = require("../../utils/logger");
+const db_1 = require("../db");
+const logger_1 = require("../utils/logger");
 /**
  * Get reconciliation summary using materialized view
  * Much faster than querying raw reconciliation data

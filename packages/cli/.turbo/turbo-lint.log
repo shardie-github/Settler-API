@@ -1,0 +1,19 @@
+npm warn config optional Use `--omit=optional` to exclude optional dependencies, or
+npm warn config `--include=optional` to include them.
+npm warn config
+npm warn config       Default value does install optional deps unless otherwise omitted.
+
+> @settler/cli@1.0.0 lint
+> eslint src --ext .ts
+
+
+Oops! Something went wrong! :(
+
+ESLint: 8.57.1
+
+ESLint couldn't find the config "prettier" to extend from. Please check that the name of the config is correct.
+
+The config "prettier" was referenced from the config file in "/workspace/.eslintrc.js".
+
+If you still have problems, please stop by https://eslint.org/chat/help to chat with the team.
+

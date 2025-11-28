@@ -25,7 +25,7 @@ export declare class SecretsManager {
     /**
      * Redact secret from logs
      */
-    static redactSecret(value: string, secretName: string): string;
+    static redactSecret(value: string, _secretName: string): string;
     /**
      * Mask sensitive data in objects
      */

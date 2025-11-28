@@ -1,8 +1,19 @@
+/**
+ * Webhook payload structure
+ */
+export interface WebhookPayload {
+    event: string;
+    data: Record<string, unknown>;
+    timestamp: string;
+    jobId?: string;
+    executionId?: string;
+    [key: string]: unknown;
+}
 interface WebhookDelivery {
     id: string;
     webhookId: string;
     url: string;
-    payload: any;
+    payload: WebhookPayload;
     secret: string;
 }
 export declare function processWebhookDelivery(delivery: WebhookDelivery): Promise<void>;

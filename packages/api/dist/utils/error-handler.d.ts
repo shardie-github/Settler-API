@@ -24,5 +24,5 @@ export declare function isHttpError(error: unknown): error is HttpError;
 /**
  * Handles errors in route handlers with proper typing
  */
-export declare function handleRouteError(res: Response, error: unknown, defaultMessage?: string, defaultStatusCode?: number, context?: Record<string, unknown>): void;
+export declare function handleRouteError(res: Response, error: unknown, defaultMessage?: string, _defaultStatusCode?: number, context?: Record<string, unknown>): void;
 //# sourceMappingURL=error-handler.d.ts.map

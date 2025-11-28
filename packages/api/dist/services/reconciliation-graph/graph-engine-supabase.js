@@ -15,7 +15,7 @@ class ReconciliationGraphEngineSupabase extends events_1.EventEmitter {
      */
     async initialize(jobId) {
         // Subscribe to node updates
-        const nodesChannel = client_1.supabaseRealtime
+        const _nodesChannel = client_1.supabaseRealtime
             .channel(`reconciliation-graph-nodes-${jobId}`)
             .on('postgres_changes', {
             event: '*',
@@ -31,8 +31,9 @@ class ReconciliationGraphEngineSupabase extends events_1.EventEmitter {
             });
         })
             .subscribe();
+        void _nodesChannel;
         // Subscribe to edge updates
-        const edgesChannel = client_1.supabaseRealtime
+        const _edgesChannel = client_1.supabaseRealtime
             .channel(`reconciliation-graph-edges-${jobId}`)
             .on('postgres_changes', {
             event: '*',
@@ -47,6 +48,7 @@ class ReconciliationGraphEngineSupabase extends events_1.EventEmitter {
             });
         })
             .subscribe();
+        void _edgesChannel;
     }
     /**
      * Add or update a node in the graph
@@ -93,7 +95,7 @@ class ReconciliationGraphEngineSupabase extends events_1.EventEmitter {
     /**
      * Add or update an edge in the graph
      */
-    async addEdge(jobId, edge) {
+    async addEdge(_jobId, edge) {
         // Verify nodes exist
         const { data: sourceNode } = await client_1.supabase
             .from('reconciliation_graph_nodes')

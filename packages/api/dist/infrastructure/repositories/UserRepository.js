@@ -42,12 +42,12 @@ class UserRepository {
                 props.tenantId,
                 props.email,
                 props.passwordHash,
-                props.name,
+                props.name ?? null,
                 props.role,
                 props.dataResidencyRegion,
                 props.dataRetentionDays,
-                props.deletedAt,
-                props.deletionScheduledAt,
+                props.deletedAt ?? null,
+                props.deletionScheduledAt ?? null,
                 props.id,
             ]);
         }
@@ -62,12 +62,12 @@ class UserRepository {
                 props.tenantId,
                 props.email,
                 props.passwordHash,
-                props.name,
+                props.name ?? null,
                 props.role,
                 props.dataResidencyRegion,
                 props.dataRetentionDays,
-                props.deletedAt,
-                props.deletionScheduledAt,
+                props.deletedAt ?? null,
+                props.deletionScheduledAt ?? null,
             ]);
         }
         return user;
@@ -82,25 +82,33 @@ class UserRepository {
     }
     async count() {
         const rows = await (0, db_1.query)(`SELECT COUNT(*) as count FROM users WHERE deleted_at IS NULL`);
+        if (!rows[0]) {
+            return 0;
+        }
         return parseInt(rows[0].count, 10);
     }
     mapRowToProps(row) {
-        return {
+        const props = {
             id: row.id,
             tenantId: row.tenant_id,
             email: row.email,
             passwordHash: row.password_hash,
-            name: row.name,
             role: row.role,
             dataResidencyRegion: row.data_residency_region,
             dataRetentionDays: row.data_retention_days,
-            deletedAt: row.deleted_at ? new Date(row.deleted_at) : undefined,
-            deletionScheduledAt: row.deletion_scheduled_at
-                ? new Date(row.deletion_scheduled_at)
-                : undefined,
             createdAt: new Date(row.created_at),
             updatedAt: new Date(row.updated_at),
         };
+        if (row.name !== null && row.name !== undefined) {
+            props.name = row.name;
+        }
+        if (row.deleted_at) {
+            props.deletedAt = new Date(row.deleted_at);
+        }
+        if (row.deletion_scheduled_at) {
+            props.deletionScheduledAt = new Date(row.deletion_scheduled_at);
+        }
+        return props;
     }
 }
 exports.UserRepository = UserRepository;

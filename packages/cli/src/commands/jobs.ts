@@ -127,11 +127,11 @@ jobsCommand
           // Check execution status via reports endpoint instead of job status
           // Job status is "active" | "paused" | "archived", not execution status
           try {
-            const report = await client.reports.get(id, {
+            // If we can get a report, the execution likely completed
+            await client.reports.get(id, {
               startDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
               endDate: new Date().toISOString(),
             });
-            // If we can get a report, the execution likely completed
             completed = true;
             console.log(chalk.green("✓ Job execution completed"));
           } catch {

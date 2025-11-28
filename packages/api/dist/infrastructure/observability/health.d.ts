@@ -13,6 +13,7 @@ export interface HealthStatus {
     checks: {
         database: HealthCheck;
         redis?: HealthCheck;
+        sentry?: HealthCheck;
         [key: string]: HealthCheck | undefined;
     };
     timestamp: string;
@@ -21,6 +22,7 @@ export declare class HealthCheckService {
     private getRedisClient;
     checkDatabase(): Promise<HealthCheck>;
     checkRedis(): Promise<HealthCheck>;
+    checkSentry(): Promise<HealthCheck>;
     checkAll(): Promise<HealthStatus>;
     checkLive(): Promise<{
         status: 'ok';

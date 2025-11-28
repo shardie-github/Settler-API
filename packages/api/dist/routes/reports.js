@@ -5,6 +5,7 @@ const express_1 = require("express");
 const zod_1 = require("zod");
 const validation_1 = require("../middleware/validation");
 const authorization_1 = require("../middleware/authorization");
+const Permissions_1 = require("../infrastructure/security/Permissions");
 const db_1 = require("../db");
 const error_handler_1 = require("../utils/error-handler");
 const router = (0, express_1.Router)();
@@ -28,14 +29,18 @@ const paginationSchema = zod_1.z.object({
     }),
 });
 // Get reconciliation report with pagination
-router.get("/:jobId", (0, authorization_1.requirePermission)("reports", "read"), (0, validation_1.validateRequest)(getReportSchema), async (req, res) => {
+router.get("/:jobId", (0, authorization_1.requirePermission)(Permissions_1.Permission.REPORTS_READ), (0, validation_1.validateRequest)(getReportSchema), async (req, res) => {
     try {
         const { jobId } = req.params;
         const userId = req.userId;
-        const { startDate, endDate, format = "json", page, limit } = req.query;
+        const queryParams = getReportSchema.parse({ params: req.params, query: req.query });
+        const { startDate, endDate, format = "json", page, limit } = queryParams.query;
+        if (!jobId || !userId) {
+            return res.status(400).json({ error: "Job ID and User ID are required" });
+        }
         // Check job ownership
         const jobs = await (0, db_1.query)(`SELECT user_id FROM jobs WHERE id = $1`, [jobId]);
-        if (jobs.length === 0) {
+        if (jobs.length === 0 || !jobs[0]) {
             return res.status(404).json({ error: "Job not found" });
         }
         if (jobs[0].user_id !== userId) {
@@ -52,7 +57,7 @@ router.get("/:jobId", (0, authorization_1.requirePermission)("reports", "read"),
          WHERE job_id = $1 AND completed_at BETWEEN $2 AND $3
          ORDER BY completed_at DESC
          LIMIT 1`, [jobId, dateStart, dateEnd]);
-        if (executions.length === 0) {
+        if (executions.length === 0 || !executions[0]) {
             return res.status(404).json({ error: "No reports found for this job" });
         }
         const execution = executions[0];
@@ -73,6 +78,9 @@ router.get("/:jobId", (0, authorization_1.requirePermission)("reports", "read"),
             (0, db_1.query)(`SELECT id, error FROM executions WHERE id = $1 AND error IS NOT NULL`, [executionId]),
             (0, db_1.query)(`SELECT COUNT(*) as count FROM matches WHERE execution_id = $1`, [executionId]),
         ]);
+        if (!totalMatches[0]) {
+            throw new Error('Failed to get match count');
+        }
         const total = parseInt(totalMatches[0].count);
         const summary = execution.summary || {
             matched: matches.length,
@@ -92,6 +100,7 @@ router.get("/:jobId", (0, authorization_1.requirePermission)("reports", "read"),
                 csv += `${u.id},${u.source_id || ''},${u.target_id || ''},${u.amount || ''},${u.currency || ''},unmatched\n`;
             });
             res.send(csv);
+            return;
         }
         else {
             res.json({
@@ -133,18 +142,21 @@ router.get("/:jobId", (0, authorization_1.requirePermission)("reports", "read"),
                     generatedAt: new Date().toISOString(),
                 },
             });
+            return;
         }
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, "Failed to generate report", 500, { userId: req.userId, jobId: req.params.jobId });
+        return;
     }
 });
 // Get report history with pagination
-router.get("/", (0, authorization_1.requirePermission)("reports", "read"), (0, validation_1.validateRequest)(paginationSchema), async (req, res) => {
+router.get("/", (0, authorization_1.requirePermission)(Permissions_1.Permission.REPORTS_READ), (0, validation_1.validateRequest)(paginationSchema), async (req, res) => {
     try {
         const userId = req.userId;
-        const page = parseInt(req.query.page) || 1;
-        const limit = Math.min(parseInt(req.query.limit) || 100, 1000);
+        const queryParams = paginationSchema.parse({ query: req.query });
+        const page = queryParams.query.page;
+        const limit = Math.min(queryParams.query.limit, 1000);
         const offset = (page - 1) * limit;
         const [reports, totalResult] = await Promise.all([
             (0, db_1.query)(`SELECT r.id, r.job_id, r.summary, r.generated_at
@@ -158,6 +170,9 @@ router.get("/", (0, authorization_1.requirePermission)("reports", "read"), (0, v
            JOIN jobs j ON r.job_id = j.id
            WHERE j.user_id = $1`, [userId]),
         ]);
+        if (!totalResult[0]) {
+            throw new Error('Failed to get report count');
+        }
         const total = parseInt(totalResult[0].count);
         res.json({
             data: reports.map(r => ({

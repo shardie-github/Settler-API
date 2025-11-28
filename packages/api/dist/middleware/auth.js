@@ -9,6 +9,21 @@ const db_1 = require("../db");
 const hash_1 = require("../utils/hash");
 const logger_1 = require("../utils/logger");
 const config_1 = require("../config");
+/**
+ * Express middleware for API key or JWT token authentication.
+ *
+ * Supports two authentication methods:
+ * 1. API Key: `X-API-Key` header with `rk_` prefix
+ * 2. JWT Token: `Authorization: Bearer <token>` header
+ *
+ * On success, attaches `userId` and `apiKeyId` (if API key) to `req`.
+ * On failure, returns 401 Unauthorized.
+ *
+ * @example
+ * ```typescript
+ * app.use("/api/v1", authMiddleware, protectedRouter);
+ * ```
+ */
 const authMiddleware = async (req, res, next) => {
     try {
         // Check for API key in header
@@ -25,10 +40,11 @@ const authMiddleware = async (req, res, next) => {
                     userAgent: req.headers['user-agent'],
                     error: message,
                 });
-                return res.status(401).json({
+                res.status(401).json({
                     error: "Unauthorized",
                     message,
                 });
+                return;
             }
         }
         // Check for JWT token
@@ -45,10 +61,11 @@ const authMiddleware = async (req, res, next) => {
                     userAgent: req.headers['user-agent'],
                     error: message,
                 });
-                return res.status(401).json({
+                res.status(401).json({
                     error: "Invalid Token",
                     message,
                 });
+                return;
             }
         }
         // No auth provided
@@ -78,11 +95,14 @@ async function validateApiKey(req, apiKey) {
         await (0, db_1.query)(`INSERT INTO audit_logs (event, ip, user_agent, path, metadata)
        VALUES ($1, $2, $3, $4, $5)`, [
             'api_key_auth_failed',
-            req.ip,
-            req.headers['user-agent'],
+            req.ip || null,
+            req.headers['user-agent'] || null,
             req.path,
             JSON.stringify({ keyPrefix: prefix }),
         ]);
+        throw new Error("Invalid API key");
+    }
+    if (!keys[0]) {
         throw new Error("Invalid API key");
     }
     const keyRecord = keys[0];
@@ -94,8 +114,8 @@ async function validateApiKey(req, apiKey) {
        VALUES ($1, $2, $3, $4, $5, $6)`, [
             'api_key_auth_failed',
             keyRecord.id,
-            req.ip,
-            req.headers['user-agent'],
+            req.ip || null,
+            req.headers['user-agent'] || null,
             req.path,
             JSON.stringify({ keyPrefix: prefix }),
         ]);

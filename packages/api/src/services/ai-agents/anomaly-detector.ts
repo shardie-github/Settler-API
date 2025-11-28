@@ -24,11 +24,13 @@ export class AnomalyDetectorAgent extends BaseAgent {
 
   private detectedAnomalies: Anomaly[] = [];
   private lastDetection?: Date;
-  private detectionRules: DetectionRule[] = [];
+  // Reserved for future rule-based detection
+  private _detectionRules: DetectionRule[] = [];
 
   async initialize(): Promise<void> {
     // Load detection rules
-    this.detectionRules = await this.loadDetectionRules();
+    this._detectionRules = await this.loadDetectionRules();
+    void this._detectionRules;
 
     // Start periodic anomaly detection
     setInterval(() => {

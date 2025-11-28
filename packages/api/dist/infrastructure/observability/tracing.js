@@ -53,7 +53,11 @@ function shutdownTracing() {
  */
 async function traceFunction(name, fn, attributes) {
     const tracer = api_1.trace.getTracer('settler-api');
-    const span = tracer.startSpan(name, { attributes });
+    const spanOptions = {};
+    if (attributes) {
+        spanOptions.attributes = attributes;
+    }
+    const span = tracer.startSpan(name, spanOptions);
     try {
         const result = await fn(span);
         span.setStatus({ code: api_1.SpanStatusCode.OK });

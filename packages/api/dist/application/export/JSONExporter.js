@@ -49,25 +49,34 @@ class JSONExporter {
                 delete transaction.raw_payload;
                 delete settlement.raw_payload;
             }
+            const matchObj = {
+                id: match.id,
+                tenantId: match.tenantId,
+                matchType: match.matchType,
+                confidenceScore: match.confidenceScore,
+                matchingRules: match.matchingRules,
+                matchedAt: match.matchedAt.toISOString(),
+                createdAt: match.createdAt.toISOString(),
+            };
+            if (match.executionId) {
+                matchObj.executionId = match.executionId;
+            }
+            if (match.jobId) {
+                matchObj.jobId = match.jobId;
+            }
+            if (match.transactionId) {
+                matchObj.transactionId = match.transactionId;
+            }
+            if (match.settlementId) {
+                matchObj.settlementId = match.settlementId;
+            }
             const matchEntry = {
-                match: {
-                    id: match.id,
-                    tenantId: match.tenantId,
-                    executionId: match.executionId,
-                    jobId: match.jobId,
-                    transactionId: match.transactionId,
-                    settlementId: match.settlementId,
-                    matchType: match.matchType,
-                    confidenceScore: match.confidenceScore,
-                    matchingRules: match.matchingRules,
-                    matchedAt: match.matchedAt.toISOString(),
-                    createdAt: match.createdAt.toISOString(),
-                },
+                match: matchObj,
                 transaction,
                 settlement,
             };
             // Add fees if included
-            if (includeFees) {
+            if (includeFees && match.transactionId) {
                 const fees = await (0, db_1.query)(`SELECT * FROM fees WHERE transaction_id = $1 AND tenant_id = $2`, [match.transactionId, tenantId]);
                 matchEntry.fees = fees.map(fee => {
                     const feeObj = { ...fee };
@@ -78,7 +87,37 @@ class JSONExporter {
                 });
                 result.summary.totalFees += fees.length;
             }
-            result.matches.push(matchEntry);
+            // Build ReconciliationMatch with proper types
+            const reconciliationMatch = {
+                id: matchObj.id,
+                tenantId: matchObj.tenantId,
+                matchType: matchObj.matchType,
+                confidenceScore: matchObj.confidenceScore,
+                matchingRules: matchObj.matchingRules,
+                matchedAt: new Date(matchObj.matchedAt),
+                createdAt: new Date(matchObj.createdAt),
+            };
+            if (matchObj.executionId) {
+                reconciliationMatch.executionId = matchObj.executionId;
+            }
+            if (matchObj.jobId) {
+                reconciliationMatch.jobId = matchObj.jobId;
+            }
+            if (matchObj.transactionId) {
+                reconciliationMatch.transactionId = matchObj.transactionId;
+            }
+            if (matchObj.settlementId) {
+                reconciliationMatch.settlementId = matchObj.settlementId;
+            }
+            const matchEntryResult = {
+                match: reconciliationMatch,
+                transaction,
+                settlement,
+            };
+            if (matchEntry.fees) {
+                matchEntryResult.fees = matchEntry.fees;
+            }
+            result.matches.push(matchEntryResult);
         }
         // Add unmatched if included
         if (includeUnmatched) {

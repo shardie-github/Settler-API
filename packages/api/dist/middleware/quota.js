@@ -13,7 +13,8 @@ function quotaMiddleware(quotaType, requestedValue = 1) {
                 res.status(403).json({ error: 'TenantNotFound', message: 'Tenant context required' });
                 return;
             }
-            const quotaService = Container_1.Container.get('QuotaService');
+            const container = Container_1.Container.getInstance();
+            const quotaService = container.get('QuotaService');
             await quotaService.enforceQuota(req.tenantId, quotaType, requestedValue);
             next();
         }

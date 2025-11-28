@@ -28,7 +28,7 @@ v1Router.use('/exports', exportsRouter);
 v1Router.use('/currency', currencyRouter);
 
 // Health check
-v1Router.get('/health', (req, res) => {
+v1Router.get('/health', (_req, res) => {
   res.json({
     version: '1.0.0',
     status: 'healthy',

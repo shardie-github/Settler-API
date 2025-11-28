@@ -67,9 +67,9 @@ function initializeSentry() {
         integrations: [
             new profiling_node_1.ProfilingIntegration(),
             new Sentry.Integrations.Http({ tracing: true }),
-            new Sentry.Integrations.Express({ app: undefined }),
+            new Sentry.Integrations.Express(),
         ],
-        beforeSend(event, hint) {
+        beforeSend(event, _hint) {
             // Don't send events in development unless explicitly enabled
             if (validation_1.validatedConfig.nodeEnv === 'development' && !process.env.SENTRY_ENABLE_DEV) {
                 return null;
@@ -86,7 +86,7 @@ function initializeSentry() {
  */
 function sentryRequestHandler() {
     if (!sentryInitialized) {
-        return (req, res, next) => next();
+        return (_req, _res, next) => next();
     }
     return Sentry.Handlers.requestHandler({
         user: ['id', 'email'],
@@ -99,7 +99,7 @@ function sentryRequestHandler() {
  */
 function sentryTracingHandler() {
     if (!sentryInitialized) {
-        return (req, res, next) => next();
+        return (_req, _res, next) => next();
     }
     return Sentry.Handlers.tracingHandler();
 }
@@ -109,7 +109,7 @@ function sentryTracingHandler() {
  */
 function sentryErrorHandler() {
     if (!sentryInitialized) {
-        return (err, req, res, next) => next(err);
+        return (err, _req, _res, next) => next(err);
     }
     return Sentry.Handlers.errorHandler({
         shouldHandleError(error) {
@@ -129,11 +129,13 @@ function setSentryUser(req) {
     if (!sentryInitialized || !req.userId) {
         return;
     }
-    Sentry.setUser({
+    const user = {
         id: req.userId,
-        email: req.email,
-        ip_address: req.ip,
-    });
+    };
+    if (req.ip !== undefined) {
+        user.ip_address = req.ip;
+    }
+    Sentry.setUser(user);
 }
 /**
  * Capture exception to Sentry
@@ -145,7 +147,9 @@ function captureException(error, context) {
     Sentry.withScope((scope) => {
         if (context) {
             Object.entries(context).forEach(([key, value]) => {
-                scope.setContext(key, value);
+                if (value !== null && value !== undefined) {
+                    scope.setContext(key, value);
+                }
             });
         }
         Sentry.captureException(error);
@@ -161,7 +165,9 @@ function captureMessage(message, level = 'info', context) {
     Sentry.withScope((scope) => {
         if (context) {
             Object.entries(context).forEach(([key, value]) => {
-                scope.setContext(key, value);
+                if (value !== null && value !== undefined) {
+                    scope.setContext(key, value);
+                }
             });
         }
         Sentry.captureMessage(message, level);

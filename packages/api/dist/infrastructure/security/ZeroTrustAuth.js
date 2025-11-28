@@ -146,6 +146,9 @@ class ZeroTrustAuth {
          VALUES ($1, $2, $3, $4)`, ['api_key_auth_failed', ipAddress, userAgent, JSON.stringify({ prefix })]);
             throw new Error('Invalid API key');
         }
+        if (!keys[0]) {
+            throw new Error('API key not found');
+        }
         const keyRecord = keys[0];
         // Verify key hash
         const isValid = await (0, hash_1.verifyApiKey)(apiKey, keyRecord.key_hash);
@@ -199,7 +202,7 @@ class ZeroTrustAuth {
         const result = await (0, db_1.query)(`SELECT COUNT(*)::INTEGER as count
        FROM revoked_tokens
        WHERE jti = $1 AND expires_at > NOW()`, [jti]);
-        return result[0]?.count > 0;
+        return (result[0]?.count ?? 0) > 0;
     }
 }
 exports.ZeroTrustAuth = ZeroTrustAuth;

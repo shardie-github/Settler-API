@@ -64,11 +64,11 @@ class StreamProcessor extends events_1.EventEmitter {
             id: event.id,
             type: 'transaction',
             jobId: event.jobId,
-            sourceId: event.sourceId,
-            targetId: event.targetId,
+            ...(event.sourceId !== undefined && { sourceId: event.sourceId }),
+            ...(event.targetId !== undefined && { targetId: event.targetId }),
             data: event.data,
-            amount: event.amount,
-            currency: event.currency,
+            ...(event.amount !== undefined && { amount: event.amount }),
+            ...(event.currency !== undefined && { currency: event.currency }),
             timestamp: event.timestamp,
             metadata: {
                 processedAt: new Date(),
@@ -100,7 +100,7 @@ class StreamProcessor extends events_1.EventEmitter {
      * Get matching rules for a job
      * In production, this would fetch from database
      */
-    async getMatchingRules(jobId) {
+    async getMatchingRules(_jobId) {
         // TODO: Fetch from database
         // For now, return default rules
         return [

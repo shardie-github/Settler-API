@@ -369,12 +369,12 @@ const openApiSpec = {
     },
 };
 // Serve OpenAPI spec
-router.get('/openapi.json', (req, res) => {
+router.get('/openapi.json', (_req, res) => {
     res.json(openApiSpec);
 });
 // Serve Swagger UI (if enabled)
 if (config_1.config.features.enableApiDocs) {
-    router.get('/docs', (req, res) => {
+    router.get('/docs', (_req, res) => {
         res.send(`
       <!DOCTYPE html>
       <html>

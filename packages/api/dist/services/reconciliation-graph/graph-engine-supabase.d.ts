@@ -18,7 +18,7 @@ export declare class ReconciliationGraphEngineSupabase extends EventEmitter {
     /**
      * Add or update an edge in the graph
      */
-    addEdge(jobId: string, edge: ReconciliationEdge): Promise<ReconciliationEdge>;
+    addEdge(_jobId: string, edge: ReconciliationEdge): Promise<ReconciliationEdge>;
     /**
      * Query the graph
      */

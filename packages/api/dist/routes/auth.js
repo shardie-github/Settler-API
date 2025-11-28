@@ -14,6 +14,10 @@ const logger_1 = require("../utils/logger");
 const error_handler_1 = require("../utils/error-handler");
 const config_1 = require("../config");
 const authorization_1 = require("../middleware/authorization");
+const Permissions_1 = require("../infrastructure/security/Permissions");
+const token_rotation_1 = require("../infrastructure/security/token-rotation");
+const uuid_1 = require("uuid");
+const api_response_1 = require("../utils/api-response");
 const router = (0, express_1.Router)();
 exports.authRouter = router;
 const loginSchema = zod_1.z.object({
@@ -40,26 +44,42 @@ router.post("/login", (0, validation_1.validateRequest)(loginSchema), async (req
     try {
         const { email, password } = req.body;
         const users = await (0, db_1.query)(`SELECT id, password_hash, role FROM users WHERE email = $1 AND deleted_at IS NULL`, [email]);
-        if (users.length === 0) {
-            return res.status(401).json({ error: "Invalid credentials" });
+        if (users.length === 0 || !users[0]) {
+            res.status(401).json({ error: "Invalid credentials" });
+            return;
         }
         const user = users[0];
         const isValid = await (0, hash_1.verifyPassword)(password, user.password_hash);
         if (!isValid) {
-            return res.status(401).json({ error: "Invalid credentials" });
+            res.status(401).json({ error: "Invalid credentials" });
+            return;
         }
+        if (!config_1.config.jwt.secret) {
+            throw new Error('JWT secret not configured');
+        }
+        const jwtSecret = config_1.config.jwt.secret;
+        const accessTokenExpiry = typeof config_1.config.jwt.accessTokenExpiry === 'string'
+            ? config_1.config.jwt.accessTokenExpiry
+            : (typeof config_1.config.jwt.accessTokenExpiry === 'number' ? config_1.config.jwt.accessTokenExpiry : '15m');
+        const refreshSecret = (config_1.config.jwt.refreshSecret || jwtSecret);
+        const refreshTokenExpiry = typeof config_1.config.jwt.refreshTokenExpiry === 'string'
+            ? config_1.config.jwt.refreshTokenExpiry
+            : (typeof config_1.config.jwt.refreshTokenExpiry === 'number' ? config_1.config.jwt.refreshTokenExpiry : '7d');
         // Generate access token (15 minutes)
-        const accessToken = jsonwebtoken_1.default.sign({ userId: user.id, type: 'access' }, config_1.config.jwt.secret, {
-            expiresIn: config_1.config.jwt.accessTokenExpiry,
+        const accessToken = jsonwebtoken_1.default.sign({ userId: user.id, type: 'access' }, jwtSecret, {
+            expiresIn: accessTokenExpiry,
             issuer: 'settler-api',
             audience: 'settler-client',
         });
-        // Generate refresh token (7 days)
-        const refreshToken = jsonwebtoken_1.default.sign({ userId: user.id, type: 'refresh' }, config_1.config.jwt.refreshSecret, {
-            expiresIn: config_1.config.jwt.refreshTokenExpiry,
+        // Generate refresh token with rotation support
+        const refreshTokenId = (0, uuid_1.v4)();
+        const refreshToken = jsonwebtoken_1.default.sign({ userId: user.id, tokenId: refreshTokenId, type: 'refresh' }, refreshSecret, {
+            expiresIn: refreshTokenExpiry,
             issuer: 'settler-api',
             audience: 'settler-client',
         });
+        // Store refresh token in database for rotation
+        await (0, token_rotation_1.storeRefreshToken)(user.id, refreshTokenId, 7);
         // Log audit event
         await (0, db_1.query)(`INSERT INTO audit_logs (event, user_id, metadata)
          VALUES ($1, $2, $3)`, [
@@ -68,16 +88,14 @@ router.post("/login", (0, validation_1.validateRequest)(loginSchema), async (req
             JSON.stringify({ ip: req.ip }),
         ]);
         (0, logger_1.logInfo)('User logged in', { userId: user.id });
-        res.json({
-            data: {
-                accessToken,
-                refreshToken,
-                expiresIn: 900, // 15 minutes in seconds
-                user: {
-                    id: user.id,
-                    email,
-                    role: user.role,
-                },
+        (0, api_response_1.sendSuccess)(res, {
+            accessToken,
+            refreshToken,
+            expiresIn: 900, // 15 minutes in seconds
+            user: {
+                id: user.id,
+                email,
+                role: user.role,
             },
         });
     }
@@ -85,44 +103,27 @@ router.post("/login", (0, validation_1.validateRequest)(loginSchema), async (req
         (0, error_handler_1.handleRouteError)(res, error, "Failed to login", 500);
     }
 });
-// Refresh access token
+// Refresh access token with rotation
 router.post("/refresh", (0, validation_1.validateRequest)(refreshTokenSchema), async (req, res) => {
     try {
         const { refreshToken } = req.body;
-        try {
-            const decoded = jsonwebtoken_1.default.verify(refreshToken, config_1.config.jwt.refreshSecret, {
-                issuer: 'settler-api',
-                audience: 'settler-client',
-            });
-            if (decoded.type !== 'refresh') {
-                return res.status(401).json({ error: "Invalid token type" });
-            }
-            // Generate new access token
-            const accessToken = jsonwebtoken_1.default.sign({ userId: decoded.userId, type: 'access' }, config_1.config.jwt.secret, {
-                expiresIn: config_1.config.jwt.accessTokenExpiry,
-                issuer: 'settler-api',
-                audience: 'settler-client',
-            });
-            res.json({
-                data: {
-                    accessToken,
-                    expiresIn: 900,
-                },
-            });
+        // Rotate refresh token (invalidates old, issues new)
+        const tokenPair = await (0, token_rotation_1.rotateRefreshToken)(refreshToken);
+        if (!tokenPair) {
+            return (0, api_response_1.sendError)(res, 401, 'INVALID_TOKEN', 'Invalid or expired refresh token');
         }
-        catch (error) {
-            if (error instanceof Error && error.name === 'TokenExpiredError') {
-                return res.status(401).json({ error: "Refresh token expired" });
-            }
-            throw error;
-        }
+        (0, api_response_1.sendSuccess)(res, {
+            accessToken: tokenPair.accessToken,
+            refreshToken: tokenPair.refreshToken,
+            expiresIn: 900, // 15 minutes in seconds
+        });
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, "Failed to refresh token", 401);
     }
 });
 // Create API key
-router.post("/api-keys", (0, authorization_1.requirePermission)("api_keys", "create"), (0, validation_1.validateRequest)(createApiKeySchema), async (req, res) => {
+router.post("/api-keys", (0, authorization_1.requirePermission)(Permissions_1.Permission.USERS_WRITE), (0, validation_1.validateRequest)(createApiKeySchema), async (req, res) => {
     try {
         const { name, scopes, rateLimit, expiresAt } = req.body;
         const userId = req.userId;
@@ -139,18 +140,22 @@ router.post("/api-keys", (0, authorization_1.requirePermission)("api_keys", "cre
             rateLimit || 1000,
             expiresAt ? new Date(expiresAt) : null,
         ]);
+        if (!result[0]) {
+            throw new Error('Failed to create API key');
+        }
+        const apiKeyId = result[0].id;
         // Log audit event
         await (0, db_1.query)(`INSERT INTO audit_logs (event, user_id, metadata)
          VALUES ($1, $2, $3)`, [
             'api_key_created',
             userId,
-            JSON.stringify({ apiKeyId: result[0].id, name }),
+            JSON.stringify({ apiKeyId, name }),
         ]);
-        (0, logger_1.logInfo)('API key created', { userId, apiKeyId: result[0].id });
+        (0, logger_1.logInfo)('API key created', { userId, apiKeyId });
         // Return key only once (never again)
         res.status(201).json({
             data: {
-                id: result[0].id,
+                id: apiKeyId,
                 key, // Only returned on creation
                 name,
                 scopes: scopes || ['jobs:read', 'jobs:write', 'reports:read'],

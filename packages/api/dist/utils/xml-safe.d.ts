@@ -3,8 +3,11 @@
  *
  * IMPORTANT: Never enable external entities (noEnt: false)
  * This prevents XXE attacks that could read local files or perform SSRF
+ *
+ * @param xml - XML string to parse
+ * @returns Parsed XML object (structure depends on input)
  */
-export declare function safeParseXML(xml: string): Promise<any>;
+export declare function safeParseXML(xml: string): Promise<unknown>;
 /**
  * Validate XML before parsing to detect XXE attempts
  */

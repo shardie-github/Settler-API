@@ -9,7 +9,6 @@
  */
 
 import { BaseAgent } from './orchestrator';
-import { register } from '../../infrastructure/observability/metrics';
 
 export interface OptimizationOpportunity {
   id: string;

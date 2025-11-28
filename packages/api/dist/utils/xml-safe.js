@@ -11,6 +11,9 @@ const xml2js_1 = require("xml2js");
  *
  * IMPORTANT: Never enable external entities (noEnt: false)
  * This prevents XXE attacks that could read local files or perform SSRF
+ *
+ * @param xml - XML string to parse
+ * @returns Parsed XML object (structure depends on input)
  */
 function safeParseXML(xml) {
     return new Promise((resolve, reject) => {

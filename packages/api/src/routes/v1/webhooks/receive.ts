@@ -8,7 +8,6 @@ import { Router, Request, Response } from 'express';
 import { WebhookIngestionService } from '../../../application/webhooks/WebhookIngestionService';
 import { sendSuccess, sendError } from '../../../utils/api-response';
 import { handleRouteError } from '../../../utils/error-handler';
-import { AuthRequest } from '../../../middleware/auth';
 
 const router = Router();
 const webhookService = new WebhookIngestionService();
@@ -75,7 +74,7 @@ router.post(
 /**
  * Get webhook secret from database
  */
-async function getWebhookSecret(adapter: string, tenantId: string): Promise<string | null> {
+async function getWebhookSecret(adapter: string, _tenantId: string): Promise<string | null> {
   const { query } = await import('../../../db');
   const result = await query<{ secret: string }>(
     `SELECT secret FROM webhook_configs WHERE adapter = $1 LIMIT 1`,

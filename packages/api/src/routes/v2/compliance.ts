@@ -105,7 +105,7 @@ router.get('/exports/:id', async (req: Request, res: Response) => {
  * GET /api/v2/compliance/templates
  * Get available export templates
  */
-router.get('/templates', async (req: Request, res: Response) => {
+router.get('/templates', async (_req: Request, res: Response) => {
   try {
     const templates = complianceExportSystem.getTemplates();
 

@@ -16,12 +16,15 @@ class ApiError extends Error {
         Error.captureStackTrace?.(this, this.constructor);
     }
     toJSON() {
-        return {
+        const result = {
             error: this.name,
             errorCode: this.errorCode,
             message: this.message,
-            ...(this.details && { details: this.details }),
         };
+        if (this.details !== undefined) {
+            result.details = this.details;
+        }
+        return result;
     }
 }
 exports.ApiError = ApiError;
@@ -31,7 +34,13 @@ class ValidationError extends ApiError {
     field;
     constructor(message, field, details) {
         super(message, details);
-        this.field = field;
+        if (field !== undefined) {
+            this.field = field;
+        }
+        // If details is an array of field errors, use it
+        if (Array.isArray(details)) {
+            this.details = details;
+        }
     }
 }
 exports.ValidationError = ValidationError;
@@ -52,8 +61,12 @@ class NotFoundError extends ApiError {
     resourceId;
     constructor(message, resourceType, resourceId, details) {
         super(message, details);
-        this.resourceType = resourceType;
-        this.resourceId = resourceId;
+        if (resourceType !== undefined) {
+            this.resourceType = resourceType;
+        }
+        if (resourceId !== undefined) {
+            this.resourceId = resourceId;
+        }
     }
 }
 exports.NotFoundError = NotFoundError;
@@ -70,9 +83,15 @@ class RateLimitError extends ApiError {
     remaining;
     constructor(message, retryAfter, limit, remaining, details) {
         super(message, details);
-        this.retryAfter = retryAfter;
-        this.limit = limit;
-        this.remaining = remaining;
+        if (retryAfter !== undefined) {
+            this.retryAfter = retryAfter;
+        }
+        if (limit !== undefined) {
+            this.limit = limit;
+        }
+        if (remaining !== undefined) {
+            this.remaining = remaining;
+        }
     }
 }
 exports.RateLimitError = RateLimitError;
@@ -87,7 +106,9 @@ class ServiceUnavailableError extends ApiError {
     retryAfter;
     constructor(message, retryAfter, details) {
         super(message, details);
-        this.retryAfter = retryAfter;
+        if (retryAfter !== undefined) {
+            this.retryAfter = retryAfter;
+        }
     }
 }
 exports.ServiceUnavailableError = ServiceUnavailableError;

@@ -3,11 +3,10 @@
  * WebSocket/SSE endpoint for reconciliation status updates
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { query } from '../db';
 import { AuthRequest } from '../middleware/auth';
 import { logInfo, logError } from '../utils/logger';
-import { handleRouteError } from '../utils/error-handler';
 
 const router = Router();
 

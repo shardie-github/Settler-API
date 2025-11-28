@@ -31,9 +31,11 @@ export interface JobResponse {
     name: string;
     source: {
         adapter: string;
+        config?: Record<string, unknown>;
     };
     target: {
         adapter: string;
+        config?: Record<string, unknown>;
     };
     rules: CreateJobRequest['rules'];
     schedule?: string;

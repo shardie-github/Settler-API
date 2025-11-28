@@ -7,7 +7,6 @@
 import { Router, Response, RequestHandler } from "express";
 import { z } from "zod";
 import { validateRequest } from "../middleware/validation";
-import { query } from "../db";
 import { handleRouteError } from "../utils/error-handler";
 import { calculateConfidenceScore } from "../services/confidence-scoring";
 import { validateAdapterConfig } from "../utils/adapter-config-validator";
@@ -36,7 +35,7 @@ const playgroundReconcileSchema = z.object({
 // Get playground examples (pre-filled)
 router.get(
   "/playground/examples",
-  (async (req: Request, res: Response): Promise<void> => {
+  (async (_req: Request, res: Response): Promise<void> => {
     try {
       const examples = [
         {
@@ -297,7 +296,7 @@ router.post(
 // Get playground adapter schemas (for UI)
 router.get(
   "/playground/adapters",
-  (async (req: Request, res: Response): Promise<void> => {
+  (async (_req: Request, res: Response): Promise<void> => {
     try {
       const adapters = [
         {

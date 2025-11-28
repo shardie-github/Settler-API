@@ -210,15 +210,18 @@ observabilityRouter.get("/logs", async (req: Request, res: Response) => {
  */
 observabilityRouter.get("/traces", async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).userId;
-    const tenantId = (req as any).tenantId;
-    const {
-      traceId,
-      jobId,
-      startDate,
-      endDate,
-      limit = "50",
-    } = req.query;
+    // Reserved for future user/tenant filtering
+    const _ = {
+      userId: (req as any).userId,
+      tenantId: (req as any).tenantId,
+    };
+    void _;
+    // Reserved for future tracing backend integration
+    void req.query.traceId;
+    void req.query.jobId;
+    void req.query.startDate;
+    void req.query.endDate;
+    void req.query.limit;
 
     // In a real implementation, this would query your tracing backend (Jaeger, Zipkin, etc.)
     // For now, return a placeholder response
@@ -240,7 +243,7 @@ observabilityRouter.get("/traces", async (req: Request, res: Response) => {
  * GET /api/v1/observability/health
  * Detailed health check with system status
  */
-observabilityRouter.get("/health", async (req: Request, res: Response) => {
+observabilityRouter.get("/health", async (_req: Request, res: Response) => {
   try {
     // Check database connection
     let dbStatus = "healthy";

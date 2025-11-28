@@ -21,7 +21,18 @@ function safeParse(schema, data) {
 function parseOrThrow(schema, data, errorMessage) {
     const result = schema.safeParse(data);
     if (!result.success) {
-        throw new zod_1.z.ZodError(result.error.errors);
+        const error = new zod_1.z.ZodError(result.error.errors);
+        if (errorMessage) {
+            // Create a new error with the custom message since message is read-only
+            const customError = new zod_1.z.ZodError(result.error.errors);
+            Object.defineProperty(customError, 'message', {
+                value: errorMessage,
+                writable: true,
+                configurable: true
+            });
+            throw customError;
+        }
+        throw error;
     }
     return result.data;
 }

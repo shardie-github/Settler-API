@@ -54,7 +54,7 @@ For "${query.question}", I recommend reviewing our decision logs and documentati
     /**
      * Generate related questions
      */
-    generateRelatedQuestions(question) {
+    generateRelatedQuestions(_question) {
         // Mock related questions
         // In production, would use LLM to generate related questions
         return [
@@ -76,8 +76,11 @@ For "${query.question}", I recommend reviewing our decision logs and documentati
     getStats() {
         const byType = {};
         for (const key of this.knowledgeBase.keys()) {
-            const type = key.split(':')[0];
-            byType[type] = (byType[type] || 0) + 1;
+            const parts = key.split(':');
+            const type = parts[0];
+            if (type) {
+                byType[type] = (byType[type] || 0) + 1;
+            }
         }
         return {
             totalItems: this.knowledgeBase.size,

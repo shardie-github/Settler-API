@@ -263,14 +263,13 @@ router.get(
   validateRequest(dashboardQuerySchema),
   async (req: AuthRequest, res: Response) => {
     try {
-      const _userId = req.userId!;
-      const { startDate, endDate } = req.query as {
-        startDate?: string;
-        endDate?: string;
+      // Reserved for future billing/plan tracking: req.userId, startDate, endDate
+      const _ = {
+        userId: req.userId,
+        startDate: req.query.startDate,
+        endDate: req.query.endDate,
       };
-
-      const _start = startDate ? new Date(startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-      const _end = endDate ? new Date(endDate) : new Date();
+      void _;
 
       // Placeholder - requires billing/plan tracking
       res.json({

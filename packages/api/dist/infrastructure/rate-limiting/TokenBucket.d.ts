@@ -33,7 +33,7 @@ export declare class TokenBucket {
     /**
      * Adaptive rate limiting: adjust rate based on tenant behavior
      */
-    adjustRate(key: string, currentConfig: TokenBucketConfig, successRate: number): Promise<TokenBucketConfig>;
+    adjustRate(_key: string, currentConfig: TokenBucketConfig, successRate: number): Promise<TokenBucketConfig>;
     /**
      * Close Redis connection
      */

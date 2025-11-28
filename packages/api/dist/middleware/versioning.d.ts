@@ -13,5 +13,5 @@ export declare function versionMiddleware(req: VersionedRequest, res: Response, 
 /**
  * Add deprecation headers for deprecated endpoints
  */
-export declare function deprecateEndpoint(sunsetDate: string, migrationGuideUrl?: string): (req: Request, res: Response, next: NextFunction) => void;
+export declare function deprecateEndpoint(sunsetDate: string, migrationGuideUrl?: string): (_req: Request, res: Response, next: NextFunction) => void;
 //# sourceMappingURL=versioning.d.ts.map

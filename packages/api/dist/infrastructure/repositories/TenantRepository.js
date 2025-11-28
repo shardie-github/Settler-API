@@ -6,18 +6,18 @@ const db_1 = require("../../db");
 class TenantRepository {
     async findById(id) {
         const rows = await (0, db_1.query)(`SELECT * FROM tenants WHERE id = $1 AND deleted_at IS NULL`, [id]);
-        return rows.length > 0 ? Tenant_1.Tenant.fromPersistence(rows[0]) : null;
+        return rows.length > 0 && rows[0] ? Tenant_1.Tenant.fromPersistence(rows[0]) : null;
     }
     async findBySlug(slug) {
         const rows = await (0, db_1.query)(`SELECT * FROM tenants WHERE slug = $1 AND deleted_at IS NULL`, [slug]);
-        return rows.length > 0 ? Tenant_1.Tenant.fromPersistence(rows[0]) : null;
+        return rows.length > 0 && rows[0] ? Tenant_1.Tenant.fromPersistence(rows[0]) : null;
     }
     async findByCustomDomain(domain) {
         const rows = await (0, db_1.query)(`SELECT * FROM tenants 
        WHERE config->>'customDomain' = $1 
        AND config->>'customDomainVerified' = 'true'
        AND deleted_at IS NULL`, [domain]);
-        return rows.length > 0 ? Tenant_1.Tenant.fromPersistence(rows[0]) : null;
+        return rows.length > 0 && rows[0] ? Tenant_1.Tenant.fromPersistence(rows[0]) : null;
     }
     async findSubAccounts(parentTenantId) {
         const rows = await (0, db_1.query)(`SELECT * FROM tenants 
@@ -26,7 +26,7 @@ class TenantRepository {
     }
     async findParentTenant(tenantId) {
         const rows = await (0, db_1.query)(`SELECT parent_tenant_id FROM tenants WHERE id = $1 AND deleted_at IS NULL`, [tenantId]);
-        if (rows.length === 0 || !rows[0].parent_tenant_id) {
+        if (rows.length === 0 || !rows[0] || !rows[0].parent_tenant_id) {
             return null;
         }
         return this.findById(rows[0].parent_tenant_id);

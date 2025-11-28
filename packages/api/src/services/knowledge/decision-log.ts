@@ -239,7 +239,8 @@ ${decision.tags.map(tag => `\`${tag}\``).join(', ')}
 
       for (const file of markdownFiles) {
         const filepath = path.join(this.logDirectory, file);
-        const content = await fs.readFile(filepath, 'utf-8');
+        const _content = await fs.readFile(filepath, 'utf-8');
+        void _content;
         // TODO: Parse markdown back to Decision object
         // For now, skip parsing
       }

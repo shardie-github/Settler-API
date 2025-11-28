@@ -12,12 +12,18 @@ function sanitizeHtml(str) {
         .replace(/'/g, '&#x27;')
         .replace(/\//g, '&#x2F;');
 }
+/**
+ * Recursively sanitize report data to prevent XSS attacks
+ *
+ * @param data - Data to sanitize (string, array, object, or primitive)
+ * @returns Sanitized data with HTML entities escaped
+ */
 function sanitizeReportData(data) {
     if (typeof data === 'string') {
         return sanitizeHtml(data);
     }
     if (Array.isArray(data)) {
-        return data.map(item => sanitizeReportData(item));
+        return data.map((item) => sanitizeReportData(item));
     }
     if (data && typeof data === 'object') {
         const sanitized = {};

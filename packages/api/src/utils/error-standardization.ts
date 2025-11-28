@@ -4,7 +4,6 @@
  */
 
 import { Response } from 'express';
-import { AuthRequest } from '../middleware/auth';
 import { sendError } from './api-response';
 import { logError } from './logger';
 

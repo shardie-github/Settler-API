@@ -14,14 +14,33 @@ export interface CursorPaginationResult<T> {
     hasMore: boolean;
 }
 /**
- * Decode cursor from base64
+ * Decodes a base64-encoded cursor string into pagination parameters.
+ *
+ * @param cursor - Base64-encoded cursor string from previous pagination response
+ * @returns Decoded cursor object with `created_at` and `id`, or `null` if invalid
+ *
+ * @example
+ * ```typescript
+ * const cursor = decodeCursor("eyJjcmVhdGVkX2F0IjoiMjAyNC0wMS0wMSIsImlkIjoiMTIzIn0=");
+ * // Returns: { created_at: "2024-01-01", id: "123" }
+ * ```
  */
 export declare function decodeCursor(cursor: string): {
     created_at: string;
     id: string;
 } | null;
 /**
- * Encode cursor to base64
+ * Encodes pagination parameters into a base64-encoded cursor string.
+ *
+ * @param created_at - Creation timestamp (ISO string or Date)
+ * @param id - Item ID
+ * @returns Base64-encoded cursor string
+ *
+ * @example
+ * ```typescript
+ * const cursor = encodeCursor(new Date(), "123");
+ * // Returns: "eyJjcmVhdGVkX2F0IjoiMjAyNC0wMS0wMSIsImlkIjoiMTIzIn0="
+ * ```
  */
 export declare function encodeCursor(created_at: string | Date, id: string): string;
 /**

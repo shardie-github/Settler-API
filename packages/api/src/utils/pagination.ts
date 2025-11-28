@@ -66,7 +66,9 @@ export function buildCursorWhereClause(
   tableAlias: string = ''
 ): { whereClause: string; params: (string | number)[]; paramIndex: number } {
   const prefix = tableAlias ? `${tableAlias}.` : '';
-  const limit = Math.min(params.limit || 100, 1000);
+  // Limit is reserved for future query building
+  const _limit = Math.min(params.limit || 100, 1000);
+  void _limit;
   const direction = params.direction || 'next';
   let paramIndex = 1;
   const queryParams: (string | number)[] = [];

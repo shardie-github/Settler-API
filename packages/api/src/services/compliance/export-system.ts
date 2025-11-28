@@ -154,7 +154,7 @@ export class ComplianceExportSystem extends EventEmitter {
    */
   private async fetchExportData(
     customerId: string,
-    jurisdiction: ComplianceExport['jurisdiction']
+    _jurisdiction: ComplianceExport['jurisdiction']
   ): Promise<Record<string, unknown>> {
     // TODO: Query database for actual data
     // For now, return mock data
@@ -174,7 +174,7 @@ export class ComplianceExportSystem extends EventEmitter {
    */
   private formatData(
     data: Record<string, unknown>,
-    jurisdiction: ComplianceExport['jurisdiction'],
+    _jurisdiction: ComplianceExport['jurisdiction'],
     format: ComplianceExport['format']
   ): Record<string, unknown> {
     switch (format) {
@@ -230,8 +230,8 @@ export class ComplianceExportSystem extends EventEmitter {
    */
   private async generateDownloadUrl(
     exportId: string,
-    data: Record<string, unknown>,
-    format: ComplianceExport['format']
+    _data: Record<string, unknown>,
+    _format: ComplianceExport['format']
   ): Promise<string> {
     // TODO: Upload to S3/R2 and generate signed URL
     // For now, return mock URL

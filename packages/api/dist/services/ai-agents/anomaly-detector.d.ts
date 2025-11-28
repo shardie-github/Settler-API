@@ -20,7 +20,7 @@ export declare class AnomalyDetectorAgent extends BaseAgent {
     type: "anomaly";
     private detectedAnomalies;
     private lastDetection?;
-    private detectionRules;
+    private _detectionRules;
     initialize(): Promise<void>;
     execute(action: string, params: Record<string, unknown>): Promise<unknown>;
     getStatus(): Promise<{

@@ -22,10 +22,12 @@ class FXService {
             fromAmount,
             toAmount,
             fxRate,
-            provider,
             rateDate: rateDate || new Date(),
             createdAt: new Date(),
         };
+        if (provider) {
+            conversion.provider = provider;
+        }
         await (0, db_1.query)(`INSERT INTO fx_conversions (
         id, tenant_id, transaction_id, from_currency, to_currency,
         from_amount, to_amount, fx_rate, provider, rate_date, created_at
@@ -39,7 +41,7 @@ class FXService {
             fromAmount,
             toAmount,
             fxRate,
-            provider,
+            conversion.provider || null,
             conversion.rateDate,
             conversion.createdAt,
         ]);
@@ -60,7 +62,7 @@ class FXService {
          AND rate_date <= $4
        ORDER BY rate_date DESC
        LIMIT 1`, [tenantId, fromCurrency, toCurrency, targetDate]);
-        if (result.length === 0) {
+        if (result.length === 0 || !result[0]) {
             return null; // No FX rate available
         }
         return result[0].fx_rate;
@@ -87,8 +89,11 @@ class FXService {
     async getBaseCurrency(tenantId) {
         // Get from tenant config or default to USD
         const result = await (0, db_1.query)(`SELECT config FROM tenants WHERE id = $1 LIMIT 1`, [tenantId]);
-        if (result.length > 0 && result[0].config?.baseCurrency) {
-            return result[0].config.baseCurrency;
+        if (result.length > 0 && result[0]?.config?.baseCurrency) {
+            const baseCurrency = result[0].config.baseCurrency;
+            if (typeof baseCurrency === 'string') {
+                return baseCurrency;
+            }
         }
         return 'USD'; // Default
     }
@@ -107,7 +112,7 @@ class FXService {
             toCurrency: row.to_currency,
             rate: row.fx_rate,
             rateDate: row.rate_date,
-            provider: row.provider || 'unknown',
+            provider: row.provider ?? 'unknown',
         }));
     }
     /**

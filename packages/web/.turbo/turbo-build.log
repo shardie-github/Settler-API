@@ -9,13 +9,31 @@ npm warn config       Default value does install optional deps unless otherwise 
   ▲ Next.js 14.2.33
 
    Creating an optimized production build ...
-   Downloading swc package @next/swc-linux-x64-gnu...
-error This project's package.json defines "packageManager": "yarn@npm@10.2.4". However the current global version of Yarn is 1.22.22.
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+ ⚠ TypeScript project references are not fully supported. Attempting to build in incremental mode.
+ ⨯ ESLint: Failed to load config "prettier" to extend from. Referenced from: /workspace/.eslintrc.js
+   Collecting page data ...
+   Generating static pages (0/7) ...
+   Generating static pages (1/7) 
+   Generating static pages (3/7) 
+   Generating static pages (5/7) 
+ ✓ Generating static pages (7/7)
+   Finalizing page optimization ...
+   Collecting build traces ...
 
-Presence of the "packageManager" field indicates that the project is meant to be used with Corepack, a tool included by default with all official Node.js distributions starting from 16.9 and 14.19.
-Corepack must currently be enabled by running corepack enable in your terminal. For more information, check out https://yarnpkg.com/corepack.
-   Downloading swc package @next/swc-linux-x64-musl...
-error This project's package.json defines "packageManager": "yarn@npm@10.2.4". However the current global version of Yarn is 1.22.22.
+Route (app)                              Size     First Load JS
+┌ ○ /                                    8.87 kB        96.1 kB
+├ ○ /_not-found                          873 B          88.1 kB
+├ ○ /docs                                138 B          87.3 kB
+├ ○ /playground                          1.11 kB        88.3 kB
+└ ƒ /realtime-dashboard                  1.72 kB        88.9 kB
++ First Load JS shared by all            87.2 kB
+  ├ chunks/1dd3208c-1bfa912d86ba96c5.js  53.6 kB
+  ├ chunks/528-7252e02374cfc55c.js       31.7 kB
+  └ other shared chunks (total)          1.86 kB
 
-Presence of the "packageManager" field indicates that the project is meant to be used with Corepack, a tool included by default with all official Node.js distributions starting from 16.9 and 14.19.
-Corepack must currently be enabled by running corepack enable in your terminal. For more information, check out https://yarnpkg.com/corepack.
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

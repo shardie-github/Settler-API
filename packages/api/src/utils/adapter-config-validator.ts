@@ -4,7 +4,6 @@
  * Part of UX-002: Adapter config schema clarity
  */
 
-import { z } from "zod";
 import { ValidationError } from "./typed-errors";
 
 export interface AdapterConfigSchema {

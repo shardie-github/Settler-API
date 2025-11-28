@@ -22,10 +22,9 @@ class TenantService {
     async createTenant(data) {
         const tier = data.tier || Tenant_1.TenantTier.FREE;
         const quotas = this.getDefaultQuotas(tier);
-        const tenant = Tenant_1.Tenant.create({
+        const tenantProps = {
             name: data.name,
             slug: data.slug,
-            parentTenantId: data.parentTenantId,
             tier,
             status: Tenant_1.TenantStatus.TRIAL,
             quotas,
@@ -38,7 +37,11 @@ class TenantService {
                 maxRetries: 3,
             },
             metadata: {},
-        });
+        };
+        if (data.parentTenantId !== undefined) {
+            tenantProps.parentTenantId = data.parentTenantId;
+        }
+        const tenant = Tenant_1.Tenant.create(tenantProps);
         await this.tenantRepo.save(tenant);
         // Create tenant schema if using schema-per-tenant
         const { config } = require('../../config');
@@ -46,15 +49,18 @@ class TenantService {
             await (0, db_1.query)(`SELECT create_tenant_schema($1)`, [data.slug]);
         }
         // Create owner user
-        const owner = User_1.User.create({
+        const userProps = {
             tenantId: tenant.id,
             email: data.ownerEmail,
             passwordHash: data.ownerPasswordHash,
-            name: data.ownerName,
             role: User_1.UserRole.OWNER,
             dataResidencyRegion: 'us',
             dataRetentionDays: 365,
-        });
+        };
+        if (data.ownerName !== undefined) {
+            userProps.name = data.ownerName;
+        }
+        const owner = User_1.User.create(userProps);
         await this.userRepo.save(owner);
         // Initialize quota usage tracking
         await (0, db_1.query)(`INSERT INTO tenant_quota_usage (tenant_id, last_reset_at)

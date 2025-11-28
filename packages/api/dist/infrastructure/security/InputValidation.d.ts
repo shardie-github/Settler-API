@@ -44,5 +44,9 @@ export declare function validateJson(input: string, maxDepth?: number): any;
 /**
  * Validate file upload
  */
-export declare function validateFile(file: Express.Multer.File): void;
+export declare function validateFile(file: {
+    size: number;
+    mimetype: string;
+    originalname: string;
+}): void;
 //# sourceMappingURL=InputValidation.d.ts.map

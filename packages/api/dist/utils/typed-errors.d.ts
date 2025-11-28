@@ -18,6 +18,11 @@ export declare class ValidationError extends ApiError {
     readonly statusCode = 400;
     readonly errorCode = "VALIDATION_ERROR";
     readonly field?: string;
+    readonly details?: Array<{
+        field: string;
+        message: string;
+        code: string;
+    }>;
     constructor(message: string, field?: string, details?: unknown);
 }
 export declare class AuthenticationError extends ApiError {

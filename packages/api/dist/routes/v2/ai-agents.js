@@ -22,16 +22,18 @@ orchestrator_1.agentOrchestrator.initializeAll().catch(console.error);
  * GET /api/v2/ai-agents
  * List all agents
  */
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
     try {
         const agents = orchestrator_1.agentOrchestrator.listAgents();
         res.json({
             data: agents,
             count: agents.length,
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to list agents', 500);
+        return;
     }
 });
 /**
@@ -41,6 +43,11 @@ router.get('/', async (req, res) => {
 router.get('/:agentId', async (req, res) => {
     try {
         const { agentId } = req.params;
+        if (!agentId) {
+            return res.status(400).json({
+                error: 'Agent ID is required',
+            });
+        }
         const agent = orchestrator_1.agentOrchestrator.getAgent(agentId);
         if (!agent) {
             return res.status(404).json({
@@ -57,9 +64,11 @@ router.get('/:agentId', async (req, res) => {
                 status,
             },
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to get agent', 500);
+        return;
     }
 });
 /**
@@ -69,6 +78,9 @@ router.get('/:agentId', async (req, res) => {
 router.post('/:agentId/execute', async (req, res) => {
     try {
         const { agentId } = req.params;
+        if (!agentId) {
+            return res.status(400).json({ error: 'Agent ID is required' });
+        }
         const { action, params } = req.body;
         const response = await orchestrator_1.agentOrchestrator.execute({
             agentId,
@@ -78,9 +90,11 @@ router.post('/:agentId/execute', async (req, res) => {
         res.json({
             data: response,
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to execute agent action', 400);
+        return;
     }
 });
 /**
@@ -90,6 +104,9 @@ router.post('/:agentId/execute', async (req, res) => {
 router.post('/:agentId/enable', async (req, res) => {
     try {
         const { agentId } = req.params;
+        if (!agentId) {
+            return res.status(400).json({ error: 'Agent ID is required' });
+        }
         const agent = orchestrator_1.agentOrchestrator.getAgent(agentId);
         if (!agent) {
             return res.status(404).json({
@@ -105,9 +122,11 @@ router.post('/:agentId/enable', async (req, res) => {
             },
             message: 'Agent enabled successfully',
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to enable agent', 400);
+        return;
     }
 });
 /**
@@ -117,6 +136,9 @@ router.post('/:agentId/enable', async (req, res) => {
 router.post('/:agentId/disable', async (req, res) => {
     try {
         const { agentId } = req.params;
+        if (!agentId) {
+            return res.status(400).json({ error: 'Agent ID is required' });
+        }
         const agent = orchestrator_1.agentOrchestrator.getAgent(agentId);
         if (!agent) {
             return res.status(404).json({
@@ -132,21 +154,24 @@ router.post('/:agentId/disable', async (req, res) => {
             },
             message: 'Agent disabled successfully',
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to disable agent', 400);
+        return;
     }
 });
 /**
  * GET /api/v2/ai-agents/stats
  * Get orchestrator stats
  */
-router.get('/stats', async (req, res) => {
+router.get('/stats', async (_req, res) => {
     try {
         const stats = orchestrator_1.agentOrchestrator.getStats();
         res.json({
             data: stats,
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to get stats', 500);

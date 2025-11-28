@@ -13,10 +13,12 @@ class AnomalyDetectorAgent extends orchestrator_1.BaseAgent {
     type = 'anomaly';
     detectedAnomalies = [];
     lastDetection;
-    detectionRules = [];
+    // Reserved for future rule-based detection
+    _detectionRules = [];
     async initialize() {
         // Load detection rules
-        this.detectionRules = await this.loadDetectionRules();
+        this._detectionRules = await this.loadDetectionRules();
+        void this._detectionRules;
         // Start periodic anomaly detection
         setInterval(() => {
             if (this.enabled) {
@@ -40,21 +42,24 @@ class AnomalyDetectorAgent extends orchestrator_1.BaseAgent {
                     return true;
                 });
             case 'get_stats':
-                return await this.getStats();
+                return await this.getStatus();
             default:
                 throw new Error(`Unknown action: ${action}`);
         }
     }
     async getStatus() {
-        return {
+        const status = {
             enabled: this.enabled,
-            lastExecution: this.lastDetection,
-            metrics: {
-                totalAnomalies: this.detectedAnomalies.length,
-                criticalAnomalies: this.detectedAnomalies.filter(a => a.severity === 'critical').length,
-                falsePositiveRate: 0.05, // TODO: Calculate actual rate
-            },
         };
+        if (this.lastDetection) {
+            status.lastExecution = this.lastDetection;
+        }
+        status.metrics = {
+            totalAnomalies: this.detectedAnomalies.length,
+            criticalAnomalies: this.detectedAnomalies.filter(a => a.severity === 'critical').length,
+            falsePositiveRate: 0.05, // TODO: Calculate actual rate
+        };
+        return status;
     }
     /**
      * Detect anomalies

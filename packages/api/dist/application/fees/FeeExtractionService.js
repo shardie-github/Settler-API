@@ -12,7 +12,6 @@ class FeeExtractionService {
      * Extract fees from a transaction's raw payload
      */
     async extractFees(transaction, tenantId) {
-        const fees = [];
         const provider = transaction.provider;
         switch (provider) {
             case 'stripe':

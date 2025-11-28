@@ -175,7 +175,9 @@ class ShopifyStripeReconciliationSaga {
                     const reconciliationId = state.aggregateId;
                     const orders = state.data.shopify_orders;
                     const payments = state.data.stripe_payments;
-                    const matchingRules = state.data.matching_rules;
+                    // Matching rules reserved for future use
+                    const _matchingRules = state.data.matching_rules;
+                    void _matchingRules;
                     const matched = [];
                     const unmatched = [];
                     // Simple matching logic (in production, use more sophisticated algorithm)
@@ -285,7 +287,7 @@ class ShopifyStripeReconciliationSaga {
             timeoutMs: 30000,
             retryable: true,
             maxRetries: 3,
-            execute: async (state) => {
+            execute: async (_state) => {
                 try {
                     // In production, persist to database
                     // For now, results are already persisted via events
@@ -393,7 +395,7 @@ class ShopifyStripeReconciliationSaga {
             error: {
                 type: error.name || 'UnknownError',
                 message: error.message,
-                stack: error.stack,
+                ...(error.stack ? { stack: error.stack } : {}),
             },
             failed_at: new Date().toISOString(),
             step: state.currentStep,

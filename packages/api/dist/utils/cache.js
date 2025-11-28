@@ -17,6 +17,7 @@ exports.cacheKey = cacheKey;
 exports.close = close;
 const ioredis_1 = __importDefault(require("ioredis"));
 const config_1 = require("../config");
+const logger_1 = require("./logger");
 // In-memory cache fallback
 const memoryCache = new Map();
 // Redis client (lazy initialization)
@@ -46,7 +47,7 @@ function getRedisClient() {
         }
     }
     catch (error) {
-        console.warn('Redis connection failed, falling back to memory cache:', error);
+        (0, logger_1.logWarn)('Redis connection failed, falling back to memory cache', { error });
     }
     return null;
 }
@@ -63,7 +64,7 @@ async function get(key) {
             }
         }
         catch (error) {
-            console.warn('Redis get failed, falling back to memory cache:', error);
+            (0, logger_1.logWarn)('Redis get failed, falling back to memory cache', { error });
         }
     }
     // Fallback to memory cache
@@ -88,7 +89,7 @@ async function set(key, value, ttlSeconds) {
             return;
         }
         catch (error) {
-            console.warn('Redis set failed, falling back to memory cache:', error);
+            (0, logger_1.logWarn)('Redis set failed, falling back to memory cache', { error });
         }
     }
     // Fallback to memory cache
@@ -116,7 +117,7 @@ async function del(key) {
             await redis.del(key);
         }
         catch (error) {
-            console.warn('Redis del failed:', error);
+            (0, logger_1.logWarn)('Redis del failed', { error });
         }
     }
     memoryCache.delete(key);
@@ -134,7 +135,7 @@ async function delPattern(pattern) {
             }
         }
         catch (error) {
-            console.warn('Redis delPattern failed:', error);
+            (0, logger_1.logWarn)('Redis delPattern failed', { error });
         }
     }
     // Fallback: delete from memory cache
@@ -154,7 +155,7 @@ async function clear() {
             await redis.flushdb();
         }
         catch (error) {
-            console.warn('Redis clear failed:', error);
+            (0, logger_1.logWarn)('Redis clear failed', { error });
         }
     }
     memoryCache.clear();

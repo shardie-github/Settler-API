@@ -30,9 +30,11 @@ router.post('/intelligence/opt-in', async (req, res) => {
             },
             message: 'Successfully opted in to cross-customer intelligence',
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to opt in', 400);
+        return;
     }
 });
 /**
@@ -55,9 +57,11 @@ router.post('/intelligence/opt-out', async (req, res) => {
             },
             message: 'Successfully opted out of cross-customer intelligence',
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to opt out', 400);
+        return;
     }
 });
 /**
@@ -78,24 +82,28 @@ router.post('/intelligence/check-pattern', async (req, res) => {
             data: match,
             matched: match !== null,
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to check pattern', 400);
+        return;
     }
 });
 /**
  * GET /api/v2/network-effects/intelligence/insights
  * Get network insights (anonymized)
  */
-router.get('/intelligence/insights', async (req, res) => {
+router.get('/intelligence/insights', async (_req, res) => {
     try {
         const insights = cross_customer_intelligence_1.crossCustomerIntelligence.getNetworkInsights();
         res.json({
             data: insights,
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to get insights', 500);
+        return;
     }
 });
 /**
@@ -118,9 +126,11 @@ router.post('/performance/opt-in', async (req, res) => {
             },
             message: 'Successfully opted in to performance tuning pools',
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to opt in', 400);
+        return;
     }
 });
 /**
@@ -151,9 +161,11 @@ router.post('/performance/submit', async (req, res) => {
             },
             message: 'Performance metrics submitted successfully',
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to submit metrics', 400);
+        return;
     }
 });
 /**
@@ -172,9 +184,11 @@ router.get('/performance/insights', async (req, res) => {
         res.json({
             data: insights,
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to get insights', 500);
+        return;
     }
 });
 /**
@@ -193,16 +207,18 @@ router.get('/performance/recommendations', async (req, res) => {
         res.json({
             data: recommendations,
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to get recommendations', 500);
+        return;
     }
 });
 /**
  * GET /api/v2/network-effects/stats
  * Get network effects statistics
  */
-router.get('/stats', async (req, res) => {
+router.get('/stats', async (_req, res) => {
     try {
         const intelligenceInsights = cross_customer_intelligence_1.crossCustomerIntelligence.getNetworkInsights();
         const performanceStats = performance_pools_1.performanceTuningPools.getStats();
@@ -212,9 +228,11 @@ router.get('/stats', async (req, res) => {
                 performance: performanceStats,
             },
         });
+        return;
     }
     catch (error) {
         (0, error_handler_1.handleRouteError)(res, error, 'Failed to get stats', 500);
+        return;
     }
 });
 exports.default = router;

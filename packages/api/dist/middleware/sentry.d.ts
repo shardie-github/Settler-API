@@ -13,12 +13,12 @@ export declare function initializeSentry(): void;
  * Sentry request handler middleware
  * Must be added before other middleware
  */
-export declare function sentryRequestHandler(): (req: Request, res: Response, next: NextFunction) => void;
+export declare function sentryRequestHandler(): (_req: Request, _res: Response, next: NextFunction) => void;
 /**
  * Sentry tracing handler middleware
  * Adds performance tracing
  */
-export declare function sentryTracingHandler(): (req: Request, res: Response, next: NextFunction) => void;
+export declare function sentryTracingHandler(): (_req: Request, _res: Response, next: NextFunction) => void;
 /**
  * Sentry error handler middleware
  * Must be added before error handler
