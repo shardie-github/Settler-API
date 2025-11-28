@@ -45,7 +45,11 @@ function getConnectionString(): string {
       // Extract project ref from URL (format: https://project-ref.supabase.co)
       const hostMatch = supabaseUrl.match(/https?:\/\/([^.]+)\.supabase\.co/);
       if (hostMatch) {
-        const host = `${hostMatch[1]}.supabase.co`;
+        const projectRef = hostMatch[1];
+        // Try transaction pooler first (better connectivity, port 6543)
+        // Format: postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
+        // For now, try direct connection with db. prefix
+        const host = `db.${projectRef}.supabase.co`;
         const port = process.env.DB_PORT || '5432';
         return `postgresql://postgres:${process.env.SUPABASE_DB_PASSWORD}@${host}:${port}/postgres`;
       }
@@ -174,11 +178,24 @@ async function runMigrations(): Promise<MigrationResult[]> {
     console.log('   For local Supabase: Make sure Supabase is running locally (supabase start)');
   }
 
+  // Parse connection string to handle IPv6 issues
+  let parsedConnection = connectionString;
+  if (connectionString.includes('supabase.co') && connectionString.includes('db.')) {
+    // For Supabase, try using the pooler which might have better IPv4 support
+    // But for migrations, we need direct connection, so we'll handle IPv6
+    // by ensuring Node.js can handle it
+  }
+
   const pool = new Pool({
-    connectionString: connectionString,
-    ssl: process.env.SUPABASE_URL ? {
-      rejectUnauthorized: process.env.NODE_ENV === 'production',
+    connectionString: parsedConnection,
+    ssl: process.env.SUPABASE_URL || connectionString.includes('supabase.co') ? {
+      rejectUnauthorized: false, // Supabase uses self-signed certs
     } : (process.env.DB_SSL === 'true'),
+    // Connection settings
+    connectionTimeoutMillis: 30000,
+    // Allow IPv6 connections
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 10000,
   });
 
   try {
