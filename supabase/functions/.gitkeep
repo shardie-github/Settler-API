@@ -1,0 +1,12 @@
+# Edge Functions Directory
+
+Place your Supabase Edge Functions in subdirectories here.
+
+Example structure:
+```
+functions/
+├── hello-world/
+│   └── index.ts
+└── _shared/
+    └── utils.ts
+```

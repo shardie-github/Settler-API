@@ -1,6 +1,22 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# Verify migrations before commit
+if git diff --cached --name-only | grep -q "supabase/migrations/"; then
+  echo "🔍 Migration files detected, running verification..."
+  bash scripts/verify-migrations.sh || {
+    echo "❌ Migration verification failed. Please fix errors before committing."
+    exit 1
+  }
+fi
+
+# Generate types if schema changed
+if git diff --cached --name-only | grep -q "prisma/schema.prisma"; then
+  echo "🔍 Prisma schema changed, generating client..."
+  npm run prisma:generate || npx prisma generate || true
+  git add src/types/ 2>/dev/null || true
+fi
+
 # Run typecheck before lint-staged to catch TypeScript errors early
 echo "🔍 Running TypeScript typecheck..."
 npm run typecheck || {
