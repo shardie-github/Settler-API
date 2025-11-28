@@ -7,6 +7,8 @@
  * UI definitions and rules. It is designed to be consumed by any reconciliation
  * backend, not just Settler's proprietary engine.
  * 
+ * Enterprise-grade security, validation, and observability built-in.
+ * 
  * @license MIT
  */
 
@@ -233,4 +235,67 @@ export interface CompilationContext {
   mode: CompilationMode;
   config: Partial<ReconciliationConfig>;
   widgetRegistry: Map<string, WidgetConfig>;
+  securityContext?: import('./security').SecurityContext;
+  validationRules?: import('./validation').ValidationRules;
 }
+
+// Re-export security types
+export type {
+  SecurityPolicy,
+  SecurityContext,
+  AuditLogEntry,
+  AuditEvent,
+  ContentSecurityPolicy,
+  ValidationPolicy,
+  SanitizationPolicy,
+  AuditLoggingPolicy,
+  RateLimitingPolicy
+} from './security';
+
+// Re-export validation types
+export type {
+  ValidationResult,
+  ValidationError,
+  ValidationWarning,
+  ValidationRules,
+  TransactionValidationRules,
+  SettlementValidationRules,
+  ExceptionValidationRules,
+  RuleValidationRules,
+  MoneyValidationRules,
+  SchemaValidator
+} from './validation';
+
+// Re-export telemetry types
+export type {
+  TelemetryEvent,
+  TelemetryEventType,
+  TelemetryContext,
+  PerformanceMetrics,
+  ErrorTelemetry,
+  TelemetryConfig,
+  TelemetryProvider
+} from './telemetry';
+
+// Re-export error types
+export {
+  ReconciliationError,
+  ValidationError as ProtocolValidationError,
+  SecurityError,
+  CompilationError,
+  ConfigurationError
+} from './errors';
+
+// Re-export utilities
+export {
+  sanitizeString,
+  isValidISODate,
+  isValidCurrency,
+  isValidMoney,
+  formatMoney,
+  sanitizeTransactionMetadata,
+  validateTransactionId,
+  maskPII,
+  generateSecureId,
+  deepClone
+} from './utils';
