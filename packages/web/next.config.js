@@ -23,6 +23,11 @@ const nextConfig = {
     // !! WARN !!
     ignoreBuildErrors: false,
   },
+  transpilePackages: [
+    '@settler/sdk',
+    '@settler/react-settler',
+    '@settler/protocol',
+  ],
   // PWA Configuration
   async headers() {
     return [
