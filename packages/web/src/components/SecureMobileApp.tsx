@@ -37,14 +37,14 @@ export default function SecureMobileApp({
   const [client, setClient] = useState<SettlerClient | null>(null);
   const [isOnline, setIsOnline] = useState(true);
   const [isPWAInstalled, setIsPWAInstalled] = useState(false);
-  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [installPrompt, setInstallPrompt] = useState<Event | null>(null);
   const [securityHeaders, setSecurityHeaders] = useState<SecurityHeaders | null>(null);
 
   // Initialize secure client
   useEffect(() => {
     const secureClient = new SettlerClient({
       apiKey,
-      baseURL,
+      baseUrl: baseURL,
     });
 
     // Set security headers
@@ -95,6 +95,7 @@ export default function SecureMobileApp({
         window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
       };
     }
+    return undefined;
   }, []);
 
   // Monitor online/offline status
@@ -115,11 +116,24 @@ export default function SecureMobileApp({
   const handleInstallPWA = useCallback(async () => {
     if (!installPrompt) return;
 
-    installPrompt.prompt();
-    const { outcome } = await installPrompt.userChoice;
-    
-    if (outcome === "accepted") {
-      setIsPWAInstalled(true);
+    try {
+      // Type assertion for BeforeInstallPromptEvent
+      interface BeforeInstallPromptEvent extends Event {
+        prompt: () => Promise<void>;
+        userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+      }
+      
+      const promptEvent = installPrompt as unknown as BeforeInstallPromptEvent;
+      if (promptEvent.prompt) {
+        await promptEvent.prompt();
+        const choiceResult = await promptEvent.userChoice;
+        
+        if (choiceResult?.outcome === "accepted") {
+          setIsPWAInstalled(true);
+        }
+      }
+    } catch (error) {
+      console.error("Error installing PWA:", error);
     }
     
     setInstallPrompt(null);
