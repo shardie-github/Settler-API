@@ -1,12 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { SettlerClient } from "@settler/sdk";
 
 interface OnboardingFlowProps {
   apiKey: string;
   onComplete: () => void;
 }
+
+interface AnalyticsEvent {
+  event: string;
+  timestamp: number;
+  step?: number;
+  duration?: number;
+  metadata?: Record<string, unknown>;
+}
+
+// Analytics tracking utility
+const trackEvent = (event: AnalyticsEvent) => {
+  // Send to APM/Analytics system
+  if (typeof window !== "undefined") {
+    // In production, this would send to your APM system (e.g., Sentry, Datadog, etc.)
+    const analyticsEndpoint = process.env.NEXT_PUBLIC_ANALYTICS_ENDPOINT || "/api/analytics";
+    
+    fetch(analyticsEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...event,
+        userId: localStorage.getItem("userId") || "anonymous",
+        sessionId: sessionStorage.getItem("sessionId") || crypto.randomUUID(),
+      }),
+    }).catch((err) => {
+      console.warn("Analytics tracking failed:", err);
+    });
+  }
+};
 
 export default function OnboardingFlow({ apiKey, onComplete }: OnboardingFlowProps) {
   const [step, setStep] = useState(1);
@@ -20,6 +49,11 @@ export default function OnboardingFlow({ apiKey, onComplete }: OnboardingFlowPro
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Analytics tracking
+  const startTimeRef = useRef<number>(Date.now());
+  const stepStartTimeRef = useRef<number>(Date.now());
+  const ahaMomentReachedRef = useRef<boolean>(false);
 
   const steps = [
     { number: 1, title: "Job Details", description: "Name your reconciliation job" },
@@ -29,12 +63,45 @@ export default function OnboardingFlow({ apiKey, onComplete }: OnboardingFlowPro
     { number: 5, title: "Review & Create", description: "Review and create your job" },
   ];
 
+  // Track onboarding start
+  useEffect(() => {
+    const sessionId = crypto.randomUUID();
+    sessionStorage.setItem("sessionId", sessionId);
+    
+    trackEvent({
+      event: "onboarding.started",
+      timestamp: Date.now(),
+      metadata: {
+        step: 1,
+        totalSteps: steps.length,
+      },
+    });
+  }, []);
+
+  // Track step changes
+  useEffect(() => {
+    const stepDuration = Date.now() - stepStartTimeRef.current;
+    
+    trackEvent({
+      event: "onboarding.step_viewed",
+      timestamp: Date.now(),
+      step,
+      duration: stepDuration,
+      metadata: {
+        stepName: steps[step - 1]?.title,
+      },
+    });
+
+    stepStartTimeRef.current = Date.now();
+  }, [step]);
+
   async function handleSubmit() {
     try {
       setLoading(true);
       setError(null);
 
-      await client.jobs.create({
+      const createStartTime = Date.now();
+      const job = await client.jobs.create({
         name: formData.name,
         source: {
           adapter: formData.sourceAdapter,
@@ -52,10 +119,66 @@ export default function OnboardingFlow({ apiKey, onComplete }: OnboardingFlowPro
         },
       });
 
+      const totalDuration = Date.now() - startTimeRef.current;
+      const createDuration = Date.now() - createStartTime;
+
+      // Track "aha moment" - first successful job creation
+      if (!ahaMomentReachedRef.current) {
+        ahaMomentReachedRef.current = true;
+        
+        trackEvent({
+          event: "onboarding.aha_moment",
+          timestamp: Date.now(),
+          duration: totalDuration,
+          metadata: {
+            jobId: job.data.id,
+            jobName: formData.name,
+            sourceAdapter: formData.sourceAdapter,
+            targetAdapter: formData.targetAdapter,
+            timeToAhaMoment: totalDuration,
+            targetTimeMs: 5 * 60 * 1000, // 5 minutes target
+            withinTarget: totalDuration < 5 * 60 * 1000,
+          },
+        });
+      }
+
+      // Track job creation success
+      trackEvent({
+        event: "onboarding.job_created",
+        timestamp: Date.now(),
+        duration: createDuration,
+        metadata: {
+          jobId: job.data.id,
+          totalOnboardingDuration: totalDuration,
+        },
+      });
+
+      // Track onboarding completion
+      trackEvent({
+        event: "onboarding.completed",
+        timestamp: Date.now(),
+        duration: totalDuration,
+        metadata: {
+          totalSteps: steps.length,
+          finalStep: step,
+        },
+      });
+
       onComplete();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Failed to create job";
       setError(message);
+      
+      // Track error
+      trackEvent({
+        event: "onboarding.error",
+        timestamp: Date.now(),
+        step,
+        metadata: {
+          error: message,
+          stepName: steps[step - 1]?.title,
+        },
+      });
     } finally {
       setLoading(false);
     }
@@ -243,7 +366,18 @@ export default function OnboardingFlow({ apiKey, onComplete }: OnboardingFlowPro
           {/* Navigation Buttons */}
           <div className="flex items-center justify-between mt-8">
             <button
-              onClick={() => setStep(Math.max(1, step - 1))}
+              onClick={() => {
+                trackEvent({
+                  event: "onboarding.step_previous",
+                  timestamp: Date.now(),
+                  step,
+                  metadata: {
+                    fromStep: step,
+                    toStep: step - 1,
+                  },
+                });
+                setStep(Math.max(1, step - 1));
+              }}
               disabled={step === 1}
               className="px-4 py-2 border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -251,7 +385,18 @@ export default function OnboardingFlow({ apiKey, onComplete }: OnboardingFlowPro
             </button>
             {step < steps.length ? (
               <button
-                onClick={() => setStep(step + 1)}
+                onClick={() => {
+                  trackEvent({
+                    event: "onboarding.step_next",
+                    timestamp: Date.now(),
+                    step,
+                    metadata: {
+                      fromStep: step,
+                      toStep: step + 1,
+                    },
+                  });
+                  setStep(step + 1);
+                }}
                 disabled={step === 1 && !formData.name}
                 className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
               >

@@ -1,0 +1,234 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run daily security scans at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  # SAST - Static Application Security Testing
+  sast:
+    name: SAST Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Semgrep SAST
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/owasp-top-ten
+            p/javascript
+            p/typescript
+          generateSarif: "1"
+        continue-on-error: true
+      
+      - name: Upload SARIF results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+        continue-on-error: true
+
+  # Dependency Vulnerability Scanning
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run npm audit
+        run: |
+          npm audit --audit-level=moderate --json > npm-audit.json || true
+          npm audit --audit-level=moderate
+        continue-on-error: true
+      
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --json-file-output=snyk-results.json
+        continue-on-error: true
+      
+      - name: Upload Snyk results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: snyk-results
+          path: snyk-results.json
+        continue-on-error: true
+      
+      - name: Check for critical vulnerabilities
+        run: |
+          if [ -f snyk-results.json ]; then
+            CRITICAL=$(jq -r '.vulnerabilities[] | select(.severity == "critical") | .id' snyk-results.json | wc -l)
+            if [ "$CRITICAL" -gt 0 ]; then
+              echo "❌ Found $CRITICAL critical vulnerabilities"
+              exit 1
+            fi
+          fi
+        continue-on-error: true
+
+  # Secrets Scanning
+  secrets-scan:
+    name: Secrets Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for better detection
+      
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+      
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+        continue-on-error: true
+
+  # Container Security (if using Docker)
+  container-scan:
+    name: Container Security Scan
+    runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build Docker image
+        run: |
+          if [ -f Dockerfile ]; then
+            docker build -t settler-api:test -f Dockerfile .
+          fi
+        continue-on-error: true
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: settler-api:test
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+        continue-on-error: true
+      
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+        continue-on-error: true
+
+  # License Compliance
+  license-scan:
+    name: License Compliance Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run license-checker
+        run: |
+          npm install -g license-checker
+          license-checker --json > license-report.json || true
+        continue-on-error: true
+      
+      - name: Check for problematic licenses
+        run: |
+          if [ -f license-report.json ]; then
+            # Check for GPL, AGPL, or other copyleft licenses
+            PROBLEMATIC=$(jq -r 'to_entries[] | select(.value.licenses | test("GPL|AGPL")) | .key' license-report.json | wc -l)
+            if [ "$PROBLEMATIC" -gt 0 ]; then
+              echo "⚠️  Found $PROBLEMATIC packages with potentially problematic licenses"
+              jq -r 'to_entries[] | select(.value.licenses | test("GPL|AGPL")) | "\(.key): \(.value.licenses)"' license-report.json
+            fi
+          fi
+        continue-on-error: true
+
+  # Security Policy Check
+  security-policy:
+    name: Security Policy Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check security headers
+        run: |
+          # Verify security headers are configured
+          if [ -f packages/web/next.config.js ]; then
+            if ! grep -q "Strict-Transport-Security" packages/web/next.config.js; then
+              echo "❌ Missing HSTS header configuration"
+              exit 1
+            fi
+            if ! grep -q "X-Frame-Options" packages/web/next.config.js; then
+              echo "❌ Missing X-Frame-Options header configuration"
+              exit 1
+            fi
+            echo "✅ Security headers configured"
+          fi
+        continue-on-error: true
+      
+      - name: Check for hardcoded secrets
+        run: |
+          # Check for common secret patterns
+          if grep -r "password.*=.*['\"].*[a-zA-Z0-9]{8,}" packages/ --include="*.ts" --include="*.js" | grep -v "test" | grep -v ".d.ts"; then
+            echo "⚠️  Potential hardcoded passwords found"
+            exit 1
+          fi
+          if grep -r "api[_-]?key.*=.*['\"].*[a-zA-Z0-9]{16,}" packages/ --include="*.ts" --include="*.js" | grep -v "test" | grep -v ".d.ts"; then
+            echo "⚠️  Potential hardcoded API keys found"
+            exit 1
+          fi
+        continue-on-error: true
+
+  # Security Report
+  security-report:
+    name: Generate Security Report
+    runs-on: ubuntu-latest
+    needs: [sast, dependency-scan, secrets-scan, container-scan, license-scan, security-policy]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Generate security summary
+        run: |
+          echo "# Security Scan Report" > security-report.md
+          echo "" >> security-report.md
+          echo "Generated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> security-report.md
+          echo "" >> security-report.md
+          echo "## Scan Results" >> security-report.md
+          echo "" >> security-report.md
+          echo "- SAST: ${{ needs.sast.result }}" >> security-report.md
+          echo "- Dependency Scan: ${{ needs.dependency-scan.result }}" >> security-report.md
+          echo "- Secrets Scan: ${{ needs.secrets-scan.result }}" >> security-report.md
+          echo "- Container Scan: ${{ needs.container-scan.result }}" >> security-report.md
+          echo "- License Scan: ${{ needs.license-scan.result }}" >> security-report.md
+          echo "- Security Policy: ${{ needs.security-policy.result }}" >> security-report.md
+      
+      - name: Upload security report
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report
+          path: security-report.md

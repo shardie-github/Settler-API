@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npm run build --filter=@settler/web",
-  "installCommand": "npm install --frozen-lockfile",
+  "buildCommand": "npm run build --workspace=@settler/protocol && npm run build --workspace=@settler/sdk && npm run build --workspace=@settler/react-settler && npm run build --workspace=@settler/web",
+  "installCommand": "npm ci",
   "framework": "nextjs",
   "regions": ["iad1"],
   "build": {

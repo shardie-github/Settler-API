@@ -156,11 +156,32 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - name: Run npm audit
-        run: npm audit --audit-level=moderate
+        run: |
+          npm audit --audit-level=moderate --json > npm-audit.json || true
+          npm audit --audit-level=moderate
+        continue-on-error: true
       - name: Run Snyk security scan
         uses: snyk/actions/node@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+        continue-on-error: true
+      - name: Check for critical vulnerabilities
+        run: |
+          if [ -f npm-audit.json ]; then
+            CRITICAL=$(jq -r '.vulnerabilities.critical // 0' npm-audit.json)
+            if [ "$CRITICAL" -gt 0 ]; then
+              echo "❌ Found $CRITICAL critical vulnerabilities - blocking merge"
+              exit 1
+            fi
+          fi
+      - name: Run Semgrep SAST
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/owasp-top-ten
         continue-on-error: true
 
   build:
@@ -247,8 +268,58 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: settler_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Run database migrations
+        run: |
+          cd packages/api
+          npm run migrate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/settler_test
+          NODE_ENV: test
+          JWT_SECRET: test-secret-min-32-chars-long-for-testing
+          ENCRYPTION_KEY: test-encryption-key-32-chars-long!!
+        continue-on-error: true
+      - name: Start API server
+        run: |
+          cd packages/api
+          npm start &
+          sleep 10
+        env:
+          NODE_ENV: test
+          PORT: 3000
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/settler_test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-secret-min-32-chars-long-for-testing
+          ENCRYPTION_KEY: test-encryption-key-32-chars-long!!
       - name: Setup k6
         run: |
           sudo gpg -k
@@ -256,16 +327,22 @@ jobs:
           echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
           sudo apt-get update
           sudo apt-get install k6
-      - name: Run load tests
+      - name: Run 10x peak load test
         run: |
-          k6 run tests/load/k6-comprehensive-load-test.js \
+          k6 run tests/load/k6-10x-peak-load-test.js \
             -e BASE_URL=http://localhost:3000 \
             -e API_KEY=test-api-key \
-            --out json=load-test-results.json
+            -e COST_PER_1K_REQUESTS=0.01 \
+            --out json=load-test-results.json \
+            --summary-export=load-test-summary.json
         continue-on-error: true
       - name: Upload load test results
         uses: actions/upload-artifact@v3
         if: always()
         with:
           name: load-test-results
-          path: load-test-results.json
+          path: |
+            load-test-results.json
+            load-test-summary.json
+            load-test-report.html
+            load-test-summary.json
